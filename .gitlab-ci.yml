@@ -11,8 +11,6 @@ pages:
   - rm -rf public
   - cp build/index.html build/404.html
   - mv build public
-  - npm install -g serve
-  - serve -s public
   artifacts:
     paths:
     - public
