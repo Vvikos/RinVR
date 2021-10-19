@@ -1,0 +1,17 @@
+image: node:16
+
+pages:
+  cache:
+    paths:
+    - node_modules/
+
+  script:
+  - npm update
+  - npm install
+  - npm start
+  artifacts:
+    paths:
+    - public
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+
