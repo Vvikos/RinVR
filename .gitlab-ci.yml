@@ -1,4 +1,4 @@
-image: node:16
+image: node
 
 pages:
   cache:
@@ -6,12 +6,15 @@ pages:
     - node_modules/
 
   script:
-  - npm update
   - npm install
-  - npm start
+  - npm run build
+  - rm -rf public
+  - cp build/index.html build/404.html
+  - mv build public
   artifacts:
     paths:
     - public
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-
+  only:
+    - master
