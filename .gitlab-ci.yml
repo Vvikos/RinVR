@@ -1,8 +1,9 @@
 image: node
 
-script:
-- npm install
-- npm run deploy
-rules:
-  - if: '$CI_COMMIT_BRANCH == "main"'
+job:
+  script:
+  - npm install
+  - npm run deploy
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
   
