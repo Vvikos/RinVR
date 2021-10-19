@@ -1,27 +1,23 @@
 {
-  "name": "react-xr-paddle-demo",
+  "name": "react-xr-simple-demo",
   "version": "1.0.0",
   "description": "",
   "keywords": [],
-  "main": "src/index.js",
+  "main": "src/index.tsx",
   "homepage": ".",
   "dependencies": {
-    "@react-three/cannon": "1.1.0",
+    "@react-three/drei": "6.1.2",
     "@react-three/fiber": "7.0.1",
     "@react-three/xr": "3.1.1",
-    "lerp": "1.0.3",
-    "lodash-es": "4.17.21",
+    "@types/react": "17.0.11",
+    "@types/react-dom": "17.0.7",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-scripts": "4.0.3",
     "three": "0.129.0",
-    "zustand": "3.5.2"
+    "typescript": "^4.4.4"
   },
-  "devDependencies": {
-    "customize-cra": "^0.9.1",
-    "customize-cra-react-refresh": "^1.0.1",
-    "react-app-rewired": "^2.1.5"
-  },
+  "devDependencies": {},
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
