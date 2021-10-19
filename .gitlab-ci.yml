@@ -1,10 +1,10 @@
 image: node
 
 pages:
+  stage: deploy
   cache:
     paths:
     - node_modules/
-
   script:
   - npm install
   - npm run build
@@ -16,3 +16,6 @@ pages:
   artifacts:
     paths:
     - public
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  
