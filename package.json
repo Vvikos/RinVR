@@ -4,7 +4,6 @@
   "description": "",
   "keywords": [],
   "main": "src/index.js",
-  "homepage": "https://victor-vogt.gitlab.io/react-xr",
   "dependencies": {
     "@react-three/xr": "3.1.2",
     "react": "17.0.2",
