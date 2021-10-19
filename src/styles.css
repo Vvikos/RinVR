@@ -1,18 +1,41 @@
-.App {
-  font-family: sans-serif;
-  text-align: center;
+* {
+  box-sizing: border-box;
 }
-canvas {
-  width: 100vw;
-  height: 100vh;
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  overflow: hidden;
+}
+
+#root {
+  overflow: auto;
 }
 
 body {
-  padding: 0;
-  margin: 0;
+  position: fixed;
+  overflow: hidden;
+  overscroll-behavior-y: none;
+  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial, sans-serif;
+  color: black;
+  background: white;
+  /* cursor: none; */
 }
 
-#ARButton {
-  color: black !important;
-  border: 1px solid black !important;
+.startup {
+  position: absolute;
+  top: 50px;
+  left: 50px;
+  color: white;
+  font-size: 1.2em;
 }

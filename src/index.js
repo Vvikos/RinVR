@@ -1,27 +1,6 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import { render } from "react-dom"
+import React from "react"
+import App from "./App"
+import "./styles.css"
 
-import { ARCanvas } from '@react-three/xr';
-
-import BallPit from './BallPit';
-
-import './styles.css';
-
-const App = () => {
-	return (
-		<ARCanvas
-			sessionInit={{ requiredFeatures: ['hit-test'] }}
-			pixelRatio={window.devicePixelRatio}>
-			<ambientLight />
-			<BallPit />
-		</ARCanvas>
-	);
-};
-
-const rootElement = document.getElementById('root');
-ReactDOM.render(
-	<React.StrictMode>
-		<App />
-	</React.StrictMode>,
-	rootElement,
-);
+render(<App />, document.getElementById("root"))
