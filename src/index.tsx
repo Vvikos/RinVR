@@ -34,7 +34,7 @@ function Button(props: any) {
 
   return (
     <Interactive onSelect={onSelect} onHover={() => setHover(true)} onBlur={() => setHover(false)}>
-      <Box color={color} scale={hover ? [1.5, 1.5, 1.5] : [1, 1, 1]} size={[0.4, 0.1, 0.1]} {...props}>
+      <Box color={color} scale={hover ? [1.5, 1.5, 1.5] : [1, 1, 1]} size={[1, 4, 0.1]} {...props}>
         
       </Box>
     </Interactive>
