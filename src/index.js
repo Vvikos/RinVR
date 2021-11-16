@@ -7,7 +7,7 @@ import './styles.css'
 
 const CELL_X_SIZE = 0.4;
 const CELL_Y_SIZE = 0.2;
-const ANGLE_MAX = -10;
+const ANGLE_MAX = -0.9;
 const GRID_NX = 20;
 const GRID_NY = 20;
 
@@ -20,7 +20,7 @@ function Floor() {
   )
 }
 
-function Box({ color, size, scale, children, ...rest }: any) {
+function Box({ color, size, scale, children, ...rest }) {
   return (
     <mesh scale={scale} {...rest}>
       <boxBufferGeometry attach="geometry" args={size} />
@@ -30,7 +30,7 @@ function Box({ color, size, scale, children, ...rest }: any) {
   )
 }
 
-function Button(props: any) {
+function Button({ children, ...rest}) {
   const [hover, setHover] = useState(false)
   const [color, setColor] = useState(0x123456)
 
@@ -40,8 +40,8 @@ function Button(props: any) {
 
   return (
     <Interactive onSelect={onSelect} onHover={() => setHover(true)} onBlur={() => setHover(false)}>
-      <Box color={color} scale={hover ? [1.5, 1.5, 1.5] : [1, 1, 1]} size={[CELL_X_SIZE, CELL_Y_SIZE, 0.05]} {...props}>
-        <Text position={[0, 0, 0.06]} fontSize={0.05} color="#000" anchorX="center" anchorY="middle" key={undefined} attach={undefined} attachArray={undefined} attachObject={undefined} args={undefined} onUpdate={undefined} type={undefined} id={undefined} uuid={undefined} name={undefined} parent={undefined} modelViewMatrix={undefined} normalMatrix={undefined} matrixWorld={undefined} matrixAutoUpdate={undefined} matrixWorldNeedsUpdate={undefined} visible={undefined} castShadow={undefined} receiveShadow={undefined} frustumCulled={undefined} renderOrder={undefined} animations={undefined} userData={undefined} customDepthMaterial={undefined} customDistanceMaterial={undefined} isObject3D={undefined} onBeforeRender={undefined} onAfterRender={undefined} applyMatrix4={undefined} applyQuaternion={undefined} setRotationFromAxisAngle={undefined} setRotationFromEuler={undefined} setRotationFromMatrix={undefined} setRotationFromQuaternion={undefined} rotateOnAxis={undefined} rotateOnWorldAxis={undefined} rotateX={undefined} rotateY={undefined} rotateZ={undefined} translateOnAxis={undefined} translateX={undefined} translateY={undefined} translateZ={undefined} localToWorld={undefined} worldToLocal={undefined} lookAt={undefined} add={undefined} remove={undefined} clear={undefined} getObjectById={undefined} getObjectByName={undefined} getObjectByProperty={undefined} getWorldPosition={undefined} getWorldQuaternion={undefined} getWorldScale={undefined} getWorldDirection={undefined} raycast={undefined} traverse={undefined} traverseVisible={undefined} traverseAncestors={undefined} updateMatrix={undefined} updateMatrixWorld={undefined} updateWorldMatrix={undefined} toJSON={undefined} clone={undefined} copy={undefined} addEventListener={undefined} hasEventListener={undefined} removeEventListener={undefined} dispatchEvent={undefined} material={undefined} geometry={undefined} morphTargetInfluences={undefined} morphTargetDictionary={undefined} isMesh={undefined} updateMorphTargets={undefined}>
+      <Box color={color} scale={hover ? [1.5, 1.5, 1.5] : [1, 1, 1]} size={[CELL_X_SIZE, CELL_Y_SIZE, 0.05]} {...rest}>
+        <Text position={[0, 0, 0.06]} fontSize={0.1} color="#999" anchorX="center" anchorY="middle">
           {children}
         </Text>
       </Box>
@@ -54,11 +54,9 @@ function App() {
     const row = [];
     for (let i = -1*GRID_NX/2; i < GRID_NX/2; i++){
       for (let j = -1*GRID_NY/2; j < GRID_NY/2; j++){
-        if (i<0){
-          row.push(<Button position={[i*(CELL_X_SIZE+0.05), j*(CELL_Y_SIZE+0.05), -1-i/GRID_NX/2]} rotation={[0, i/GRID_NX/2*ANGLE_MAX, 0]}>i</Button>)
-        } else if (i>=0) {
-          row.push(<Button position={[i*(CELL_X_SIZE+0.05), j*(CELL_Y_SIZE+0.05), -1+i/GRID_NX/2]} rotation={[0, i/GRID_NX/2*ANGLE_MAX, 0]}>i</Button>)
-        }
+        let rotationY = i/(GRID_NX/2)*ANGLE_MAX;
+        let positionZ = 0.020*i*i +i*0.002;
+        row.push(<Button position={[i*(CELL_X_SIZE), j*(CELL_Y_SIZE), positionZ]} rotation={[0, rotationY, 0]}>{''+i}x{''+j}</Button>);
       }
     }
     return row;
@@ -69,9 +67,6 @@ function App() {
       <Floor />
       <ambientLight />
       <pointLight position={[10, 10, 10]} />
-      <Text position={[10, 10, 10]}>
-        hello world!
-      </Text>
       <DefaultXRControllers />
       {generateGrid()}
     </VRCanvas>
