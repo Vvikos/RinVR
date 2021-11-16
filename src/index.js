@@ -7,9 +7,9 @@ import './styles.css'
 
 const CELL_X_SIZE = 0.4;
 const CELL_Y_SIZE = 0.2;
-const ANGLE_MAX = -0.9;
+const ANGLE_MAX = -1.3;
 const GRID_NX = 20;
-const GRID_NY = 20;
+const GRID_NY = 10;
 
 function Floor() {
   return (
@@ -30,9 +30,9 @@ function Box({ color, size, scale, children, ...rest }) {
   )
 }
 
-function Button({ children, ...rest}) {
+function Button({ children, size, color, fontSize, fontColor, ...rest}) {
   const [hover, setHover] = useState(false)
-  const [color, setColor] = useState(0x123456)
+  //const [color, setColor] = useState(0x123456)
 
   const onSelect = () => {
     setColor((Math.random() * 0xffffff) | 0)
@@ -40,8 +40,8 @@ function Button({ children, ...rest}) {
 
   return (
     <Interactive onSelect={onSelect} onHover={() => setHover(true)} onBlur={() => setHover(false)}>
-      <Box color={color} scale={hover ? [1.5, 1.5, 1.5] : [1, 1, 1]} size={[CELL_X_SIZE, CELL_Y_SIZE, 0.05]} {...rest}>
-        <Text position={[0, 0, 0.06]} fontSize={0.1} color="#999" anchorX="center" anchorY="middle">
+      <Box color={color} scale={hover ? [1.5, 1.5, 1.5] : [1, 1, 1]} size={size} {...rest}>
+        <Text position={[0, 0, 0.06]} fontSize={fontSize} color={fontColor} anchorX="center" anchorY="middle">
           {children}
         </Text>
       </Box>
@@ -49,18 +49,50 @@ function Button({ children, ...rest}) {
   )
 }
 
-function App() {
+function ButtonPanel({ position, rotation }) {
+  return (
+    <Box color="black" size={[0.4, 0.4, 0.01]} position={position} rotation={rotation}>
+      <Button color="#999" fontColor="#000" fontSize={0.015} size={[0.1, 0.1, 0.1]} position={[0.15, -0.15, 0]}>Next Col</Button>
+      <Button color="#999" fontColor="#000" fontSize={0.015} size={[0.1, 0.1, 0.1]} position={[0.04, -0.15, 0]}>Previous Col</Button>
+    </Box>
+  )
+}
+
+function SpreadSheet({position, gridSize, cellSize, anglemax}){
   const generateGrid = ([x, y, z]) => {
     const row = [];
-    for (let i = -1*GRID_NX/2; i < GRID_NX/2; i++){
-      for (let j = -1*GRID_NY/2; j < GRID_NY/2; j++){
-        let rotationY = i/(GRID_NX/2)*ANGLE_MAX;
-        let positionZ = 0.020*i*i +i*0.002;
-        row.push(<Button position={[x+i*CELL_X_SIZE, y+j*CELL_Y_SIZE, z+positionZ]} rotation={[0, rotationY, 0]}>{''+i}x{''+j}</Button>);
+    let startX = position[0]-gridSize[0]/2*cellSize[0];
+    let startY = position[1]+gridSize[1]/2*cellSize[1];
+    for (let i=0; i < gridSize[0]; i++){
+      for (let j=0; j < gridSize[1]; j++){
+        let mirrorX = i-gridSize[0]/2;
+        let rotation = [0, mirrorX/(gridSize[0]/2)*anglemax, 0];
+        let position = [startX+i*cellSize[0], startY-j*cellSize[1], z+0.025*mirrorX*mirrorX];
+        let size = [cellSize[0]+0.0025*mirrorX*mirrorX, cellSize[1], 0.1];
+        let text = i+'x'+j;
+        let color=0x123456;
+        if(i==0){
+          text = j+'';
+          color=0x000006;
+        } else if (j==0) {
+          text = 'Col'+ i;
+          color=0x000006;
+        }
+        row.push(<Button key={i+''+j} fontSize={0.1} fontColor={0xffffff} color={color} size={size} position={position} rotation={rotation}>{text}</Button>);
       }
     }
     return row;
   }
+
+  return (
+      <Box>
+        {generateGrid(position)}
+      </Box>
+  )
+}
+
+function App() {
+
   return (
     <VRCanvas>
       <Sky sunPosition={[0, 1, 0]} />
@@ -68,7 +100,8 @@ function App() {
       <ambientLight />
       <pointLight position={[10, 10, 10]} />
       <DefaultXRControllers />
-      {generateGrid([0, 0, -1.5])}
+      <SpreadSheet position={[0, 0, -1.7]}  gridSize={[20, 10]} cellSize={[0.4, 0.2]} anglemax={-1.4} />
+      <ButtonPanel rotation={[0,0,0]} position={[0, 0, 4]}/>
     </VRCanvas>
   )
 }
