@@ -50,13 +50,13 @@ function Button({ children, ...rest}) {
 }
 
 function App() {
-  const generateGrid = () => {
+  const generateGrid = ([x, y, z]) => {
     const row = [];
     for (let i = -1*GRID_NX/2; i < GRID_NX/2; i++){
       for (let j = -1*GRID_NY/2; j < GRID_NY/2; j++){
         let rotationY = i/(GRID_NX/2)*ANGLE_MAX;
         let positionZ = 0.020*i*i +i*0.002;
-        row.push(<Button position={[i*(CELL_X_SIZE), j*(CELL_Y_SIZE), positionZ]} rotation={[0, rotationY, 0]}>{''+i}x{''+j}</Button>);
+        row.push(<Button position={[x+i*CELL_X_SIZE, y+j*CELL_Y_SIZE, z+positionZ]} rotation={[0, rotationY, 0]}>{''+i}x{''+j}</Button>);
       }
     }
     return row;
@@ -68,7 +68,7 @@ function App() {
       <ambientLight />
       <pointLight position={[10, 10, 10]} />
       <DefaultXRControllers />
-      {generateGrid()}
+      {generateGrid([0, 0, -1.5])}
     </VRCanvas>
   )
 }
