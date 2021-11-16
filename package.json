@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "keywords": [],
-  "main": "src/index.tsx",
+  "main": "src/index.js",
   "homepage": ".",
   "dependencies": {
     "@react-three/drei": "6.1.2",
