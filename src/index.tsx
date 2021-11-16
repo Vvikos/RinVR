@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import ReactDOM from 'react-dom'
 import { VRCanvas, Interactive, DefaultXRControllers } from '@react-three/xr'
-import { Sky } from '@react-three/drei'
+import { Sky, Text } from '@react-three/drei'
 import '@react-three/fiber'
 import './styles.css'
 
 const CELL_X_SIZE = 0.4;
 const CELL_Y_SIZE = 0.2;
-const ANGLE_MAX = 40;
+const ANGLE_MAX = -10;
+const GRID_NX = 20;
+const GRID_NY = 20;
 
 function Floor() {
   return (
@@ -39,7 +41,7 @@ function Button(props: any) {
   return (
     <Interactive onSelect={onSelect} onHover={() => setHover(true)} onBlur={() => setHover(false)}>
       <Box color={color} scale={hover ? [1.5, 1.5, 1.5] : [1, 1, 1]} size={[CELL_X_SIZE, CELL_Y_SIZE, 0.05]} {...props}>
-        
+        <Text>Coucou</Text>
       </Box>
     </Interactive>
   )
@@ -48,14 +50,12 @@ function Button(props: any) {
 function App() {
   const generateGrid = () => {
     const row = [];
-    for (let i = -10; i < 10; i++){
-      for (let j = -10; j < 10; j++){
+    for (let i = -1*GRID_NX/2; i < GRID_NX/2; i++){
+      for (let j = -1*GRID_NY/2; j < GRID_NY/2; j++){
         if (i<0){
-          row.push(<Button position={[i*(CELL_X_SIZE+0.05), j*(CELL_Y_SIZE+0.05), -1-i/10]} rotation={[0, -1*i/ANGLE_MAX, 0]}/>)
-        } else if (i>0) {
-          row.push(<Button position={[i*(CELL_X_SIZE+0.05), j*(CELL_Y_SIZE+0.05), -1+i/10]} rotation={[0, -1*i/ANGLE_MAX, 0]}/>)
-        } else {
-          row.push(<Button position={[i*(CELL_X_SIZE+0.05), j*(CELL_Y_SIZE+0.05), -1]} rotation={[0, -1*i/ANGLE_MAX, 0]}/>)
+          row.push(<Button position={[i*(CELL_X_SIZE+0.05), j*(CELL_Y_SIZE+0.05), -1-i/GRID_NX/2]} rotation={[0, i/GRID_NX/2*ANGLE_MAX, 0]}/>)
+        } else if (i>=0) {
+          row.push(<Button position={[i*(CELL_X_SIZE+0.05), j*(CELL_Y_SIZE+0.05), -1+i/GRID_NX/2]} rotation={[0, i/GRID_NX/2*ANGLE_MAX, 0]}/>)
         }
       }
     }
