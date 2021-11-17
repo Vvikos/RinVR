@@ -55,21 +55,18 @@ function DataCol({firstcol, position, colSize, cellSize, rotation}){
   const [color, setColor] = useState(0xffffff)
 
   const onSelect = () => {
+    setSelect(!select);
     if (select)
       setColor(0xffa36e);
     else
       setColor(0xffffff);
-    setSelect(!select);
   }
 
   const onHover = () => {
-    setColor(0xffa36e);
     setHover(true);
   }
 
   const onBlur = () => {
-    if(!select)
-      setColor(0xffffff);
     setHover(false);
   }
   
@@ -97,7 +94,7 @@ function DataCol({firstcol, position, colSize, cellSize, rotation}){
 
   return (
     <Interactive onSelect={onSelect} onHover={onHover} onBlur={onBlur}>
-      <Box scale={hover ? [1.5, 1.5, 1.5] : [1, 1, 1]} position={position} rotation={rotation} size={[cellSize[0], cellSize[1]*colSize, 0.01]}>
+      <Box scale={hover ? [1.1, 1.1, 1.1] : [1, 1, 1]} position={position} rotation={rotation} size={[cellSize[0], cellSize[1]*colSize, 0.01]}>
         {generateCells()}
       </Box>
     </Interactive>
