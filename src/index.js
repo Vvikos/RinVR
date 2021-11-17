@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import ReactDOM from 'react-dom'
-import { VRCanvas, Interactive, DefaultXRControllers } from '@react-three/xr'
-import { Sky, Text } from '@react-three/drei'
+import { VRCanvas, Interactive, DefaultXRControllers, Hands } from '@react-three/xr'
+import { Sky, Text, OrbitControls } from '@react-three/drei'
+import { Pinchable } from './handui.js'
 import '@react-three/fiber'
 import './styles.css'
 
@@ -102,6 +103,11 @@ function App() {
       <DefaultXRControllers />
       <SpreadSheet position={[0, 2, -1.7]}  gridSize={[20, 10]} cellSize={[0.4, 0.2]} anglemax={-1.4} />
       <ButtonPanel rotation={[0, 0, 0]} position={[0, 3, 4]}/>
+      <Pinchable />
+      <Hands profile="spheres" />
+      <OrbitControls />
+      <color args={['black']} attach="background" />
+      {/* <Sky sunPosition={[500, 500, 500]} /> */}
     </VRCanvas>
   )
 }
