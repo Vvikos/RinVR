@@ -87,7 +87,7 @@ function DataCol({firstcol, position, colSize, cellSize, rotation}){
         colorBtn=0x000000;
         fontColor=0xffffff;
       }
-      row.push(<Button key={i+''+colSize} position={position} fontSize={0.1} fontColor={fontColor} color={colorBtn} size={size}>{text}</Button>);
+      row.push(<Button onSelect={onSelect} onHover={onHover} onBlur={onBlur} key={i+''+colSize} position={position} fontSize={0.1} fontColor={fontColor} color={colorBtn} size={size}>{text}</Button>);
     }
     return row;
   }
