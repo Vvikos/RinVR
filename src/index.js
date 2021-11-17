@@ -70,15 +70,18 @@ function SpreadSheet({position, gridSize, cellSize, anglemax}){
         let position = [startX+i*cellSize[0], startY-j*cellSize[1], z+0.025*mirrorX*mirrorX];
         let size = [cellSize[0]+0.0025*mirrorX*mirrorX, cellSize[1], 0.1];
         let text = i+'x'+j;
-        let color=0x123456;
+        let color=0xffffff;
+        let fontColor=0x000000
         if(i==0){
           text = j+'';
-          color=0x000006;
+          color=0x000000;
+          fontColor=0xffffff;
         } else if (j==0) {
           text = 'Col'+ i;
-          color=0x000006;
+          color=0x000000;
+          fontColor=0xffffff;
         }
-        row.push(<Button key={i+''+j} fontSize={0.1} fontColor={0xffffff} color={color} size={size} position={position} rotation={rotation}>{text}</Button>);
+        row.push(<Button key={i+''+j} fontSize={0.1} fontColor={fontColor} color={color} size={size} position={position} rotation={rotation}>{text}</Button>);
       }
     }
     return row;
@@ -101,7 +104,7 @@ function App() {
       <pointLight position={[10, 10, 10]} />
       <DefaultXRControllers />
       <SpreadSheet position={[0, 2, -3]}  gridSize={[20, 10]} cellSize={[0.4, 0.2]} anglemax={-1.4} />
-      <ButtonPanel rotation={[-1.4, 0, 0]} position={[0, 0, -1]}/>
+      <ButtonPanel rotation={[-1.4, 0, 0]} position={[0, 0.6, -1]}/>
     </VRCanvas>
   )
 }
