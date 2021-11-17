@@ -163,7 +163,7 @@ function App() {
       <pointLight position={[10, 10, 10]} />
       <DefaultXRControllers />
       <SpreadSheet position={[0, 2, -4]}  gridSize={[20, 10]} cellSize={[0.4, 0.2]} anglemax={-1.4} />
-      <ButtonPanel position={[0, 1.5, -1]} rotation={[0, 0, 0]} />
+      <ButtonPanel position={[0, 1.5, -1]} rotation={[-0.8, 0, 0]} />
     </VRCanvas>
   )
 }
