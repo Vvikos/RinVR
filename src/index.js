@@ -60,7 +60,7 @@ function ButtonPanel({ position, rotation }) {
 
 function DataCol({firstcol, position, colSize, cellSize, rotation}){
   const [hover, setHover] = useState(false)
-  const [color, setColor] = useState(0x123456)
+  const [color, setColor] = useState(0xffffff)
 
   const onSelect = () => {
     if (color==0xffffff)
@@ -120,7 +120,13 @@ function SpreadSheet({position, gridSize, cellSize, anglemax}){
       let rotation = [0, mirrorX/(gridSize[0]/2)*anglemax, 0];
       let position = [startX+i*cellSize[0], startY, z+0.025*mirrorX*mirrorX];
       let size = [cellSize[0]+0.0025*mirrorX*mirrorX, cellSize[1], 0.1];
-      row.push(<DataCol firstcol={false} position={position} rotation={rotation} colSize={gridSize[1]} cellSize={size} />);
+      let firstcol = false;
+      if(i==0){
+        firstcol=true;
+      } else {
+        firstcol=false;
+      }
+      row.push(<DataCol firstcol={firstcol} position={position} rotation={rotation} colSize={gridSize[1]} cellSize={size} />);
     }
     return row;
   }
