@@ -41,13 +41,33 @@ function Button({ children, size, color, fontSize, fontColor, ...rest}) {
 }
 
 function ButtonPanel({ position, rotation }) {
+  const [hover, setHover] = useState(false)
+  const [select, setSelect] = useState(false)
+  const [color, setColor] = useState(0xffffff)
+
+  const onSelect = () => {
+    if (select)
+      setColor(0xffa36e);
+    else
+      setColor(0xffffff);
+    setSelect(!select);
+  }
+
+  const onHover = () => {
+    setHover(true);
+  }
+
+  const onBlur = () => {
+    setHover(false);
+  }
+  
   return (
-    <Box color={0x43464B} size={[0.4, 0.4, 0.01]} position={position} rotation={rotation}>
-      <Interactive>
-        <Button color={0xfc2617} fontColor={0xffffff} fontSize={0.015} size={[0.15, 0.1, 0.02]} position={[0.15, -0.15, 0.03]}>Next Col</Button>
+    <Box color={color} size={[0.4, 0.4, 0.01]} position={position} rotation={rotation}>
+      <Interactive onSelect={onSelect} onHover={onHover} onBlur={onBlur}>
+        <Button scale={hover ? [1.1, 1.1, 1.1] : [1, 1, 1]} color={0xfc2617} fontColor={0xffffff} fontSize={0.015} size={[0.15, 0.1, 0.02]} position={[0.15, -0.15, 0.03]}>Next Col</Button>
       </Interactive>
-      <Interactive>
-        <Button color={0xfc2617} fontColor={0xffffff} fontSize={0.015} size={[0.15, 0.1, 0.02]} position={[0.04, -0.15, 0.03]}>Previous Col</Button>
+      <Interactive onSelect={onSelect} onHover={onHover} onBlur={onBlur}>
+        <Button scale={hover ? [1.1, 1.1, 1.1] : [1, 1, 1]} color={0xfc2617} fontColor={0xffffff} fontSize={0.015} size={[0.15, 0.1, 0.02]} position={[0.04, -0.15, 0.03]}>Previous Col</Button>
       </Interactive>
     </Box>
   )
