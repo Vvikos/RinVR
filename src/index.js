@@ -52,8 +52,8 @@ function Button({ children, size, color, fontSize, fontColor, ...rest}) {
 function ButtonPanel({ position, rotation }) {
   return (
     <Box color="black" size={[0.4, 0.4, 0.2]} position={position} rotation={rotation}>
-      <Button color="#999" fontColor="#000" fontSize={0.015} size={[0.1, 0.1, 0.1]} position={[0.15, -0.15, 0]}>Next Col</Button>
-      <Button color="#999" fontColor="#000" fontSize={0.015} size={[0.1, 0.1, 0.1]} position={[0.04, -0.15, 0]}>Previous Col</Button>
+      <Button color="#999" fontColor="#000" fontSize={0.015} size={[0.1, 0.1, 0.2]} position={[0.15, -0.15, 0]}>Next Col</Button>
+      <Button color="#999" fontColor="#000" fontSize={0.015} size={[0.1, 0.1, 0.2]} position={[0.04, -0.15, 0]}>Previous Col</Button>
     </Box>
   )
 }
@@ -103,8 +103,8 @@ function App() {
       <ambientLight />
       <pointLight position={[10, 10, 10]} />
       <DefaultXRControllers />
-      <SpreadSheet position={[0, 2, -3]}  gridSize={[20, 10]} cellSize={[0.4, 0.2]} anglemax={-1.4} />
-      <ButtonPanel rotation={[-1.4, 0, 0]} position={[0, 0.6, -1]}/>
+      <SpreadSheet position={[0, 2, -4]}  gridSize={[20, 10]} cellSize={[0.4, 0.2]} anglemax={-1.4} />
+      <ButtonPanel rotation={[-1.1, 0, 0]} position={[0, 1, -1]}/>
     </VRCanvas>
   )
 }
