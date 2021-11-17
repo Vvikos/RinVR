@@ -42,9 +42,9 @@ function Button({ children, size, color, fontSize, fontColor, ...rest}) {
 
 function ButtonPanel({ position, rotation }) {
   return (
-    <Box color="black" size={[0.4, 0.4, 0.2]} position={position} rotation={rotation}>
-      <Button color="#999" fontColor="#000" fontSize={0.015} size={[0.1, 0.1, 0.21]} position={[0.15, -0.15, 0]}>Next Col</Button>
-      <Button color="#999" fontColor="#000" fontSize={0.015} size={[0.1, 0.1, 0.21]} position={[0.04, -0.15, 0]}>Previous Col</Button>
+    <Box color="black" size={[0.4, 0.4, 0.01]} position={position} rotation={rotation}>
+      <Button color="#999" fontColor="#000" fontSize={0.015} size={[0.1, 0.02, 0.02]} position={[0.15, -0.15, 0.03]}>Next Col</Button>
+      <Button color="#999" fontColor="#000" fontSize={0.015} size={[0.1, 0.02, 0.02]} position={[0.04, -0.15, 0.03]}>Previous Col</Button>
     </Box>
   )
 }
@@ -94,9 +94,9 @@ function DataCol({firstcol, position, colSize, cellSize, rotation}){
 
   return (
       <Box scale={hover ? [1.1, 1.1, 1.1] : [1, 1, 1]} position={position} rotation={rotation} size={[cellSize[0], cellSize[1]*colSize, 0.01]}>
-      <Interactive onSelect={onSelect} onHover={onHover} onBlur={onBlur}>
-        {generateCells()}
-      </Interactive>
+        <Interactive onSelect={onSelect} onHover={onHover} onBlur={onBlur}>
+          {generateCells()}
+        </Interactive>
       </Box>
   )
 }
