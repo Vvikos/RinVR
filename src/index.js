@@ -87,17 +87,17 @@ function DataCol({firstcol, position, colSize, cellSize, rotation}){
         colorBtn=0x000000;
         fontColor=0xffffff;
       }
-      row.push(<Button onSelect={onSelect} onHover={onHover} onBlur={onBlur} key={i+''+colSize} position={position} fontSize={0.1} fontColor={fontColor} color={colorBtn} size={size}>{text}</Button>);
+      row.push(<Button key={i+''+colSize} position={position} fontSize={0.1} fontColor={fontColor} color={colorBtn} size={size}>{text}</Button>);
     }
     return row;
   }
 
   return (
-    <Interactive onSelect={onSelect} onHover={onHover} onBlur={onBlur}>
       <Box scale={hover ? [1.1, 1.1, 1.1] : [1, 1, 1]} position={position} rotation={rotation} size={[cellSize[0], cellSize[1]*colSize, 0.01]}>
+      <Interactive onSelect={onSelect} onHover={onHover} onBlur={onBlur}>
         {generateCells()}
+      </Interactive>
       </Box>
-    </Interactive>
   )
 }
 
