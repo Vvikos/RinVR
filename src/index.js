@@ -40,7 +40,7 @@ function Button({ children, size, color, fontSize, fontColor, ...rest}) {
 
   return (
     <Interactive onSelect={onSelect} onHover={() => setHover(true)} onBlur={() => setHover(false)}>
-      <Box color={color} scale={hover ? [1.5, 1.5, 1.5] : [1, 1, 1]} size={size} {...rest}>
+      <Box color={color} size={size} {...rest}>
         <Text position={[0, 0, 0.06]} fontSize={fontSize} color={fontColor} anchorX="center" anchorY="middle">
           {children}
         </Text>
@@ -60,13 +60,15 @@ function ButtonPanel({ position, rotation }) {
 
 function DataCol({firstcol, position, colSize, cellSize, rotation}){
   const [hover, setHover] = useState(false)
+  const [select, setSelect] = useState(false)
   const [color, setColor] = useState(0xffffff)
 
   const onSelect = () => {
-    if (color==0xffffff)
+    if (select)
       setColor(0xffa36e);
     else
       setColor(0xffffff);
+    setSelect(!select);
   }
 
   const onHover = () => {
@@ -75,7 +77,8 @@ function DataCol({firstcol, position, colSize, cellSize, rotation}){
   }
 
   const onBlur = () => {
-    setColor(0xffffff);
+    if(!select)
+      setColor(0xffffff);
     setHover(false);
   }
   
@@ -103,7 +106,7 @@ function DataCol({firstcol, position, colSize, cellSize, rotation}){
 
   return (
     <Interactive onSelect={onSelect} onHover={onHover} onBlur={onBlur}>
-      <Box position={position} rotation={rotation} size={[cellSize[0], cellSize[1]*colSize, 0.01]}>
+      <Box scale={hover ? [1.5, 1.5, 1.5] : [1, 1, 1]} position={position} rotation={rotation} size={[cellSize[0], cellSize[1]*colSize, 0.01]}>
         {generateCells()}
       </Box>
     </Interactive>
