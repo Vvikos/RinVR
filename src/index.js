@@ -127,6 +127,16 @@ function DataCol({firstcol, position, colSize, cellSize, rotation}){
 
 function SpreadSheet({position, gridSize, cellSize, anglemax}){
   const generateGrid = ([x, y, z]) => {
+    fetch("http://localhost:8000/csv?name=sample.csv", {mode: 'cors'})
+      .then(res => res.json())
+      .then(result => {
+          console.log(result);
+          return result;
+      })
+      .catch(e => {
+        console.log(e);
+        return e;
+      });
     const row = [];
     let startX = position[0]-gridSize[0]/2*cellSize[0];
     let startY = position[1]+gridSize[1]/2*cellSize[1];
@@ -147,9 +157,9 @@ function SpreadSheet({position, gridSize, cellSize, anglemax}){
   }
 
   return (
-      <Box>
+      <>
         {generateGrid(position)}
-      </Box>
+      </>
   )
 }
 
@@ -168,5 +178,4 @@ function App() {
   )
 }
 
-//<ButtonPanel position={[0, 1.0, -1]} rotation={[-1.1, 0, 0]} />
 ReactDOM.render(<App />, document.getElementById('root'))
