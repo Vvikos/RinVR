@@ -31,21 +31,12 @@ function Box({ color, size, scale, children, ...rest }) {
 }
 
 function Button({ children, size, color, fontSize, fontColor, ...rest}) {
-  const [hover, setHover] = useState(false)
-  //const [color, setColor] = useState(0x123456)
-
-  const onSelect = () => {
-    setColor((Math.random() * 0xffffff) | 0)
-  }
-
   return (
-    <Interactive onSelect={onSelect} onHover={() => setHover(true)} onBlur={() => setHover(false)}>
-      <Box color={color} size={size} {...rest}>
-        <Text position={[0, 0, 0.06]} fontSize={fontSize} color={fontColor} anchorX="center" anchorY="middle">
-          {children}
-        </Text>
-      </Box>
-    </Interactive>
+    <Box color={color} size={size} {...rest}>
+      <Text position={[0, 0, 0.06]} fontSize={fontSize} color={fontColor} anchorX="center" anchorY="middle">
+        {children}
+      </Text>
+    </Box>
   )
 }
 
@@ -95,7 +86,7 @@ function DataCol({firstcol, position, colSize, cellSize, rotation}){
         colorBtn=0x000000;
         fontColor=0xffffff;
       } else if (i==0) {
-        text = 'Col'+ i;
+        text = 'Col';
         colorBtn=0x000000;
         fontColor=0xffffff;
       }
