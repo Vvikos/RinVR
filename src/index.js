@@ -181,6 +181,7 @@ function SpreadSheet({position, colInterval, fetchInterval, gridSize, cellSize, 
       let size = [cellSize[0], cellSize[1], 0.1];
       let firstcol = (i == 0);
       let data=[i];
+      console.log(i+colInterval[0]);
       if(i>0 && i+colInterval[0] <= csv.length)
         data=csv[colInterval[0]+i-1];
       rows.push(<DataCol key={'Col'+i} data={data} firstcol={firstcol} fetchInterval={fetchInterval} position={pos} rotation={rotation} colSize={gridSize[1]} cellSize={size} />);
@@ -227,7 +228,7 @@ function App() {
   }
 
   const onClickColPrev = () => {
-    setcolInterval(prevstate => (((prevstate[0]==0) ? 0 : prevstate[0]-1), ((prevstate[0]==0) ? 0 : prevstate[0]-1)));
+    setcolInterval(prevstate => (((prevstate[0]==0) ? 0 : prevstate[0]-1), ((prevstate[1]==0) ? 0 : prevstate[1]-1)));
   }
 
   const onClickColNext = () => {
