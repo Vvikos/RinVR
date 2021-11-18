@@ -11,7 +11,7 @@ const CELL_Y_SIZE = 0.2;
 const ANGLE_MAX = -1.3;
 const GRID_NX = 20;
 const GRID_NY = 10;
-const API_R = 'http://achencraft.fr:8000';
+const API_R = 'https://vr.achencraft.fr';
 
 function Floor() {
   return (
@@ -232,7 +232,7 @@ function App() {
       <ambientLight />
       <pointLight position={[10, 10, 10]} />
       <DefaultXRControllers />
-      <SpreadSheet position={[0, 2, -0.5]} fetchInterval={fetchInterval} gridSize={[8, 10]} cellSize={[0.8, 0.2]} anglemax={-1.4} />
+      <SpreadSheet position={[0, 2, -1]} fetchInterval={fetchInterval} gridSize={[8, 10]} cellSize={[0.8, 0.2]} anglemax={-1.4} />
       <ButtonPanel onClickNext={onClickNext} onClickPrev={onClickPrev} position={[0, 1.5, -1]} rotation={[-0.8, 0, 0]} />
     </VRCanvas>
   )
