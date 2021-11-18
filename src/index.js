@@ -188,7 +188,6 @@ function SpreadSheet({position, colInterval, fetchInterval, gridSize, cellSize, 
       rows.push(<DataCol key={'Col'+i} data={data} firstcol={firstcol} fetchInterval={fetchInterval} position={pos} rotation={rotation} colSize={gridSize[1]} cellSize={size} />);
     }
     console.log(csv);
-    setLogs('LOGS : Used For Generation Csv : ' + csv.toString() + '\n');
 
     /*for (let i=0; i < maxRows; i++){
       let mirrorX = i-gridSize[0]/2;
