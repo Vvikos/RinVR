@@ -184,7 +184,7 @@ function SpreadSheet({position, colInterval, fetchInterval, gridSize, cellSize, 
       let firstcol = (i == 0);
       let data=[i];
       console.log(i+colInterval[0]);
-      if(i>0 && i+colInterval[0] <= colInterval[0]+csv.length)
+      if(i>0 && i+colInterval[0] <= csv.length)
         data=csv[colInterval[0]+i-1];
       rows.push(<DataCol key={'Col'+i} data={data} firstcol={firstcol} fetchInterval={fetchInterval} position={pos} rotation={rotation} colSize={gridSize[1]} cellSize={size} />);
     }
