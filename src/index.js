@@ -157,6 +157,7 @@ function SpreadSheet({position, colInterval, fetchInterval, gridSize, cellSize, 
       const csv_data = Papa.parse(csvStr);
       const csv_flip = csv_data.data.map((_, colIndex) => csv_data.data.map(row => row[colIndex]));
       setCsv(csv_flip);
+      setLogs('LOGS : Fetched Csv : ' + csv_flip.toString() + '\n');
     })
     .catch(e => {
       console.log(e);
@@ -181,13 +182,12 @@ function SpreadSheet({position, colInterval, fetchInterval, gridSize, cellSize, 
       let pos = [position[0]+circle_ray*Math.cos(-1*(maxRows-i)*pi_coeff), position[2]+startY, circle_ray*Math.sin(-1*(maxRows-i)*pi_coeff)];
       let size = [cellSize[0], cellSize[1], 0.01];
       let firstcol = (i == 0);
-      let data=[i, 'salut'];
+      let data=[i, 'csvl :'+csv.length];
       if(i>0 && i+colInterval[0] <= csv.length)
         data=csv[colInterval[0]+i-1];
       rows.push(<DataCol key={'Col'+i} data={data} firstcol={firstcol} fetchInterval={fetchInterval} position={pos} rotation={rotation} colSize={gridSize[1]} cellSize={size} />);
     }
     console.log(csv);
-    setLogs('LOGS : ' + csv.toString() + '\n');
 
     /*for (let i=0; i < maxRows; i++){
       let mirrorX = i-gridSize[0]/2;
