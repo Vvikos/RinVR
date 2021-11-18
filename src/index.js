@@ -178,7 +178,7 @@ function SpreadSheet({position, colInterval, fetchInterval, gridSize, cellSize, 
       //let pos = [startX+i*cellSize[0], startY, position[2]+0.025*mirrorX*mirrorX];
       let rotation = [0,-Math.PI/2*Math.cos(-1*(maxRows-i)*pi_coeff),0];
       let pos = [position[0]+circle_ray*Math.cos(-1*(maxRows-i)*pi_coeff), position[2]+startY, circle_ray*Math.sin(-1*(maxRows-i)*pi_coeff)];
-      let size = [cellSize[0], cellSize[1], 0.1];
+      let size = [cellSize[0], cellSize[1], 0.01];
       let firstcol = (i == 0);
       let data=[i];
       console.log(i+colInterval[0]);
@@ -217,7 +217,7 @@ function SpreadSheet({position, colInterval, fetchInterval, gridSize, cellSize, 
 
 function App() {
   const [fetchInterval, setfetchInterval] = useState([0, GRID_NY-1]);
-  const [colInterval, setcolInterval] = useState([0, GRID_NX]);
+  const [colInterval, setcolInterval] = useState([0, 8]);
 
   const onClickRowPrev = () => {
     setfetchInterval(prevstate => (((prevstate[0]==0) ? 0 : prevstate[0]-1), ((prevstate[0]==0) ? 0 : prevstate[0]-1)));
