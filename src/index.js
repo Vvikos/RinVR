@@ -226,7 +226,7 @@ function App() {
       <ambientLight />
       <pointLight position={[10, 10, 10]} />
       <DefaultXRControllers />
-      <SpreadSheet position={[0, 2, -0.5]} fetchInterval={fetchInterval} gridSize={[20, 10]} cellSize={[0.8, 0.2]} anglemax={-1.4} />
+      <SpreadSheet position={[0, 2, -0.5]} fetchInterval={fetchInterval} gridSize={[8, 10]} cellSize={[0.8, 0.2]} anglemax={-1.4} />
       <ButtonPanel onClickNext={onClickNext} onClickPrev={onClickPrev} position={[0, 1.5, -1]} rotation={[-0.8, 0, 0]} />
     </VRCanvas>
   )
