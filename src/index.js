@@ -183,7 +183,8 @@ function SpreadSheet({position, colInterval, fetchInterval, gridSize, cellSize, 
       let size = [cellSize[0], cellSize[1], 0.01];
       let firstcol = (i == 0);
       let data=[i, 'csvl :'+csv.length];
-      if(i>0 && i+colInterval[0] <= csv.length)
+      console.log(i+' '+colInterval+'<='+csv.length);
+      if(i>0 && i+colInterval[0]-1 < csv.length)
         data=csv[colInterval[0]+i-1];
       rows.push(<DataCol key={'Col'+i} data={data} firstcol={firstcol} fetchInterval={fetchInterval} position={pos} rotation={rotation} colSize={gridSize[1]} cellSize={size} />);
     }
@@ -211,8 +212,8 @@ function SpreadSheet({position, colInterval, fetchInterval, gridSize, cellSize, 
 
   return (
       <>
-        <Box size={[4,3.8, 0.00]} position={[0, 6, -4]} rotation={[Math.PI*2.2, 0, 0]} color="black">
-          <Text anchorX="center" anchorY="middle" position={[1,0,0]} maxWidth={3} color="white"  fontSize={0.1}>{'Console logs\n' + logs}</Text>
+        <Box size={[4,4, 0.00]} position={[0, 6, -4]} rotation={[Math.PI*2.2, 0, 0]} color="black">
+          <Text anchorX="center" anchorY="middle" position={[1,0,0.02]} maxWidth={3} color="white"  fontSize={0.12}>{'Console logs\n' + logs}</Text>
         </Box>
         {generateGrid()}
       </>
