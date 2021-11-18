@@ -115,7 +115,12 @@ function DataCol({data, firstcol, fetchInterval, position, colSize, cellSize, ro
         colorBtn=0x000000;
         fontColor=0xffffff;
       }
-      row.push(<Button key={i+''+colSize} position={position} fontSize={0.1} fontColor={fontColor} color={colorBtn} size={size}>{text}</Button>);
+      if(i < data.length){
+        row.push(<Button key={i+''+colSize} position={position} fontSize={0.1} fontColor={fontColor} color={colorBtn} size={size}>{text}</Button>);
+      } else {
+        row.push(<Button key={i+''+colSize} position={position} fontSize={0.1} fontColor={fontColor} color={colorBtn} size={size}></Button>);
+      }
+
     }
     return row;
   }
@@ -152,7 +157,7 @@ function SpreadSheet({position, fetchInterval, gridSize, cellSize, anglemax}){
       return e;
     });
     console.log(csv);
-  });
+  }, []);
 
   const generateGrid = () => {
     const rows = [];
@@ -174,7 +179,7 @@ function SpreadSheet({position, fetchInterval, gridSize, cellSize, anglemax}){
       if(i < csv.length){
         rows.push(<DataCol key={'Col'+i} data={csv[i]} firstcol={firstcol} fetchInterval={fetchInterval} position={pos} rotation={rotation} colSize={gridSize[1]} cellSize={size} />);
       } else {
-        rows.push(<DataCol key={'Col'+i} data={[1,2,3,4,5,6,4,5,7,1,1,1,1,1]} firstcol={false} fetchInterval={fetchInterval} position={pos} rotation={rotation} colSize={gridSize[1]} cellSize={size} />);
+        rows.push(<DataCol key={'Col'+i} data={[1,2,3,4,5,6,4,5,7]} firstcol={false} fetchInterval={fetchInterval} position={pos} rotation={rotation} colSize={gridSize[1]} cellSize={size} />);
       }
     }
 
