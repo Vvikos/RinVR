@@ -228,7 +228,7 @@ function App() {
   }
 
   const onClickColPrev = () => {
-    setcolInterval(prevstate => (((prevstate[0]==0) ? 0 : prevstate[0]-1), ((prevstate[1]==0) ? 0 : prevstate[1]-1)));
+    setcolInterval(prevstate => (((prevstate[0]==0) ? 0 : prevstate[0]-1), ((prevstate[0]==0) ? 0 : prevstate[1]-1)));
   }
 
   const onClickColNext = () => {
