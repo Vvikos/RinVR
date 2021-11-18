@@ -140,7 +140,8 @@ function DataCol({data, firstcol, fetchInterval, position, colSize, cellSize, ro
 }
 
 function SpreadSheet({position, colInterval, fetchInterval, gridSize, cellSize, anglemax}){
-  const [csv, setCsv] = useState([])
+  const [csv, setCsv] = useState([]);
+  const [logs, setLogs] = useState('No console logs.\n');
 
   useEffect(() => {
     fetch(API_R + "/csv?name=sample.csv&offset="+fetchInterval[0]+"&limit="+(fetchInterval[1]-fetchInterval[0]), {mode: 'cors'})
@@ -156,12 +157,13 @@ function SpreadSheet({position, colInterval, fetchInterval, gridSize, cellSize, 
       const csv_data = Papa.parse(csvStr);
       const csv_flip = csv_data.data.map((_, colIndex) => csv_data.data.map(row => row[colIndex]));
       setCsv(csv_flip);
+      setLogs('LOGS : Fetched Csv : ' + csv_flip.toString() + '\n');
     })
     .catch(e => {
       console.log(e);
       return e;
     });
-  }, [colInterval]);
+  }, []);
 
   const generateGrid = () => {
     const rows = [];
@@ -210,6 +212,9 @@ function SpreadSheet({position, colInterval, fetchInterval, gridSize, cellSize, 
 
   return (
       <>
+        <Box size={[100 ,100, 0.00]} position={[0, 4, -10]} rotation={[Math.PI*2, 0, 0]} color="black">
+          <Text color="white" fontSize={0.2}>{'Console logs\n' + logs}</Text>
+        </Box>
         {generateGrid()}
       </>
   )
