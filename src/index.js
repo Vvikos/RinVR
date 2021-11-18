@@ -42,7 +42,7 @@ function Button({ children, size, color, fontSize, fontColor, ...rest}) {
   )
 }
 
-function ButtonPanel({ onClickPrev, onClickNext, position, rotation }) {
+function ButtonPanel({ onClickColPrev, onClickColNext, onClickRowPrev, onClickRowNext, position, rotation }) {
   const [hover, setHover] = useState(false)
   const [select, setSelect] = useState(false)
   const [color, setColor] = useState(0xffffff)
@@ -65,10 +65,10 @@ function ButtonPanel({ onClickPrev, onClickNext, position, rotation }) {
   
   return (
     <Box color={color} size={[0.4, 0.4, 0.01]} position={position} rotation={rotation}>
-      <Interactive onSelect={function() { onSelect(); onClickNext(); }} onHover={onHover} onBlur={onBlur}>
+      <Interactive onSelect={function() { onSelect(); onClickColNext(); }} onHover={onHover} onBlur={onBlur}>
         <Button scale={hover ? [1.1, 1.1, 1.1] : [1, 1, 1]} color={0xfc2617} fontColor={0xffffff} fontSize={0.015} size={[0.15, 0.1, 0.02]} position={[0.10, -0.15, 0.03]}>Next Col</Button>
       </Interactive>
-      <Interactive onSelect={function() { onSelect(); onClickPrev(); }} onHover={onHover} onBlur={onBlur}>
+      <Interactive onSelect={function() { onSelect(); onClickColPrev(); }} onHover={onHover} onBlur={onBlur}>
         <Button scale={hover ? [1.1, 1.1, 1.1] : [1, 1, 1]} color={0xfc2617} fontColor={0xffffff} fontSize={0.015} size={[0.15, 0.1, 0.02]} position={[-0.10, -0.15, 0.03]}>Previous Col</Button>
       </Interactive>
     </Box>
@@ -131,7 +131,7 @@ function DataCol({data, firstcol, fetchInterval, position, colSize, cellSize, ro
   }
 
   return (
-      <Box scale={hover ? [1.1, 1.1, 1.1] : [1, 1, 1]} position={position} rotation={rotation} size={[0,0,0]}>
+      <Box scale={hover ? [1.01, 1.01, 1.01] : [1, 1, 1]} position={position} rotation={rotation} size={[0,0,0]}>
         <Interactive onSelect={onSelect} onHover={onHover} onBlur={onBlur}>
           {generateCells()}
         </Interactive>
@@ -139,7 +139,7 @@ function DataCol({data, firstcol, fetchInterval, position, colSize, cellSize, ro
   )
 }
 
-function SpreadSheet({position, fetchInterval, gridSize, cellSize, anglemax}){
+function SpreadSheet({position, colInterval, fetchInterval, gridSize, cellSize, anglemax}){
   const [csv, setCsv] = useState([])
 
   useEffect(() => {
@@ -181,8 +181,8 @@ function SpreadSheet({position, fetchInterval, gridSize, cellSize, anglemax}){
       let size = [cellSize[0], cellSize[1], 0.1];
       let firstcol = (i == 0);
       let data=[i];
-      if(i>0 && i <= csv.length)
-        data=csv[i-1];
+      if(i>0 && i+colInterval[0] <= csv.length)
+        data=csv[colInterval[0]+i-1];
       rows.push(<DataCol key={'Col'+i} data={data} firstcol={firstcol} fetchInterval={fetchInterval} position={pos} rotation={rotation} colSize={gridSize[1]} cellSize={size} />);
     }
     console.log(csv);
@@ -216,13 +216,22 @@ function SpreadSheet({position, fetchInterval, gridSize, cellSize, anglemax}){
 
 function App() {
   const [fetchInterval, setfetchInterval] = useState([0, GRID_NY-1]);
+  const [colInterval, setcolInterval] = useState([0, GRID_NX]);
 
-  const onClickPrev = () => {
-    setfetchInterval(prevstate => (((prevstate[0]==0) ? 0 : prevstate[0]-1), prevstate[1]-1));
+  const onClickRowPrev = () => {
+    setfetchInterval(prevstate => (((prevstate[0]==0) ? 0 : prevstate[0]-1), ((prevstate[0]==0) ? 0 : prevstate[0]-1)));
   }
 
-  const onClickNext = () => {
+  const onClickRowNext = () => {
     setfetchInterval(prevstate => (prevstate[0]+1, prevstate[1]+1));
+  }
+
+  const onClickColPrev = () => {
+    setcolInterval(prevstate => (((prevstate[0]==0) ? 0 : prevstate[0]-1), ((prevstate[0]==0) ? 0 : prevstate[0]-1)));
+  }
+
+  const onClickColNext = () => {
+    setcolInterval(prevstate => (prevstate[0]+1, prevstate[1]+1));
   }
   
   return (
@@ -232,8 +241,8 @@ function App() {
       <ambientLight />
       <pointLight position={[10, 10, 10]} />
       <DefaultXRControllers />
-      <SpreadSheet position={[0, 2, -1]} fetchInterval={fetchInterval} gridSize={[8, 10]} cellSize={[0.8, 0.2]} anglemax={-1.4} />
-      <ButtonPanel onClickNext={onClickNext} onClickPrev={onClickPrev} position={[0, 1.5, -1]} rotation={[-0.8, 0, 0]} />
+      <SpreadSheet position={[0, 2, -1]} colInterval={colInterval} fetchInterval={fetchInterval} gridSize={[8, 10]} cellSize={[0.8, 0.2]} anglemax={-1.4} />
+      <ButtonPanel onClickColPrev={onClickColPrev} onClickColNext={onClickColNext} onClickRowNext={onClickRowNext} onClickRowPrev={onClickRowPrev} position={[0, 1.5, -1]} rotation={[-0.8, 0, 0]} />
     </VRCanvas>
   )
 }
