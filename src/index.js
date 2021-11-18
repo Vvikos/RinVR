@@ -98,7 +98,7 @@ function DataCol({data, firstcol, fetchInterval, position, colSize, cellSize, ro
   
   const generateCells = () => {
     const row = [];
-    let maxCells = ((colSize < data.length) ? colSize-1 : data.length);
+    let maxCells = ((colSize > data.length) ? colSize-1 : data.length);
     for (let i=0; i < maxCells; i++){
       let size = [cellSize[0], cellSize[1], 0.1];
       let position = [0, cellSize[1]*(colSize/2-i), 0.1];
@@ -156,7 +156,6 @@ function SpreadSheet({position, fetchInterval, gridSize, cellSize, anglemax}){
       console.log(e);
       return e;
     });
-    console.log(csv);
   }, []);
 
   const generateGrid = () => {
@@ -179,9 +178,10 @@ function SpreadSheet({position, fetchInterval, gridSize, cellSize, anglemax}){
       if(i < csv.length){
         rows.push(<DataCol key={'Col'+i} data={csv[i]} firstcol={firstcol} fetchInterval={fetchInterval} position={pos} rotation={rotation} colSize={gridSize[1]} cellSize={size} />);
       } else {
-        rows.push(<DataCol key={'Col'+i} data={[1,2,3,4,5,6,4,5,7]} firstcol={false} fetchInterval={fetchInterval} position={pos} rotation={rotation} colSize={gridSize[1]} cellSize={size} />);
+        rows.push(<DataCol key={'Col'+i} data={[i]} firstcol={false} fetchInterval={fetchInterval} position={pos} rotation={rotation} colSize={gridSize[1]} cellSize={size} />);
       }
     }
+    console.log(csv);
 
     /*for (let i=0; i < maxRows; i++){
       let mirrorX = i-gridSize[0]/2;
@@ -214,7 +214,7 @@ function App() {
   const [fetchInterval, setfetchInterval] = useState([0, GRID_NY-1]);
 
   const onClickPrev = () => {
-    setfetchInterval(prevstate => (prevstate[0]-1, prevstate[1]-1));
+    setfetchInterval(prevstate => (((prevstate[0]==0) ? 0 : prevstate[0]-1), prevstate[1]-1));
   }
 
   const onClickNext = () => {
