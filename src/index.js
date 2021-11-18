@@ -213,7 +213,7 @@ function SpreadSheet({position, colInterval, fetchInterval, gridSize, cellSize, 
   return (
       <>
         <Box size={[4,3.8, 0.00]} position={[0, 6, -4]} rotation={[Math.PI*2.2, 0, 0]} color="black">
-          <Text anchorX="center" anchorY="middle" position={[0.5,0,0]} maxWidth={3} color="white"  fontSize={0.1}>{'Console logs\n' + logs}</Text>
+          <Text anchorX="center" anchorY="middle" position={[1,0,0]} maxWidth={3} color="white"  fontSize={0.1}>{'Console logs\n' + logs}</Text>
         </Box>
         {generateGrid()}
       </>
