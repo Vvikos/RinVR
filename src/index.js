@@ -182,7 +182,7 @@ function SpreadSheet({position, colInterval, fetchInterval, gridSize, cellSize, 
       let pos = [position[0]+circle_ray*Math.cos(-1*(maxRows-i)*pi_coeff), position[2]+startY, circle_ray*Math.sin(-1*(maxRows-i)*pi_coeff)];
       let size = [cellSize[0], cellSize[1], 0.01];
       let firstcol = (i == 0);
-      let data=[i];
+      let data=[i, 'salut'];
       console.log(i+colInterval[0]);
       if(i>0 && i+colInterval[0] <= csv.length)
         data=csv[colInterval[0]+i-1];
