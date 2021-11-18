@@ -98,9 +98,15 @@ function DataCol({data, firstcol, fetchInterval, position, colSize, cellSize, ro
   
   const generateCells = () => {
     const row = [];
+    let fontSize = 0.1;
     let maxCells = colSize;
     for (let i=0; i < maxCells; i++){
-      let size = [cellSize[0], cellSize[1], 0.1];
+      var longest = data.reduce(
+        function (a, b) {
+            return a.length > b.length ? a : b;
+        }
+      );
+      let size = [((cellSize[0]<longest.length*fontSize/2) ? longest.length*fontSize/2 : cellSize[0]), cellSize[1], 0.1];
       let position = [0, cellSize[1]*(colSize/2-i), 0.1];
       let text = data[i];
       let colorBtn=color;
@@ -118,7 +124,7 @@ function DataCol({data, firstcol, fetchInterval, position, colSize, cellSize, ro
       if(i >= data.length && !firstcol)
         text = '';
       
-      row.push(<Button key={i+''+colSize} position={position} fontSize={0.1} fontColor={fontColor} color={colorBtn} size={size}>{text}</Button>);
+      row.push(<Button key={i+''+colSize} position={position} fontSize={fontSize} fontColor={fontColor} color={colorBtn} size={size}>{text}</Button>);
 
     }
     return row;
