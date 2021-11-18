@@ -121,7 +121,7 @@ function DataCol({data, firstcol, fetchInterval, position, colSize, cellSize, ro
   }
 
   return (
-      <Box scale={hover ? [1.1, 1.1, 1.1] : [1, 1, 1]} position={position} rotation={rotation} size={[cellSize[0], cellSize[1]*colSize, 0.01]}>
+      <Box scale={hover ? [1.1, 1.1, 1.1] : [1, 1, 1]} position={position} rotation={rotation} size={[0,0,0]}>
         <Interactive onSelect={onSelect} onHover={onHover} onBlur={onBlur}>
           {generateCells()}
         </Interactive>
@@ -161,15 +161,15 @@ function SpreadSheet({position, fetchInterval, gridSize, cellSize, anglemax}){
 
     let maxRows = ((gridSize[0] > csv.length ? gridSize[0] : csv.length));
     let pi_coeff = Math.PI/maxRows;
-    let circle_ray = 4;
+    let circle_ray = 5;
 
     for (let i=0; i < maxRows; i++){
       let mirrorX = i-gridSize[0]/2;
       //let rotation = [0, mirrorX/(gridSize[0]/2)*anglemax, 0];
       //let pos = [startX+i*cellSize[0], startY, position[2]+0.025*mirrorX*mirrorX];
-      let rotation = [0,0,0];
-      let pos = [position[0]+circle_ray*Math.cos(-1*i*pi_coeff), position[2]+startY, circle_ray*Math.sin(-1*i*pi_coeff)];
-      let size = [cellSize[0]+0.0025*mirrorX*mirrorX, cellSize[1], 0.1];
+      let rotation = [0,-Math.PI/2*Math.cos(-1*(maxRows-i)*pi_coeff),0];
+      let pos = [position[0]+circle_ray*Math.cos(-1*(maxRows-i)*pi_coeff), position[2]+startY, circle_ray*Math.sin(-1*(maxRows-i)*pi_coeff)];
+      let size = [cellSize[0], cellSize[1], 0.1];
       let firstcol = (i == 0);
       if(i < csv.length){
         rows.push(<DataCol key={'Col'+i} data={csv[i]} firstcol={firstcol} fetchInterval={fetchInterval} position={pos} rotation={rotation} colSize={gridSize[1]} cellSize={size} />);
@@ -223,7 +223,7 @@ function App() {
       <ambientLight />
       <pointLight position={[10, 10, 10]} />
       <DefaultXRControllers />
-      <SpreadSheet position={[0, 2, 0]} fetchInterval={fetchInterval} gridSize={[20, 10]} cellSize={[0.4, 0.2]} anglemax={-1.4} />
+      <SpreadSheet position={[0, 2, 0]} fetchInterval={fetchInterval} gridSize={[20, 10]} cellSize={[0.8, 0.2]} anglemax={-1.4} />
       <ButtonPanel onClickNext={onClickNext} onClickPrev={onClickPrev} position={[0, 1.5, -1]} rotation={[-0.8, 0, 0]} />
     </VRCanvas>
   )
