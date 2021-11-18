@@ -115,7 +115,7 @@ function DataCol({data, firstcol, fetchInterval, position, colSize, cellSize, ro
         colorBtn=0x000000;
         fontColor=0xffffff;
       }
-      if(i >= data.length)
+      if(i >= data.length && !firstcol)
         text = '';
       
       row.push(<Button key={i+''+colSize} position={position} fontSize={0.1} fontColor={fontColor} color={colorBtn} size={size}>{text}</Button>);
@@ -174,11 +174,10 @@ function SpreadSheet({position, fetchInterval, gridSize, cellSize, anglemax}){
       let pos = [position[0]+circle_ray*Math.cos(-1*(maxRows-i)*pi_coeff), position[2]+startY, circle_ray*Math.sin(-1*(maxRows-i)*pi_coeff)];
       let size = [cellSize[0], cellSize[1], 0.1];
       let firstcol = (i == 0);
-      if(i < csv.length){
-        rows.push(<DataCol key={'Col'+i} data={csv[i]} firstcol={firstcol} fetchInterval={fetchInterval} position={pos} rotation={rotation} colSize={gridSize[1]} cellSize={size} />);
-      } else {
-        rows.push(<DataCol key={'Col'+i} data={[i]} firstcol={false} fetchInterval={fetchInterval} position={pos} rotation={rotation} colSize={gridSize[1]} cellSize={size} />);
-      }
+      let data=[i];
+      if(i>0 && i < csv.length)
+        data=csv[i];
+      rows.push(<DataCol key={'Col'+i} data={data} firstcol={firstcol} fetchInterval={fetchInterval} position={pos} rotation={rotation} colSize={gridSize[1]} cellSize={size} />);
     }
     console.log(csv);
 
