@@ -183,12 +183,12 @@ function SpreadSheet({position, colInterval, fetchInterval, gridSize, cellSize, 
       let size = [cellSize[0], cellSize[1], 0.01];
       let firstcol = (i == 0);
       let data=[i, 'salut'];
-      console.log(i+colInterval[0]);
       if(i>0 && i+colInterval[0] <= csv.length)
         data=csv[colInterval[0]+i-1];
       rows.push(<DataCol key={'Col'+i} data={data} firstcol={firstcol} fetchInterval={fetchInterval} position={pos} rotation={rotation} colSize={gridSize[1]} cellSize={size} />);
     }
     console.log(csv);
+    setLogs('LOGS : Used For Generation Csv : ' + csv.toString() + '\n');
 
     /*for (let i=0; i < maxRows; i++){
       let mirrorX = i-gridSize[0]/2;
