@@ -212,8 +212,8 @@ function SpreadSheet({position, colInterval, fetchInterval, gridSize, cellSize, 
 
   return (
       <>
-        <Box size={[100 ,100, 0.00]} position={[0, 4, -10]} rotation={[Math.PI*2, 0, 0]} color="black">
-          <Text color="white" fontSize={0.2}>{'Console logs\n' + logs}</Text>
+        <Box size={[2,5, 0.00]} position={[0, 5, -3]} rotation={[Math.PI*2.4, 0, 0]} color="black">
+          <Text maxWidth={2} color="white"  fontSize={0.2}>{'Console logs\n' + logs}</Text>
         </Box>
         {generateGrid()}
       </>
