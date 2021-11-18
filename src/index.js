@@ -134,7 +134,7 @@ function DataCol({data, firstcol, fetchInterval, position, colSize, cellSize, ro
 }
 
 function SpreadSheet({position, fetchInterval, gridSize, cellSize, anglemax}){
-  const [csv, setCsv] = useState([[0,1,2,3,4,5,6,7,8,9],[0,1,2,3,4,5,6,7,8,9],[0,1,2,3,4,5,6,7,8,9],[0,1,2,3,4,5,6,7,8,9],[0,1,2,3,4,5,6,7,8,9],[0,1,2,3,4,5,6,7,8,9],[0,1,2,3,4,5,6,7,8,9],[0,1,2,3,4,5,6,7,8,9],[0,1,2,3,4,5,6,7,8,9],[0,1,2,3,4,5,6,7,8,9],[0,1,2,3,4,5,6,7,8,9]])
+  const [csv, setCsv] = useState([])
 
   useEffect(() => {
     fetch(API_R + "/csv?name=sample.csv&offset="+fetchInterval[0]+"&limit="+(fetchInterval[1]-fetchInterval[0]), {mode: 'cors'})
@@ -175,8 +175,8 @@ function SpreadSheet({position, fetchInterval, gridSize, cellSize, anglemax}){
       let size = [cellSize[0], cellSize[1], 0.1];
       let firstcol = (i == 0);
       let data=[i];
-      if(i>0 && i < csv.length)
-        data=csv[i];
+      if(i>0 && i <= csv.length)
+        data=csv[i-1];
       rows.push(<DataCol key={'Col'+i} data={data} firstcol={firstcol} fetchInterval={fetchInterval} position={pos} rotation={rotation} colSize={gridSize[1]} cellSize={size} />);
     }
     console.log(csv);
