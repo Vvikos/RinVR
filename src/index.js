@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ReactDOM from 'react-dom'
 import { VRCanvas, Interactive, DefaultXRControllers } from '@react-three/xr'
 import { Sky, Text } from '@react-three/drei'
 import '@react-three/fiber'
+import Papa from 'papaparse';
 import './styles.css'
 
 const CELL_X_SIZE = 0.4;
@@ -10,6 +11,7 @@ const CELL_Y_SIZE = 0.2;
 const ANGLE_MAX = -1.3;
 const GRID_NX = 20;
 const GRID_NY = 10;
+const API_R = 'http://achencraft.fr:8000';
 
 function Floor() {
   return (
@@ -40,7 +42,7 @@ function Button({ children, size, color, fontSize, fontColor, ...rest}) {
   )
 }
 
-function ButtonPanel({ position, rotation }) {
+function ButtonPanel({ onClickPrev, onClickNext, position, rotation }) {
   const [hover, setHover] = useState(false)
   const [select, setSelect] = useState(false)
   const [color, setColor] = useState(0xffffff)
@@ -63,17 +65,17 @@ function ButtonPanel({ position, rotation }) {
   
   return (
     <Box color={color} size={[0.4, 0.4, 0.01]} position={position} rotation={rotation}>
-      <Interactive onSelect={onSelect} onHover={onHover} onBlur={onBlur}>
+      <Interactive onSelect={function() { onSelect(); onClickNext(); }} onHover={onHover} onBlur={onBlur}>
         <Button scale={hover ? [1.1, 1.1, 1.1] : [1, 1, 1]} color={0xfc2617} fontColor={0xffffff} fontSize={0.015} size={[0.15, 0.1, 0.02]} position={[0.10, -0.15, 0.03]}>Next Col</Button>
       </Interactive>
-      <Interactive onSelect={onSelect} onHover={onHover} onBlur={onBlur}>
+      <Interactive onSelect={function() { onSelect(); onClickPrev(); }} onHover={onHover} onBlur={onBlur}>
         <Button scale={hover ? [1.1, 1.1, 1.1] : [1, 1, 1]} color={0xfc2617} fontColor={0xffffff} fontSize={0.015} size={[0.15, 0.1, 0.02]} position={[-0.10, -0.15, 0.03]}>Previous Col</Button>
       </Interactive>
     </Box>
   )
 }
 
-function DataCol({firstcol, position, colSize, cellSize, rotation}){
+function DataCol({data, firstcol, fetchInterval, position, colSize, cellSize, rotation}){
   const [hover, setHover] = useState(false)
   const [select, setSelect] = useState(false)
   const [color, setColor] = useState(0xffffff)
@@ -96,18 +98,20 @@ function DataCol({firstcol, position, colSize, cellSize, rotation}){
   
   const generateCells = () => {
     const row = [];
-    for (let i=0; i < colSize; i++){
+    let maxCells = ((colSize < data.length) ? colSize-1 : data.length);
+    for (let i=0; i < maxCells; i++){
       let size = [cellSize[0], cellSize[1], 0.1];
       let position = [0, cellSize[1]*(colSize/2-i), 0.1];
-      let text = colSize+'x'+i;
+      let text = data[i];
       let colorBtn=color;
       let fontColor=0x000000
       if(firstcol){
-        text = i+'';
+        text = (fetchInterval[0]+i)+'';
         colorBtn=0x000000;
         fontColor=0xffffff;
       } else if (i==0) {
-        text = 'Col';
+        if (firstcol)
+          text = '';
         colorBtn=0x000000;
         fontColor=0xffffff;
       }
@@ -125,46 +129,92 @@ function DataCol({firstcol, position, colSize, cellSize, rotation}){
   )
 }
 
-function SpreadSheet({position, gridSize, cellSize, anglemax}){
-  const generateGrid = ([x, y, z]) => {
-    fetch("http://localhost:8000/csv?name=sample.csv", {mode: 'cors'})
-      .then(res => res.json())
-      .then(result => {
-          console.log(result);
-          return result;
-      })
-      .catch(e => {
-        console.log(e);
-        return e;
-      });
-    const row = [];
-    let startX = position[0]-gridSize[0]/2*cellSize[0];
-    let startY = position[1]+gridSize[1]/2*cellSize[1];
-    for (let i=0; i < gridSize[0]; i++){
+function SpreadSheet({position, fetchInterval, gridSize, cellSize, anglemax}){
+  const [csv, setCsv] = useState([[0,1,2,3,4,5,6,7,8,9],[0,1,2,3,4,5,6,7,8,9],[0,1,2,3,4,5,6,7,8,9],[0,1,2,3,4,5,6,7,8,9],[0,1,2,3,4,5,6,7,8,9],[0,1,2,3,4,5,6,7,8,9],[0,1,2,3,4,5,6,7,8,9],[0,1,2,3,4,5,6,7,8,9],[0,1,2,3,4,5,6,7,8,9],[0,1,2,3,4,5,6,7,8,9],[0,1,2,3,4,5,6,7,8,9]])
+
+  useEffect(() => {
+    fetch(API_R + "/csv?name=sample.csv&offset="+fetchInterval[0]+"&limit="+(fetchInterval[1]-fetchInterval[0]), {mode: 'cors'})
+    .then(res => {
+      const reader = res.body.getReader();
+      return reader.read();
+    })
+    .then(result => {
+      const decoder = new TextDecoder('utf-8');
+      return decoder.decode(result.value);
+    })
+    .then(csvStr => {
+      const csv_data = Papa.parse(csvStr);
+      const csv_flip = csv_data.data.map((_, colIndex) => csv_data.data.map(row => row[colIndex]));
+      setCsv(csv_flip);
+    })
+    .catch(e => {
+      console.log(e);
+      return e;
+    });
+    console.log(csv);
+  });
+
+  const generateGrid = () => {
+    const rows = [];
+    const startX = position[0]-gridSize[0]/2*cellSize[0];
+    const startY = position[1]+gridSize[1]/2*cellSize[1];
+    [-Math.PI / 2, 0, 0]
+    
+    let maxRows = ((gridSize[0] > csv.length ? gridSize[0] : csv.length));
+    let pi_coeff = Math.PI/maxRows;
+    for (let i=0; i < maxRows; i++){
+      let mirrorX = i-gridSize[0]/2;
+      //let rotation = [0, mirrorX/(gridSize[0]/2)*anglemax, 0];
+      //let pos = [startX+i*cellSize[0], startY, position[2]+0.025*mirrorX*mirrorX];
+      let rotation = [0,0,0];
+      let pos = [position[0]+2*Math.cos(i*pi_coeff), position[2]+startY, 2*Math.sin(i*pi_coeff)];
+      let size = [cellSize[0]+0.0025*mirrorX*mirrorX, cellSize[1], 0.1];
+      let firstcol = (i == 0);
+      if(i < csv.length){
+        rows.push(<DataCol key={'Col'+i} data={csv[i]} firstcol={firstcol} fetchInterval={fetchInterval} position={pos} rotation={rotation} colSize={gridSize[1]} cellSize={size} />);
+      } else {
+        rows.push(<DataCol key={'Col'+i} data={[1,2,3,4,5,6,4,5,7,1,1,1,1,1]} firstcol={false} fetchInterval={fetchInterval} position={pos} rotation={rotation} colSize={gridSize[1]} cellSize={size} />);
+      }
+    }
+
+    /*for (let i=0; i < maxRows; i++){
       let mirrorX = i-gridSize[0]/2;
       let rotation = [0, mirrorX/(gridSize[0]/2)*anglemax, 0];
-      let position = [startX+i*cellSize[0], startY, z+0.025*mirrorX*mirrorX];
+      let pos = [startX+i*cellSize[0], startY, position[2]+0.025*mirrorX*mirrorX];
       let size = [cellSize[0]+0.0025*mirrorX*mirrorX, cellSize[1], 0.1];
-      let firstcol = false;
-      if(i==0){
-        firstcol=true;
-      } else {
-        firstcol=false;
-      }
-      row.push(<DataCol firstcol={firstcol} position={position} rotation={rotation} colSize={gridSize[1]} cellSize={size} />);
-    }
-    return row;
+      let firstcol = (i == 0);
+      rows.push(<DataCol data={csv[i]} firstcol={firstcol} fetchInterval={fetchInterval} position={pos} rotation={rotation} colSize={gridSize[1]} cellSize={size} />);
+    }*/
+
+    /*for (let i=maxRows; i < gridSize[0]; i++){
+      let mirrorX = i-gridSize[0]/2;
+      let rotation = [0, mirrorX/(gridSize[0]/2)*anglemax, 0];
+      let pos = [startX+i*cellSize[0], startY, position[2]+0.025*mirrorX*mirrorX];
+      let size = [cellSize[0]+0.0025*mirrorX*mirrorX, cellSize[1], 0.1];
+      rows.push(<DataCol data={[1,2,3,4,5,6,4,5,7,1,1,1,1,1]} firstcol={false} fetchInterval={fetchInterval} position={pos} rotation={rotation} colSize={gridSize[1]} cellSize={size} />);
+    }*/
+    
+    return rows;
   }
 
   return (
       <>
-        {generateGrid(position)}
+        {generateGrid()}
       </>
   )
 }
 
 function App() {
+  const [fetchInterval, setfetchInterval] = useState([0, GRID_NY-1]);
 
+  const onClickPrev = () => {
+    setfetchInterval(prevstate => (prevstate[0]-1, prevstate[1]-1));
+  }
+
+  const onClickNext = () => {
+    setfetchInterval(prevstate => (prevstate[0]+1, prevstate[1]+1));
+  }
+  
   return (
     <VRCanvas>
       <Sky sunPosition={[0, 1, 0]} />
@@ -172,10 +222,10 @@ function App() {
       <ambientLight />
       <pointLight position={[10, 10, 10]} />
       <DefaultXRControllers />
-      <SpreadSheet position={[0, 2, -4]}  gridSize={[20, 10]} cellSize={[0.4, 0.2]} anglemax={-1.4} />
-      <ButtonPanel position={[0, 1.5, -1]} rotation={[-0.8, 0, 0]} />
+      <SpreadSheet position={[0, 0, 0]} fetchInterval={fetchInterval} gridSize={[20, 10]} cellSize={[0.4, 0.2]} anglemax={-1.4} />
+      <ButtonPanel onClickNext={onClickNext} onClickPrev={onClickPrev} position={[0, 1.5, -1]} rotation={[-0.8, 0, 0]} />
     </VRCanvas>
   )
 }
 
-ReactDOM.render(<App />, document.getElementById('root'))
+ReactDOM.render(<App />, document.getElementById('root'));
