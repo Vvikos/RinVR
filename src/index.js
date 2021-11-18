@@ -161,7 +161,7 @@ function SpreadSheet({position, colInterval, fetchInterval, gridSize, cellSize, 
       console.log(e);
       return e;
     });
-  }, []);
+  }, [colInterval]);
 
   const generateGrid = () => {
     const rows = [];
