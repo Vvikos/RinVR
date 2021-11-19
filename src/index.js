@@ -75,6 +75,15 @@ function ButtonPanel({ onClickColPrev, onClickColNext, onClickRowPrev, onClickRo
   )
 }
 
+function Console({logs}){
+
+  return (
+    <Box size={[4,4, 0.00]} position={[0, 6, -4]} rotation={[Math.PI*2.2, 0, 0]} color="black">
+      <Text anchorX="center" anchorY="middle" position={[1,0,0.02]} maxWidth={3} color="white"  fontSize={0.12}>{'Console logs\n' + logs}</Text>
+    </Box>
+  )
+}
+
 function DataCol({data, firstcol, fetchInterval, position, colSize, cellSize, rotation}){
   const [hover, setHover] = useState(false)
   const [select, setSelect] = useState(false)
@@ -139,12 +148,54 @@ function DataCol({data, firstcol, fetchInterval, position, colSize, cellSize, ro
   )
 }
 
-function SpreadSheet({position, colInterval, fetchInterval, gridSize, cellSize, anglemax}){
-  const [csv, setCsv] = useState([]);
+
+function SpreadSheet({data, position, colInterval, fetchInterval, gridSize, cellSize, anglemax}){
+  function range([start, end]) {
+    return Array(end - start + 1).fill().map((_, idx) => start + idx)
+  }
+
+  const generateGrid = () => {
+    const rows = [];
+    const startY = position[1]+gridSize[1]/2*cellSize[1];
+
+    let maxRows = gridSize[0];
+    let pi_coeff = Math.PI/maxRows;
+    let circle_ray = 5;
+    
+    let rotation = [0,-Math.PI/2*Math.cos(-1*maxRows*pi_coeff),0];
+    let pos = [position[0]+circle_ray*Math.cos(-1*maxRows*pi_coeff), position[2]+startY, circle_ray*Math.sin(-1*maxRows*pi_coeff)];
+    let size = [cellSize[0], cellSize[1], 0.01];
+    let data_col = range(fetchInterval);
+    rows.push(<DataCol key={'Col'+0} data={data_col} firstcol={true} fetchInterval={fetchInterval} position={pos} rotation={rotation} colSize={gridSize[1]} cellSize={size} />);
+   
+    for (let i=1; i < maxRows; i++){
+      rotation = [0,-Math.PI/2*Math.cos(-1*(maxRows-i)*pi_coeff),0];
+      pos = [position[0]+circle_ray*Math.cos(-1*(maxRows-i)*pi_coeff), position[2]+startY, circle_ray*Math.sin(-1*(maxRows-i)*pi_coeff)];
+      data_col=[i];
+      if(i+colInterval[0]-1 < data.length)
+        data_col=data[colInterval[0]+i-1];
+      rows.push(<DataCol key={'Col'+i} data={data_col} firstcol={false} fetchInterval={fetchInterval} position={pos} rotation={rotation} colSize={gridSize[1]} cellSize={size} />);
+    }
+    console.log(data);
+    return rows;
+  }
+
+  return (
+      <>
+        {generateGrid()}
+      </>
+  )
+}
+
+function App() {
   const [logs, setLogs] = useState('No console logs.\n');
+  const [csv, setCsv] = useState([]);
+  const [csvFiles, setCsvFiles] = useState([['sample.csv'], []]);
+  const [fetchInterval, setFetchInterval] = useState([0, GRID_NY-1]);
+  const [colInterval, setColInterval] = useState([0, 8]);
 
   useEffect(() => {
-    fetch(API_R + "/csv?name=sample.csv&offset="+fetchInterval[0]+"&limit="+(fetchInterval[1]-fetchInterval[0]), {mode: 'cors'})
+    fetch(API_R + "/csv?name="+csvFiles[0]+"&offset="+fetchInterval[0]+"&limit="+(fetchInterval[1]-fetchInterval[0]), {mode: 'cors'})
     .then(res => {
       const reader = res.body.getReader();
       return reader.read();
@@ -157,7 +208,26 @@ function SpreadSheet({position, colInterval, fetchInterval, gridSize, cellSize, 
       const csv_data = Papa.parse(csvStr);
       const csv_flip = csv_data.data.map((_, colIndex) => csv_data.data.map(row => row[colIndex]));
       setCsv(csv_flip);
-      setLogs('LOGS : Fetched Csv : ' + csv_flip.toString() + '\n');
+      addLogs('Fetched Csv', csv_flip.toString());
+    })
+    .catch(e => {
+      console.log(e);
+      return e;
+    });
+    
+    fetch(API_R + "/csv_names", {mode: 'cors'})
+    .then(res => {
+      const reader = res.body.getReader();
+      return reader.read();
+    })
+    .then(result => {
+      const decoder = new TextDecoder('utf-8');
+      return decoder.decode(result.value);
+    })
+    .then(csvStr => {
+      const csv_data = Papa.parse(csvStr);
+      setCsvFiles([csv_data[0], csv_data]);
+      addLogs('Fetched Csv Files', csv_data.toString());
     })
     .catch(e => {
       console.log(e);
@@ -165,79 +235,33 @@ function SpreadSheet({position, colInterval, fetchInterval, gridSize, cellSize, 
     });
   }, []);
 
-  const generateGrid = () => {
-    const rows = [];
-    const startX = position[0]-gridSize[0]/2*cellSize[0];
-    const startY = position[1]+gridSize[1]/2*cellSize[1];
-
-    let maxRows = gridSize[0];
-    let pi_coeff = Math.PI/maxRows;
-    let circle_ray = 5;
-
-    for (let i=0; i < gridSize[0]; i++){
-      let mirrorX = i-gridSize[0]/2;
-      //let rotation = [0, mirrorX/(gridSize[0]/2)*anglemax, 0];
-      //let pos = [startX+i*cellSize[0], startY, position[2]+0.025*mirrorX*mirrorX];
-      let rotation = [0,-Math.PI/2*Math.cos(-1*(maxRows-i)*pi_coeff),0];
-      let pos = [position[0]+circle_ray*Math.cos(-1*(maxRows-i)*pi_coeff), position[2]+startY, circle_ray*Math.sin(-1*(maxRows-i)*pi_coeff)];
-      let size = [cellSize[0], cellSize[1], 0.01];
-      let firstcol = (i == 0);
-      let data=[i, 'csvl :'+csv.length];
-      console.log(i+' '+colInterval+'<='+csv.length);
-      if(i>0 && i+colInterval[0]-1 < csv.length)
-        data=csv[colInterval[0]+i-1];
-      rows.push(<DataCol key={'Col'+i} data={data} firstcol={firstcol} fetchInterval={fetchInterval} position={pos} rotation={rotation} colSize={gridSize[1]} cellSize={size} />);
-    }
-    console.log(csv);
-
-    /*for (let i=0; i < maxRows; i++){
-      let mirrorX = i-gridSize[0]/2;
-      let rotation = [0, mirrorX/(gridSize[0]/2)*anglemax, 0];
-      let pos = [startX+i*cellSize[0], startY, position[2]+0.025*mirrorX*mirrorX];
-      let size = [cellSize[0]+0.0025*mirrorX*mirrorX, cellSize[1], 0.1];
-      let firstcol = (i == 0);
-      rows.push(<DataCol data={csv[i]} firstcol={firstcol} fetchInterval={fetchInterval} position={pos} rotation={rotation} colSize={gridSize[1]} cellSize={size} />);
-    }*/
-
-    /*for (let i=maxRows; i < gridSize[0]; i++){
-      let mirrorX = i-gridSize[0]/2;
-      let rotation = [0, mirrorX/(gridSize[0]/2)*anglemax, 0];
-      let pos = [startX+i*cellSize[0], startY, position[2]+0.025*mirrorX*mirrorX];
-      let size = [cellSize[0]+0.0025*mirrorX*mirrorX, cellSize[1], 0.1];
-      rows.push(<DataCol data={[1,2,3,4,5,6,4,5,7,1,1,1,1,1]} firstcol={false} fetchInterval={fetchInterval} position={pos} rotation={rotation} colSize={gridSize[1]} cellSize={size} />);
-    }*/
-    
-    return rows;
+  const addLogs = (type, log) => {
+    const MAX_CHAR = 100;
+    let added_logs = 'LOGS | '+type+' : ' + log + '\n';
+    if(logs + added_logs.length < MAX_CHAR)
+      setLogs(logs+'\n'+added_logs);
+    else
+      setLogs(added_logs);
   }
 
-  return (
-      <>
-        <Box size={[4,4, 0.00]} position={[0, 6, -4]} rotation={[Math.PI*2.2, 0, 0]} color="black">
-          <Text anchorX="center" anchorY="middle" position={[1,0,0.02]} maxWidth={3} color="white"  fontSize={0.12}>{'Console logs\n' + logs}</Text>
-        </Box>
-        {generateGrid()}
-      </>
-  )
-}
-
-function App() {
-  const [fetchInterval, setfetchInterval] = useState([0, GRID_NY-1]);
-  const [colInterval, setcolInterval] = useState([0, 8]);
-
   const onClickRowPrev = () => {
-    setfetchInterval(prevstate => (((prevstate[0]==0) ? 0 : prevstate[0]-1), ((prevstate[0]==0) ? 0 : prevstate[0]-1)));
+    addLogs('Mouse Event', 'Clicked Previous Row');
+    setFetchInterval(prevstate => ((prevstate[0]==0) ? [0, prevstate[1]] : [prevstate[0]-1, prevstate[1]]));
   }
 
   const onClickRowNext = () => {
-    setfetchInterval(prevstate => (prevstate[0]+1, prevstate[1]+1));
+    addLogs('Mouse Event', 'Clicked Next Row');
+    setFetchInterval(prevstate => (prevstate[0]+1, prevstate[1]+1));
   }
 
   const onClickColPrev = () => {
-    setcolInterval(prevstate => (((prevstate[0]==0) ? 0 : prevstate[0]-1), ((prevstate[0]==0) ? prevstate[1] : prevstate[1]-1)));
+    addLogs('Mouse Event', 'Clicked Previous Col');
+    setColInterval(prevstate => ((prevstate[0]==0) ? [0, prevstate[1]] : [prevstate[0]-1, prevstate[1]]));
   }
 
   const onClickColNext = () => {
-    setcolInterval(prevstate => (prevstate[0]+1, prevstate[1]+1));
+    addLogs('Mouse Event', 'Clicked Next Col');
+    setColInterval(prevstate => (prevstate[0]+1, prevstate[1]+1));
   }
   
   return (
@@ -247,7 +271,8 @@ function App() {
       <ambientLight />
       <pointLight position={[10, 10, 10]} />
       <DefaultXRControllers />
-      <SpreadSheet position={[0, 2, -1]} colInterval={colInterval} fetchInterval={fetchInterval} gridSize={[8, 10]} cellSize={[0.8, 0.2]} anglemax={-1.4} />
+      <Console logs={logs} />
+      <SpreadSheet data={csv} position={[0, 2, -1]} colInterval={colInterval} fetchInterval={fetchInterval} gridSize={[8, 10]} cellSize={[0.8, 0.2]} anglemax={-1.4} />
       <ButtonPanel onClickColPrev={onClickColPrev} onClickColNext={onClickColNext} onClickRowNext={onClickRowNext} onClickRowPrev={onClickRowPrev} position={[0, 1.5, -1]} rotation={[-0.8, 0, 0]} />
     </VRCanvas>
   )
