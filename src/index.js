@@ -35,7 +35,7 @@ function Box({ color, size, scale, children, ...rest }) {
 function Button({ children, size, color, fontSize, fontColor, ...rest}) {
   return (
     <Box color={color} size={size} {...rest}>
-      <Text position={[0, 0, 0.06]} fontSize={fontSize} color={fontColor} anchorX="center" anchorY="middle">
+      <Text fontSize={fontSize} color={fontColor} anchorX="center" anchorY="middle">
         {children}
       </Text>
     </Box>
@@ -78,7 +78,7 @@ function ButtonPanel({ onClickColPrev, onClickColNext, onClickRowPrev, onClickRo
 function Console({logs}){
 
   return (
-    <Box size={[4,4, 0.00]} position={[0, 6, -4]} rotation={[Math.PI*2.2, 0, 0]} color="black">
+    <Box size={[4, 4, 0]} position={[0, 6, -4]} rotation={[Math.PI*2.2, 0, 0]} color="black">
       <Text anchorX="center" anchorY="middle" position={[1,0,0.02]} maxWidth={3} color="white"  fontSize={0.12}>{'Console logs\n' + logs}</Text>
     </Box>
   )
@@ -225,7 +225,7 @@ function App() {
       return decoder.decode(result.value);
     })
     .then(csvStr => {
-      const csv_data = Papa.parse(csvStr);
+      const csv_data = Papa.parse(csvStr).data;
       setCsvFiles([csv_data[0], csv_data]);
       addLogs('Fetched Csv Files', csv_data.toString());
     })
