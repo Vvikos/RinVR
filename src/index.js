@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import ReactDOM from 'react-dom'
 import { VRCanvas, Interactive, DefaultXRControllers } from '@react-three/xr'
-import { Sky, Text } from '@react-three/drei'
+import { Sky, Text} from '@react-three/drei'
 import '@react-three/fiber'
 import Papa from 'papaparse';
 import './styles.css'
@@ -35,14 +35,14 @@ function Box({ color, size, scale, children, ...rest }) {
 function Button({ children, size, color, fontSize, fontColor, ...rest}) {
   return (
     <Box color={color} size={size} {...rest}>
-      <Text fontSize={fontSize} color={fontColor} anchorX="center" anchorY="middle">
+      <Text fontSize={fontSize} position={[-size[0]/2+0.1,0,0.07]} maxWidth={size[0]-0.2} color={fontColor} anchorX="left" anchorY="middle">
         {children}
       </Text>
     </Box>
   )
 }
 
-function ButtonPanel({ onClickColPrev, onClickColNext, onClickRowPrev, onClickRowNext, position, rotation }) {
+function ButtonPanel({ onClickRefresh, onClickColPrev, onClickColNext, onClickRowPrev, onClickRowNext, position, rotation }) {
   const [hover, setHover] = useState(false)
   const [select, setSelect] = useState(false)
   const [color, setColor] = useState(0xffffff)
@@ -65,21 +65,33 @@ function ButtonPanel({ onClickColPrev, onClickColNext, onClickRowPrev, onClickRo
   
   return (
     <Box color={color} size={[0.4, 0.4, 0.01]} position={position} rotation={rotation}>
+      <Interactive onSelect={function() { onSelect(); onClickRowNext(); }} onHover={onHover} onBlur={onBlur}>
+        <Button color={0xfc2617} fontColor={0xffffff} fontSize={0.015} size={[0.15, 0.1, 0.02]} position={[0, -0.15, 0.03]}>Next Row</Button>
+      </Interactive>
+      <Interactive onSelect={function() { onSelect(); onClickRowPrev(); }} onHover={onHover} onBlur={onBlur}>
+        <Button color={0xfc2617} fontColor={0xffffff} fontSize={0.015} size={[0.15, 0.1, 0.02]} position={[0, 0.15, 0.03]}>Previous Row</Button>
+      </Interactive>
+
+      <Interactive onSelect={function() { onSelect(); onClickRefresh(); }} onHover={onHover} onBlur={onBlur}>
+        <Button color={0x16a5f2} fontColor={0xffffff} fontSize={0.015} size={[0.1, 0.1, 0.02]} position={[0, 0, 0.03]}>Refresh</Button>
+      </Interactive>
+      
       <Interactive onSelect={function() { onSelect(); onClickColNext(); }} onHover={onHover} onBlur={onBlur}>
-        <Button scale={hover ? [1.1, 1.1, 1.1] : [1, 1, 1]} color={0xfc2617} fontColor={0xffffff} fontSize={0.015} size={[0.15, 0.1, 0.02]} position={[0.10, -0.15, 0.03]}>Next Col</Button>
+        <Button color={0xfc2617} fontColor={0xffffff} fontSize={0.015} size={[0.15, 0.1, 0.02]} position={[0.15, 0, 0.03]}>Next Col</Button>
       </Interactive>
       <Interactive onSelect={function() { onSelect(); onClickColPrev(); }} onHover={onHover} onBlur={onBlur}>
-        <Button scale={hover ? [1.1, 1.1, 1.1] : [1, 1, 1]} color={0xfc2617} fontColor={0xffffff} fontSize={0.015} size={[0.15, 0.1, 0.02]} position={[-0.10, -0.15, 0.03]}>Previous Col</Button>
+        <Button color={0xfc2617} fontColor={0xffffff} fontSize={0.015} size={[0.15, 0.1, 0.02]} position={[-0.15, 0, 0.03]}>Previous Col</Button>
       </Interactive>
     </Box>
   )
 }
 
-function Console({logs}){
+function Console({logs, rotation, position}){
 
   return (
-    <Box size={[4, 4, 0]} position={[0, 6, -4]} rotation={[Math.PI*2.2, 0, 0]} color="black">
-      <Text anchorX="center" anchorY="middle" position={[1,0,0.02]} maxWidth={3} color="white"  fontSize={0.12}>{'Console logs\n' + logs}</Text>
+    <Box size={[8, 4, 0]} position={position} rotation={rotation} color={0xf5f3ed}>
+      <Text anchorX="left" anchorY="top-baseline" position={[-3.7,1.7,0.1]} maxWidth={7.5} color="black" fontSize={0.15}>{'CONSOLE LOGS'}</Text>
+      <Text anchorX="left" anchorY="top-baseline" position={[-3.7,1.4,0.1]} maxWidth={7.5} color="black" fontSize={0.09}>{logs+"\n>"}</Text>
     </Box>
   )
 }
@@ -158,19 +170,23 @@ function SpreadSheet({data, position, colInterval, fetchInterval, gridSize, cell
     const rows = [];
     const startY = position[1]+gridSize[1]/2*cellSize[1];
 
+    let first_col_size = 0.2;
     let maxRows = gridSize[0];
     let pi_coeff = Math.PI/maxRows;
-    let circle_ray = 5;
+    let circle_ray = 6;
     
-    let rotation = [0,-Math.PI/2*Math.cos(-1*maxRows*pi_coeff),0];
-    let pos = [position[0]+circle_ray*Math.cos(-1*maxRows*pi_coeff), position[2]+startY, circle_ray*Math.sin(-1*maxRows*pi_coeff)];
-    let size = [cellSize[0], cellSize[1], 0.01];
+    //let rotation = [0,-Math.PI/2*Math.cos(-1*maxRows*pi_coeff),0];
+    //let pos = [position[0]+circle_ray*Math.cos(-1*maxRows*pi_coeff), position[2]+startY, circle_ray*Math.sin(-1*maxRows*pi_coeff)];
+    let size = [first_col_size, cellSize[1], 0.01];
     let data_col = range(fetchInterval);
+    let rotation = [0, 0, 0];
+    let pos = [position[0]+cellSize[0]*(-maxRows/2+1)-first_col_size, position[1], position[2]];
     rows.push(<DataCol key={'Col'+0} data={data_col} firstcol={true} fetchInterval={fetchInterval} position={pos} rotation={rotation} colSize={gridSize[1]} cellSize={size} />);
-   
+    size = [cellSize[0], cellSize[1], 0.01];
     for (let i=1; i < maxRows; i++){
-      rotation = [0,-Math.PI/2*Math.cos(-1*(maxRows-i)*pi_coeff),0];
-      pos = [position[0]+circle_ray*Math.cos(-1*(maxRows-i)*pi_coeff), position[2]+startY, circle_ray*Math.sin(-1*(maxRows-i)*pi_coeff)];
+      //rotation = [0,-Math.PI/2*Math.cos(-1*(maxRows-i)*pi_coeff),0];
+      //pos = [position[0]+circle_ray*Math.cos(-1*(maxRows-i)*pi_coeff), position[2]+startY, circle_ray*Math.sin(-1*(maxRows-i)*pi_coeff)];
+      pos = [position[0]+cellSize[0]*(i-maxRows/2+1/2), position[1], position[2]];
       data_col=[i];
       if(i+colInterval[0]-1 < data.length)
         data_col=data[colInterval[0]+i-1];
@@ -188,7 +204,7 @@ function SpreadSheet({data, position, colInterval, fetchInterval, gridSize, cell
 }
 
 function App() {
-  const [logs, setLogs] = useState('No console logs.\n');
+  const [logs, setLogs] = useState('>');
   const [csv, setCsv] = useState([]);
   const [csvFiles, setCsvFiles] = useState([['sample.csv'], []]);
   const [fetchInterval, setFetchInterval] = useState([0, GRID_NY-1]);
@@ -208,13 +224,15 @@ function App() {
       const csv_data = Papa.parse(csvStr);
       const csv_flip = csv_data.data.map((_, colIndex) => csv_data.data.map(row => row[colIndex]));
       setCsv(csv_flip);
-      addLogs('Fetched Csv', csv_flip.toString());
+      addLogs('Fetched CSV', 'length : '+csv_flip.length );
     })
     .catch(e => {
       console.log(e);
       return e;
     });
-    
+  }, [fetchInterval]);
+
+  useEffect(() => {
     fetch(API_R + "/csv_names", {mode: 'cors'})
     .then(res => {
       const reader = res.body.getReader();
@@ -236,22 +254,27 @@ function App() {
   }, []);
 
   const addLogs = (type, log) => {
-    const MAX_CHAR = 100;
-    let added_logs = 'LOGS | '+type+' : ' + log + '\n';
-    if(logs + added_logs.length < MAX_CHAR)
+    const MAX_CHAR = 1000;
+    let added_logs = '> '+type+' : ' + log;
+    if(logs.length + added_logs.length < MAX_CHAR)
       setLogs(logs+'\n'+added_logs);
     else
       setLogs(added_logs);
   }
 
+  const onClickRefresh = () => {
+    addLogs('Mouse Event', 'Clicked Refresh');
+    setFetchInterval(prevstate => ([prevstate[0], prevstate[1]]));
+  }
+
   const onClickRowPrev = () => {
     addLogs('Mouse Event', 'Clicked Previous Row');
-    setFetchInterval(prevstate => ((prevstate[0]==0) ? [0, prevstate[1]] : [prevstate[0]-1, prevstate[1]]));
+    setFetchInterval(prevstate => ((prevstate[0]==0) ? [0, prevstate[1]] : [prevstate[0]-1, prevstate[1]-1]));
   }
 
   const onClickRowNext = () => {
     addLogs('Mouse Event', 'Clicked Next Row');
-    setFetchInterval(prevstate => (prevstate[0]+1, prevstate[1]+1));
+    setFetchInterval(prevstate => ([prevstate[0]+1, prevstate[1]+1]));
   }
 
   const onClickColPrev = () => {
@@ -261,7 +284,7 @@ function App() {
 
   const onClickColNext = () => {
     addLogs('Mouse Event', 'Clicked Next Col');
-    setColInterval(prevstate => (prevstate[0]+1, prevstate[1]+1));
+    setColInterval(prevstate => ([prevstate[0]+1, prevstate[1]+1]));
   }
   
   return (
@@ -271,9 +294,25 @@ function App() {
       <ambientLight />
       <pointLight position={[10, 10, 10]} />
       <DefaultXRControllers />
-      <Console logs={logs} />
-      <SpreadSheet data={csv} position={[0, 2, -1]} colInterval={colInterval} fetchInterval={fetchInterval} gridSize={[8, 10]} cellSize={[0.8, 0.2]} anglemax={-1.4} />
-      <ButtonPanel onClickColPrev={onClickColPrev} onClickColNext={onClickColNext} onClickRowNext={onClickRowNext} onClickRowPrev={onClickRowPrev} position={[0, 1.5, -1]} rotation={[-0.8, 0, 0]} />
+      <Console position={[0, 6, -4]} rotation={[Math.PI*2.2, 0, 0]} logs={logs} />
+      <SpreadSheet 
+        data={csv} 
+        position={[0, 2, -7]} 
+        colInterval={colInterval} 
+        fetchInterval={fetchInterval} 
+        gridSize={[8, 10]} 
+        cellSize={[2.5, 0.2]} 
+        anglemax={-1.4} 
+      />
+      <ButtonPanel 
+        position={[0, 1, -1]} 
+        rotation={[-0.8, 0, 0]} 
+        onClickColPrev={onClickColPrev} 
+        onClickColNext={onClickColNext} 
+        onClickRowPrev={onClickRowPrev} 
+        onClickRowNext={onClickRowNext} 
+        onClickRefresh={onClickRefresh}
+      />
     </VRCanvas>
   )
 }
