@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react'
 import ReactDOM from 'react-dom'
-import { VRCanvas, Interactive, DefaultXRControllers } from '@react-three/xr'
-import { Sky, Text} from '@react-three/drei'
+import { VRCanvas, DefaultXRControllers } from '@react-three/xr'
+import { Sky } from '@react-three/drei'
 import Console from './components/Console'
 import SpreadSheet from './components/SpreadSheet'
 import ButtonPanel from './components/ButtonPanel'
 import RService from './services/RService'
 import '@react-three/fiber'
-import Papa from 'papaparse';
 import './styles.css'
 
 const CELL_X_SIZE = 0.4;
@@ -15,7 +14,7 @@ const CELL_Y_SIZE = 0.2;
 const ANGLE_MAX = -1.3;
 const GRID_NX = 20;
 const GRID_NY = 10;
-const API_R = 'https://vr.achencraft.fr';
+const FETCH_SIZE = 40;
 
 function Floor() {
   return (
@@ -30,7 +29,8 @@ function App() {
   const [logs, setLogs] = useState('');
   const [csv, setCsv] = useState([]);
   const [csvFiles, setCsvFiles] = useState(['', []]);
-  const [fetchInterval, setFetchInterval] = useState([0, GRID_NY-1]);
+  const [fetchInterval, setFetchInterval] = useState([0, 1]);
+  const [rowInterval, setRowInterval] = useState([0, GRID_NY-1]);
   const [colInterval, setColInterval] = useState([0, 8]);
 
   useEffect(() => {
@@ -38,10 +38,21 @@ function App() {
       addLogs('NO REQUEST', 'csv details not fetched because no file selected');
       return;
     }
+    if(rowInterval[1]+rowInterval[0]>fetchInterval[0]+fetchInterval[1]){
+      setFetchInterval(prevstate => ([prevstate[0], prevstate[1]+FETCH_SIZE]));
+    }
+
+  }, [rowInterval, csvFiles]);
+
+  useEffect(() => {
+    if(csvFiles[0]=='') {
+      addLogs('NO REQUEST', 'csv details not fetched because no file selected');
+      return;
+    }
+
     RService.getCsv(csvFiles[0], fetchInterval).then(response => setCsv(response));
     addLogs('REQUEST 200 OK', 'csv details fetched');
-
-  }, [fetchInterval, csvFiles]);
+  }, [fetchInterval]);
 
   useEffect(() => {
     RService.getCsvFiles().then(response => setCsvFiles(['', response]));
@@ -64,17 +75,17 @@ function App() {
 
   const onClickRefresh = () => {
     addLogs('Mouse Event', 'Clicked Refresh');
-    setFetchInterval(prevstate => ([prevstate[0], prevstate[1]]));
+    setRowInterval(prevstate => ([prevstate[0], prevstate[1]]));
   }
 
   const onClickRowPrev = () => {
     addLogs('Mouse Event', 'Clicked Previous Row');
-    setFetchInterval(prevstate => ((prevstate[0]==0) ? [0, prevstate[1]] : [prevstate[0]-1, prevstate[1]-1]));
+    setRowInterval(prevstate => ((prevstate[0]==0) ? [0, prevstate[1]] : [prevstate[0]-1, prevstate[1]]));
   }
 
   const onClickRowNext = () => {
     addLogs('Mouse Event', 'Clicked Next Row');
-    setFetchInterval(prevstate => ([prevstate[0]+1, prevstate[1]+1]));
+    setRowInterval(prevstate => ([prevstate[0]+1, prevstate[1]]));
   }
 
   const onClickColPrev = () => {
@@ -99,7 +110,7 @@ function App() {
         data={csv} 
         position={[0, 2, -7]} 
         colInterval={colInterval} 
-        fetchInterval={fetchInterval} 
+        rowInterval={rowInterval} 
         gridSize={[8, 10]} 
         cellSize={[2.5, 0.2]} 
         anglemax={-1.4} 

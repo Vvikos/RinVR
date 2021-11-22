@@ -16,7 +16,6 @@ class RService {
         .then(csvStr => {
             const csv_data = Papa.parse(csvStr).data;
             return csv_data;
-            //setCsvFiles([csv_data[0], csv_data]);
         })
         .catch(e => {
             console.log(e);
@@ -25,7 +24,7 @@ class RService {
     }
     
     getCsv(csvName, fetchInterval) {
-        return fetch(API_R + "/csv?name="+csvName+"&offset="+fetchInterval[0]+"&limit="+(fetchInterval[1]-fetchInterval[0]), {mode: 'cors'})
+        return fetch(API_R + "/csv?name="+csvName+"&offset="+fetchInterval[0]+"&limit="+fetchInterval[1], {mode: 'cors'})
         .then(res => {
             const reader = res.body.getReader();
             return reader.read();
@@ -38,7 +37,6 @@ class RService {
             const csv_data = Papa.parse(csvStr).data;
             const csv_flip = csv_data.map((_, colIndex) => csv_data.map(row => row[colIndex]));
             return csv_flip;
-            //setCsv(csv_flip);
         })
         .catch(e => {
             console.log(e);
