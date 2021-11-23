@@ -54,8 +54,6 @@ function DataCol({data, colId, firstcol, rowInterval, onClickCol, position, cell
             text = '';
           colorBtn=0x000000;
           fontColor=0xffffff;
-        } else if (selected) {
-          colorBtn=0xffa36e;
         }
 
         if(i >= data.length && !firstcol)
