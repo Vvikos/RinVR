@@ -3,18 +3,24 @@ import { Interactive } from '@react-three/xr'
 import Button from './Button'
 import Box from './Box'
 
-function DataCol({data, colId, firstcol, rowInterval, onClickCol, position, cellSize, rotation}){
+function DataCol({data, colId, firstcol, rowInterval, onClickCol, position, cellSize, rotation, selected}){
     const [hover, setHover] = useState(false)
-    const [select, setSelect] = useState(false)
+    const [select, setSelect] = useState(selected)
     const [color, setColor] = useState(0xffffff)
-  
-    const onSelect = () => {
+
+    useEffect(() => {
       if (select)
         setColor(0xffa36e);
       else
         setColor(0xffffff);
-      setSelect(!select);
-    }
+    }, []);
+
+    useEffect(() => {
+      if (select)
+        setColor(0xffa36e);
+      else
+        setColor(0xffffff);
+    }, [select]);
   
     const onHover = () => {
       setHover(true);
@@ -48,7 +54,10 @@ function DataCol({data, colId, firstcol, rowInterval, onClickCol, position, cell
             text = '';
           colorBtn=0x000000;
           fontColor=0xffffff;
+        } else if (selected) {
+          colorBtn=0xffa36e;
         }
+
         if(i >= data.length && !firstcol)
           text = '';
         
@@ -60,22 +69,17 @@ function DataCol({data, colId, firstcol, rowInterval, onClickCol, position, cell
   
     return (
         <Box scale={hover ? [1.01, 1.01, 1.01] : [1, 1, 1]} position={position} rotation={rotation} size={[0,0,0]}>
-          <Interactive onSelect={function() { onClickCol(); onSelect(); }} onHover={onHover} onBlur={onBlur}>
+          <Interactive onSelect={function() { onClickCol(colId); setSelect(!select); }} onHover={onHover} onBlur={onBlur}>
             {generateCells()}
           </Interactive>
         </Box>
     )
   }
 
-  function SpreadSheet({data, position, colInterval, rowInterval, gridSize, cellSize, anglemax}){
-    const [selected, setSelected] = useState([])
+  function SpreadSheet({data, position, colInterval, rowInterval, gridSize, cellSize, anglemax, onClickCol}){
 
     function range([start, end]) {
       return Array(end - start + 1).fill().map((_, idx) => start + idx)
-    }
-
-    const onClickCol = (col) => {
-      //setSelected(prevstate => (prevstate[col]))
     }
   
     const generateGrid = () => {
@@ -93,16 +97,40 @@ function DataCol({data, colId, firstcol, rowInterval, onClickCol, position, cell
       let data_col = range(rowInterval);
       let rotation = [0, 0, 0];
       let pos = [position[0]+cellSize[0]*(-maxRows/2+1)-first_col_size, position[1], position[2]];
-      rows.push(<DataCol key={0} data={data_col} firstcol={true} rowInterval={rowInterval} position={pos} rotation={rotation} colSize={gridSize[1]} cellSize={size} />);
+      rows.push(
+        <DataCol 
+          colId={0} 
+          data={data_col} 
+          firstcol={true} 
+          rowInterval={rowInterval} 
+          position={pos} 
+          rotation={rotation} 
+          colSize={gridSize[1]} 
+          cellSize={size} 
+          selected={false} 
+        />
+      );
       size = [cellSize[0], cellSize[1], 0.01];
       for (let i=1; i < maxRows; i++){
         //rotation = [0,-Math.PI/2*Math.cos(-1*(maxRows-i)*pi_coeff),0];
         //pos = [position[0]+circle_ray*Math.cos(-1*(maxRows-i)*pi_coeff), position[2]+startY, circle_ray*Math.sin(-1*(maxRows-i)*pi_coeff)];
         pos = [position[0]+cellSize[0]*(i-maxRows/2+1/2), position[1], position[2]];
         data_col=[i];
-        if(i+colInterval[0]-1 < data.length)
-          data_col=data[colInterval[0]+i-1];
-        rows.push(<DataCol key={i} data={data_col} firstcol={false} rowInterval={rowInterval} position={pos} rotation={rotation} cellSize={size} />);
+        if(i+colInterval[0]-1 < data[1].length)
+          data_col=data[1][colInterval[0]+i-1];
+        rows.push(
+          <DataCol 
+            onClickCol={function() {onClickCol(i+colInterval[0]-1);}} 
+            selected={data[0][i+colInterval[0]-1]} 
+            colId={i} 
+            data={data_col} 
+            firstcol={false} 
+            rowInterval={rowInterval} 
+            position={pos} 
+            rotation={rotation} 
+            cellSize={size} 
+          />
+        );
       }
       console.log(data);
       return rows;

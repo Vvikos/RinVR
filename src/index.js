@@ -27,7 +27,7 @@ function Floor() {
 
 function App() {
   const [logs, setLogs] = useState('');
-  const [csv, setCsv] = useState([]);
+  const [csv, setCsv] = useState([[],[]]);
   const [csvFiles, setCsvFiles] = useState(['', []]);
   const [fetchInterval, setFetchInterval] = useState([0, 1]);
   const [rowInterval, setRowInterval] = useState([0, GRID_NY-1]);
@@ -35,7 +35,7 @@ function App() {
 
   useEffect(() => {
     if(csvFiles[0]=='') {
-      addLogs('NO REQUEST', 'csv details not fetched because no file selected');
+      addLogs('NO REQUEST', 'NO FETCH');
       return;
     }
     if(rowInterval[1]+rowInterval[0]>fetchInterval[0]+fetchInterval[1]){
@@ -46,17 +46,17 @@ function App() {
 
   useEffect(() => {
     if(csvFiles[0]=='') {
-      addLogs('NO REQUEST', 'csv details not fetched because no file selected');
+      addLogs('NO REQUEST', 'NO FETCH');
       return;
     }
 
-    RService.getCsv(csvFiles[0], fetchInterval).then(response => setCsv(response));
-    addLogs('REQUEST 200 OK', 'csv details fetched');
+    RService.getCsv(csvFiles[0], fetchInterval).then(response => setCsv([Array(response.length).fill(false), response]));
+    addLogs('REQUEST 200 OK', 'DETAILS FETCHED');
   }, [fetchInterval]);
 
   useEffect(() => {
     RService.getCsvFiles().then(response => setCsvFiles(['', response]));
-    addLogs('REQUEST 200 OK', 'csv files fetched');
+    addLogs('REQUEST 200 OK', 'FILES FETCHED');
   }, []);
 
   const addLogs = (type, log) => {
@@ -97,6 +97,14 @@ function App() {
     addLogs('Mouse Event', 'Clicked Next Col');
     setColInterval(prevstate => ([prevstate[0]+1, prevstate[1]+1]));
   }
+
+  const onClickCol = (colId) => {
+    let selected = csv[0];
+    selected[colId] = !selected[colId];
+    let info = ((selected[colId]) ? 'Selected' : 'Unselected')
+    addLogs('COL SELECTION', 'Col '+colId+' '+info);
+    setCsv([selected, csv[1]]);
+  }
   
   return (
     <VRCanvas>
@@ -114,6 +122,7 @@ function App() {
         gridSize={[8, 10]} 
         cellSize={[2.5, 0.2]} 
         anglemax={-1.4} 
+        onClickCol={onClickCol}
       />
       <ButtonPanel 
         position={[0, 1, -1.5]} 
