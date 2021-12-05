@@ -5,22 +5,21 @@ import Box from './Box'
 
 function DataCol({data, colId, firstcol, rowInterval, onClickCol, position, cellSize, rotation, selected}){
     const [hover, setHover] = useState(false)
-    const [select, setSelect] = useState(selected)
     const [color, setColor] = useState(0xffffff)
 
     useEffect(() => {
-      if (select)
+      if (selected)
         setColor(0xffa36e);
       else
         setColor(0xffffff);
     }, []);
 
     useEffect(() => {
-      if (select)
+      if (selected)
         setColor(0xffa36e);
       else
         setColor(0xffffff);
-    }, [select]);
+    }, [selected]);
   
     const onHover = () => {
       setHover(true);
@@ -52,6 +51,8 @@ function DataCol({data, colId, firstcol, rowInterval, onClickCol, position, cell
         } else if (i==0) {
           if (firstcol)
             text = '';
+          else 
+            text = data[0];
           colorBtn=0x000000;
           fontColor=0xffffff;
         }
@@ -67,7 +68,7 @@ function DataCol({data, colId, firstcol, rowInterval, onClickCol, position, cell
   
     return (
         <Box scale={hover ? [1.01, 1.01, 1.01] : [1, 1, 1]} position={position} rotation={rotation} size={[0,0,0]}>
-          <Interactive onSelect={function() { onClickCol(colId); setSelect(!select); }} onHover={onHover} onBlur={onBlur}>
+          <Interactive onSelect={function() { onClickCol(colId); }} onHover={onHover} onBlur={onBlur}>
             {generateCells()}
           </Interactive>
         </Box>
@@ -86,9 +87,9 @@ function DataCol({data, colId, firstcol, rowInterval, onClickCol, position, cell
   
       let first_col_size = 0.2;
       let maxRows = gridSize[0];
-      let pi_coeff = Math.PI/maxRows;
-      let circle_ray = 6;
-      
+      // Circle geometry TODO
+      //let pi_coeff = Math.PI/maxRows;
+      //let circle_ray = 6;
       //let rotation = [0,-Math.PI/2*Math.cos(-1*maxRows*pi_coeff),0];
       //let pos = [position[0]+circle_ray*Math.cos(-1*maxRows*pi_coeff), position[2]+startY, circle_ray*Math.sin(-1*maxRows*pi_coeff)];
       let size = [first_col_size, cellSize[1], 0.01];
@@ -109,17 +110,18 @@ function DataCol({data, colId, firstcol, rowInterval, onClickCol, position, cell
         />
       );
       size = [cellSize[0], cellSize[1], 0.01];
-      for (let i=1; i < maxRows; i++){
+      for (let i=0; i < maxRows; i++){
+        let colId = i+1, colIdx = i+colInterval[0];
         //rotation = [0,-Math.PI/2*Math.cos(-1*(maxRows-i)*pi_coeff),0];
         //pos = [position[0]+circle_ray*Math.cos(-1*(maxRows-i)*pi_coeff), position[2]+startY, circle_ray*Math.sin(-1*(maxRows-i)*pi_coeff)];
-        pos = [position[0]+cellSize[0]*(i-maxRows/2+1/2), position[1], position[2]];
+        pos = [position[0]+cellSize[0]*(colId-maxRows/2+1/2), position[1], position[2]];
         data_col=[i];
-        if(i+colInterval[0]-1 < data[1].length)
-          data_col=data[1][colInterval[0]+i-1];
+        if(colIdx < data[1].length)
+          data_col=data[1][colIdx];
         rows.push(
           <DataCol 
-            onClickCol={function() {onClickCol(i+colInterval[0]-1);}} 
-            selected={data[0][i+colInterval[0]-1]} 
+            onClickCol={function() {onClickCol(colIdx);}} 
+            selected={data[0][colIdx]} 
             colId={i} 
             data={data_col} 
             firstcol={false} 

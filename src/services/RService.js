@@ -3,7 +3,7 @@ import Papa from 'papaparse';
 const API_R = 'https://vr.achencraft.fr';
 
 class RService {
-    getCsvFiles() {
+    async getCsvFiles() {
         return fetch(API_R + "/csv_names", {mode: 'cors'})
         .then(res => {
             const reader = res.body.getReader();
@@ -23,7 +23,7 @@ class RService {
         });
     }
     
-    getCsv(csvName, fetchInterval) {
+    async getCsv(csvName, fetchInterval) {
         return fetch(API_R + "/csv?name="+csvName+"&offset="+fetchInterval[0]+"&limit="+fetchInterval[1], {mode: 'cors'})
         .then(res => {
             const reader = res.body.getReader();

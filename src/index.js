@@ -98,11 +98,11 @@ function App() {
     setColInterval(prevstate => ([prevstate[0]+1, prevstate[1]+1]));
   }
 
-  const onClickCol = (colId) => {
+  const onClickCol = (colIdx) => {
     let selected = csv[0];
-    selected[colId] = !selected[colId];
-    let info = ((selected[colId]) ? 'Selected' : 'Unselected')
-    addLogs('COL SELECTION', 'Col '+colId+' '+info);
+    selected[colIdx] = !selected[colIdx];
+    let info = ((selected[colIdx]) ? 'Selected' : 'Unselected')
+    addLogs('COL SELECTION', 'Col '+colIdx+' '+info);
     setCsv([selected, csv[1]]);
   }
   
