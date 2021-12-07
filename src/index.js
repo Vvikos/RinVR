@@ -12,8 +12,6 @@ import './styles.css'
 const CELL_X_SIZE = 0.4;
 const CELL_Y_SIZE = 0.2;
 const ANGLE_MAX = -1.3;
-const GRID_NX = 20;
-const GRID_NY = 10;
 const FETCH_SIZE = 40;
 
 function Floor() {
@@ -26,19 +24,21 @@ function Floor() {
 }
 
 function App() {
+  const [gridSize, setGridSize] = useState([10, 10]);
   const [logs, setLogs] = useState('');
-  const [csv, setCsv] = useState([[],[]]);
+  const [csv, setCsv] = useState([]);
+  const [selectedCols, setSelectedCols] = useState([]);
   const [csvFiles, setCsvFiles] = useState(['', []]);
-  const [fetchInterval, setFetchInterval] = useState([0, 1]);
-  const [rowInterval, setRowInterval] = useState([0, GRID_NY-1]);
-  const [colInterval, setColInterval] = useState([0, 8]);
+  const [fetchInterval, setFetchInterval] = useState([0, 0]);
+  const [rowInterval, setRowInterval] = useState([0, 9]);
+  const [colInterval, setColInterval] = useState([0, 9]);
 
   useEffect(() => {
     if(csvFiles[0]=='') {
       addLogs('NO REQUEST', 'NO FETCH');
       return;
     }
-    if(rowInterval[1]+rowInterval[0]>fetchInterval[0]+fetchInterval[1]){
+    if(rowInterval[1]+rowInterval[0]>=fetchInterval[0]+fetchInterval[1]){
       setFetchInterval(prevstate => ([prevstate[0], prevstate[1]+FETCH_SIZE]));
     }
 
@@ -50,12 +50,23 @@ function App() {
       return;
     }
 
-    RService.getCsv(csvFiles[0], fetchInterval).then(response => setCsv([Array(response.length).fill(false), response]));
-    addLogs('REQUEST 200 OK', 'DETAILS FETCHED');
+    RService.getCsv(csvFiles[0], fetchInterval).then(response => setCsv(response));
+    addLogs('DETAILS FETCHED', '['+fetchInterval[0]+','+(fetchInterval[0]+fetchInterval[1])+']');
   }, [fetchInterval]);
 
   useEffect(() => {
-    RService.getCsvFiles().then(response => setCsvFiles(['', response]));
+    /*if (csv.length>0 && csv[1].length>0 && csv[1][0].length>0) {
+      setRowInterval([0, ((csv[1][0].length < gridSize[1]-1) ? csv[1][0].length : gridSize[1]-1)]);
+      setColInterval([0, ((csv[1].length < gridSize[0]-1) ? csv[1].length : gridSize[0]-1)]);
+    }*/
+    setSelectedCols(Array(csv.length).fill(false));
+    if (csv.length>0)
+      addLogs('REQUEST 200 OK', 'CSV SIZE ' + csv.length + 'x' + csv[0].length);
+    console.log('REQUEST DONE' + csv);
+  }, [csv]);
+
+  useEffect(() => {
+    RService.getCsvFiles().then(response => setCsvFiles([response[0], response]));
     addLogs('REQUEST 200 OK', 'FILES FETCHED');
   }, []);
 
@@ -75,35 +86,35 @@ function App() {
 
   const onClickRefresh = () => {
     addLogs('Mouse Event', 'Clicked Refresh');
-    setRowInterval(prevstate => ([prevstate[0], prevstate[1]]));
+    setRowInterval(rowInterval);
   }
 
   const onClickRowPrev = () => {
     addLogs('Mouse Event', 'Clicked Previous Row');
-    setRowInterval(prevstate => ((prevstate[0]==0) ? [0, prevstate[1]] : [prevstate[0]-1, prevstate[1]]));
+    setRowInterval(prevstate => ((prevstate[0]==0) ? prevstate : [prevstate[0]-1, prevstate[1]]));
   }
 
   const onClickRowNext = () => {
-    addLogs('Mouse Event', 'Clicked Next Row');
-    setRowInterval(prevstate => ([prevstate[0]+1, prevstate[1]]));
+    addLogs('Clicked Next Row', '['+(rowInterval[0]+1)+','+(rowInterval[0]+rowInterval[1]+1)+'] '+csv.length+'x'+csv[0].length);
+    setRowInterval(prevstate => ((prevstate[0]+prevstate[1]>=csv.length-2) ? prevstate : [prevstate[0]+1, prevstate[1]]));
   }
 
   const onClickColPrev = () => {
     addLogs('Mouse Event', 'Clicked Previous Col');
-    setColInterval(prevstate => ((prevstate[0]==0) ? [0, prevstate[1]] : [prevstate[0]-1, prevstate[1]]));
+    setColInterval(prevstate => ((prevstate[0]==0) ? prevstate : [prevstate[0]-1, prevstate[1]]));
   }
 
   const onClickColNext = () => {
-    addLogs('Mouse Event', 'Clicked Next Col');
-    setColInterval(prevstate => ([prevstate[0]+1, prevstate[1]+1]));
+    addLogs('Clicked Next Col', '['+(colInterval[0]+1)+','+(colInterval[0]+colInterval[1]+1)+'] '+csv.length+'x'+csv[0].length);
+    setColInterval(prevstate => ((prevstate[0]+prevstate[1]>=csv[0].length-2) ? prevstate : [prevstate[0]+1, prevstate[1]]));
   }
 
   const onClickCol = (colIdx) => {
-    let selected = csv[0];
+    let selected = selectedCols;
     selected[colIdx] = !selected[colIdx];
     let info = ((selected[colIdx]) ? 'Selected' : 'Unselected')
     addLogs('COL SELECTION', 'Col '+colIdx+' '+info);
-    setCsv([selected, csv[1]]);
+    setSelectedCols(selected);
   }
   
   return (
@@ -116,10 +127,11 @@ function App() {
       <Console position={[0, 6, -4]} rotation={[Math.PI*2.2, 0, 0]} logs={logs} />
       <SpreadSheet 
         data={csv} 
-        position={[0, 2, -7]} 
+        selectedCols={selectedCols}
+        position={[0, 2, -7]}
+        gridSize={[10,10]}
         colInterval={colInterval} 
-        rowInterval={rowInterval} 
-        gridSize={[8, 10]} 
+        rowInterval={rowInterval}
         cellSize={[2.5, 0.2]} 
         anglemax={-1.4} 
         onClickCol={onClickCol}

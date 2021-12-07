@@ -3,7 +3,7 @@ import { Interactive } from '@react-three/xr'
 import Button from './Button'
 import Box from './Box'
 
-function DataCol({data, colId, firstcol, rowInterval, onClickCol, position, cellSize, rotation, selected}){
+function DataCol({data, colId, colSize, firstcol, rowInterval, onClickCol, position, cellSize, rotation, selected}){
     const [hover, setHover] = useState(false)
     const [color, setColor] = useState(0xffffff)
 
@@ -32,35 +32,31 @@ function DataCol({data, colId, firstcol, rowInterval, onClickCol, position, cell
     const generateCells = () => {
       const row = [];
       let fontSize = 0.1;
-      let maxCells = rowInterval[1];
-      for (let i=0; i < maxCells; i++){
-        var longest = data.reduce(
-          function (a, b) {
-              return a.length > b.length ? a : b;
-          }
-        );
+      let longest = data.reduce(
+        function (a, b) {
+            return a.length > b.length ? a : b;
+        }
+      );
+
+      for (let i=0; i < colSize; i++){
+        let rowIdx = rowInterval[0] + i;
         let size = [((cellSize[0]<longest.length*fontSize/2) ? longest.length*fontSize/2 : cellSize[0]), cellSize[1], 0.1];
-        let position = [0, cellSize[1]*(maxCells/2-i), 0.1];
-        let text = data[rowInterval[0] + i];
+        let position = [0, cellSize[1]*(colSize/2-i), 0.1];
+        let text = '';
         let colorBtn=color;
-        let fontColor=0x000000
-        if(firstcol){
-          text = (rowInterval[0]+i)+'';
-          colorBtn=0x000000;
-          fontColor=0xffffff;
-        } else if (i==0) {
-          if (firstcol)
-            text = '';
-          else 
-            text = data[0];
+        let fontColor=0x000000;
+        if(firstcol || i==0){
           colorBtn=0x000000;
           fontColor=0xffffff;
         }
-
-        if(i >= data.length && !firstcol)
-          text = '';
         
-        row.push(<Button key={i+''+maxCells} position={position} fontSize={fontSize} fontColor={fontColor} color={colorBtn} size={size}>{text}</Button>);
+        if(firstcol){
+          text = ((i==0) ? '' : rowIdx+'');
+        } else if(i < data.length) {
+          text = ((i==0) ? data[0] : data[rowIdx]+'');
+        }
+        
+        row.push(<Button key={i+''+colSize} position={position} fontSize={fontSize} fontColor={fontColor} color={colorBtn} size={size}>{text}</Button>);
       }
 
       return row;
@@ -75,7 +71,7 @@ function DataCol({data, colId, firstcol, rowInterval, onClickCol, position, cell
     )
   }
 
-  function SpreadSheet({data, position, colInterval, rowInterval, gridSize, cellSize, anglemax, onClickCol}){
+  function SpreadSheet({data, selectedCols, position, colInterval, rowInterval, gridSize, cellSize, anglemax, onClickCol}){
 
     function range([start, end]) {
       return Array(end - start + 1).fill().map((_, idx) => start + idx)
@@ -85,17 +81,18 @@ function DataCol({data, colId, firstcol, rowInterval, onClickCol, position, cell
       const rows = [];
       const startY = position[1]+gridSize[1]/2*cellSize[1];
   
-      let first_col_size = 0.2;
+      let firstColSize = 0.2;
+      console.log('GRIDSIZE : ' + gridSize);
       let maxRows = gridSize[0];
       // Circle geometry TODO
       //let pi_coeff = Math.PI/maxRows;
       //let circle_ray = 6;
       //let rotation = [0,-Math.PI/2*Math.cos(-1*maxRows*pi_coeff),0];
       //let pos = [position[0]+circle_ray*Math.cos(-1*maxRows*pi_coeff), position[2]+startY, circle_ray*Math.sin(-1*maxRows*pi_coeff)];
-      let size = [first_col_size, cellSize[1], 0.01];
+      let size = [firstColSize, cellSize[1], 0.01];
       let data_col = range(rowInterval);
       let rotation = [0, 0, 0];
-      let pos = [position[0]+cellSize[0]*(-maxRows/2+1)-first_col_size, position[1], position[2]];
+      let pos = [position[0]+cellSize[0]*(-maxRows/2+1)-firstColSize, position[1], position[2]];
       rows.push(
         <DataCol 
           colId={0} 
@@ -106,7 +103,8 @@ function DataCol({data, colId, firstcol, rowInterval, onClickCol, position, cell
           rotation={rotation} 
           colSize={gridSize[1]} 
           cellSize={size} 
-          selected={false} 
+          selected={false}
+          onClickCol={function() {}}
         />
       );
       size = [cellSize[0], cellSize[1], 0.01];
@@ -116,16 +114,19 @@ function DataCol({data, colId, firstcol, rowInterval, onClickCol, position, cell
         //pos = [position[0]+circle_ray*Math.cos(-1*(maxRows-i)*pi_coeff), position[2]+startY, circle_ray*Math.sin(-1*(maxRows-i)*pi_coeff)];
         pos = [position[0]+cellSize[0]*(colId-maxRows/2+1/2), position[1], position[2]];
         data_col=[i];
-        if(colIdx < data[1].length)
-          data_col=data[1][colIdx];
+        if(colIdx < data.length){
+          data_col=data[colIdx];
+        }
+        console.log('row'+i+' pushed');
         rows.push(
           <DataCol 
             onClickCol={function() {onClickCol(colIdx);}} 
-            selected={data[0][colIdx]} 
+            selected={selectedCols[colIdx]} 
             colId={i} 
             data={data_col} 
             firstcol={false} 
             rowInterval={rowInterval} 
+            colSize={gridSize[1]}
             position={pos} 
             rotation={rotation} 
             cellSize={size} 
