@@ -12,7 +12,7 @@ import './styles.css'
 const CELL_X_SIZE = 0.4;
 const CELL_Y_SIZE = 0.2;
 const ANGLE_MAX = -1.3;
-const FETCH_SIZE = 40;
+const FETCH_SIZE = 10;
 
 function Floor() {
   return (
@@ -31,7 +31,7 @@ function App() {
   const [csvFiles, setCsvFiles] = useState(['', []]);
   const [fetchInterval, setFetchInterval] = useState([0, 0]);
   const [rowInterval, setRowInterval] = useState([0, 9]);
-  const [colInterval, setColInterval] = useState([20, 29]);
+  const [colInterval, setColInterval] = useState([0, 9]);
 
   useEffect(() => {
     if(csvFiles[0]=='') {

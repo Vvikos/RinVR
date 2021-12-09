@@ -1,6 +1,7 @@
 import Papa from 'papaparse';
 
-const API_R = 'https://vr.achencraft.fr';
+//const API_R = 'https://vr.achencraft.fr';
+const API_R = 'http://localhost:8000';
 
 class RService {
     async getCsvFiles() {
@@ -14,7 +15,7 @@ class RService {
             return decoder.decode(result.value);
         })
         .then(csvStr => {
-            const csv_data = Papa.parse(csvStr).data;
+            const csv_data = JSON.parse(csvStr);
             return csv_data;
         })
         .catch(e => {
