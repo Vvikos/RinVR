@@ -34,7 +34,15 @@ function DataCol({data, colId, colSize, firstcol, rowInterval, onClickCol, posit
       let fontSize = 0.1;
       let longest = data.reduce(
         function (a, b) {
-            return a.length > b.length ? a : b;
+            if (a == null && b == null){
+              return "default_text";
+            } else if (a == null) {
+              return b;
+            } else if (b == null){
+              return a;
+            } else {
+              return a.length > b.length ? a : b;
+            }
         }
       );
 
@@ -56,7 +64,7 @@ function DataCol({data, colId, colSize, firstcol, rowInterval, onClickCol, posit
           text = ((i==0) ? data[0] : data[rowIdx]+'');
         }
         
-        row.push(<Button key={i+''+colSize} position={position} fontSize={fontSize} fontColor={fontColor} color={colorBtn} size={size}>{text}</Button>);
+        row.push(<Button key={i+'x'+colSize} position={position} fontSize={fontSize} fontColor={fontColor} color={colorBtn} size={size}>{text}</Button>);
       }
 
       return row;
@@ -82,7 +90,6 @@ function DataCol({data, colId, colSize, firstcol, rowInterval, onClickCol, posit
       const startY = position[1]+gridSize[1]/2*cellSize[1];
   
       let firstColSize = 0.2;
-      console.log('GRIDSIZE : ' + gridSize);
       let maxRows = gridSize[0];
       // Circle geometry TODO
       //let pi_coeff = Math.PI/maxRows;
@@ -95,6 +102,7 @@ function DataCol({data, colId, colSize, firstcol, rowInterval, onClickCol, posit
       let pos = [position[0]+cellSize[0]*(-maxRows/2+1)-firstColSize, position[1], position[2]];
       rows.push(
         <DataCol 
+          key={'Col0'}
           colId={0} 
           data={data_col} 
           firstcol={true} 
@@ -117,9 +125,9 @@ function DataCol({data, colId, colSize, firstcol, rowInterval, onClickCol, posit
         if(colIdx < data.length){
           data_col=data[colIdx];
         }
-        console.log('row'+i+' pushed');
         rows.push(
-          <DataCol 
+          <DataCol
+            key={'Col'+colId}
             onClickCol={function() {onClickCol(colIdx);}} 
             selected={selectedCols[colIdx]} 
             colId={i} 

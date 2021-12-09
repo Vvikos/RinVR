@@ -31,7 +31,7 @@ function App() {
   const [csvFiles, setCsvFiles] = useState(['', []]);
   const [fetchInterval, setFetchInterval] = useState([0, 0]);
   const [rowInterval, setRowInterval] = useState([0, 9]);
-  const [colInterval, setColInterval] = useState([0, 9]);
+  const [colInterval, setColInterval] = useState([20, 29]);
 
   useEffect(() => {
     if(csvFiles[0]=='') {
@@ -55,14 +55,13 @@ function App() {
   }, [fetchInterval]);
 
   useEffect(() => {
-    /*if (csv.length>0 && csv[1].length>0 && csv[1][0].length>0) {
+    if (csv.length>0 && csv[1].length>0 && csv[1][0].length>0) {
       setRowInterval([0, ((csv[1][0].length < gridSize[1]-1) ? csv[1][0].length : gridSize[1]-1)]);
       setColInterval([0, ((csv[1].length < gridSize[0]-1) ? csv[1].length : gridSize[0]-1)]);
-    }*/
+    }
     setSelectedCols(Array(csv.length).fill(false));
     if (csv.length>0)
       addLogs('REQUEST 200 OK', 'CSV SIZE ' + csv.length + 'x' + csv[0].length);
-    console.log('REQUEST DONE' + csv);
   }, [csv]);
 
   useEffect(() => {
