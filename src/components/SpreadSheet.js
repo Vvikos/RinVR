@@ -48,7 +48,7 @@ function DataCol({data, colId, colSize, firstcol, rowInterval, onClickCol, posit
 
       for (let i=0; i < colSize; i++){
         let rowIdx = rowInterval[0] + i;
-        let size = [((cellSize[0]<longest.length*fontSize/2) ? longest.length*fontSize/2 : cellSize[0]), cellSize[1], 0.1];
+        let size = [((cellSize[0]<longest.length*fontSize/2) ? longest.length*fontSize/2 : cellSize[0]), cellSize[1], 0.02];
         let position = [0, cellSize[1]*(colSize/2-i), 0.1];
         let text = '';
         let colorBtn=color;

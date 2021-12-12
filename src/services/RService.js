@@ -36,7 +36,7 @@ class RService {
         })
         .then(csvStr => {
             const csv_data = Papa.parse(csvStr).data;
-            const csv_flip = csv_data.map((_, colIndex) => csv_data.map(row => row[colIndex]));
+            const csv_flip = csv_data[0].map((col, i) => csv_data.map(row => row[i]));
             return csv_flip;
         })
         .catch(e => {

@@ -41,7 +41,7 @@ function DropDown({ position, dropDownValue, cellSize, onChangeValue, ...rest}) 
         {dropDownValue[0]}
       </Button>
       <Interactive onSelect={function() { onSelect(); }}>
-        <Button color={0xffffff} fontColor={0x000000} fontSize={0.015} position={[0.15, 0, 0]} size={[0.15, 0.1, 0]}>Choose File</Button>
+        <Button color={0xffffff} fontColor={0x000000} fontSize={0.015} position={[0.06, 0, 0]} size={[0.15, 0.1, 0.02]}>Choose File</Button>
       </Interactive>
       {visible && generateComboBox()}
     </Box>
