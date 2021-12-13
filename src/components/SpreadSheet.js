@@ -92,14 +92,14 @@ function DataCol({data, colId, colSize, firstcol, rowInterval, onClickCol, posit
       let firstColSize = 0.2;
       let maxRows = gridSize[0];
       // Circle geometry TODO
-      //let pi_coeff = Math.PI/maxRows;
-      //let circle_ray = 6;
-      //let rotation = [0,-Math.PI/2*Math.cos(-1*maxRows*pi_coeff),0];
-      //let pos = [position[0]+circle_ray*Math.cos(-1*maxRows*pi_coeff), position[2]+startY, circle_ray*Math.sin(-1*maxRows*pi_coeff)];
+      let pi_coeff = Math.PI/maxRows;
+      let circle_ray = 8;
+      let rotation = [0,-Math.PI/2*Math.cos(-1*maxRows*pi_coeff),0];
+      let pos = [position[0]+circle_ray*Math.cos(-1*maxRows*pi_coeff), position[1], circle_ray*Math.sin(-1*maxRows*pi_coeff)];
       let size = [firstColSize, cellSize[1], 0.01];
       let data_col = range(rowInterval);
-      let rotation = [0, 0, 0];
-      let pos = [position[0]+cellSize[0]*(-maxRows/2+1)-firstColSize, position[1], position[2]];
+      //let rotation = [0, 0, 0];
+      //let pos = [position[0]+cellSize[0]*(-maxRows/2+1)-firstColSize, position[1], position[2]];
       rows.push(
         <DataCol 
           key={'Col0'}
@@ -118,9 +118,9 @@ function DataCol({data, colId, colSize, firstcol, rowInterval, onClickCol, posit
       size = [cellSize[0], cellSize[1], 0.01];
       for (let i=0; i < maxRows; i++){
         let colId = i+1, colIdx = i+colInterval[0];
-        //rotation = [0,-Math.PI/2*Math.cos(-1*(maxRows-i)*pi_coeff),0];
-        //pos = [position[0]+circle_ray*Math.cos(-1*(maxRows-i)*pi_coeff), position[2]+startY, circle_ray*Math.sin(-1*(maxRows-i)*pi_coeff)];
-        pos = [position[0]+cellSize[0]*(colId-maxRows/2+1/2), position[1], position[2]];
+        rotation = [0,-Math.PI/2*Math.cos(-1*(maxRows-i)*pi_coeff),0];
+        pos = [0+circle_ray*Math.cos(-1*(maxRows-i)*pi_coeff), position[1], circle_ray*Math.sin(-1*(maxRows-i)*pi_coeff)];
+        //pos = [position[0]+cellSize[0]*(colId-maxRows/2+1/2), position[1], position[2]];
         data_col=[i];
         if(colIdx < data.length){
           data_col=data[colIdx];

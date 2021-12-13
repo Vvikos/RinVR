@@ -24,7 +24,7 @@ function Floor() {
 }
 
 function App() {
-  const [gridSize, setGridSize] = useState([10, 10]);
+  const [gridSize, setGridSize] = useState([10, 20]);
   const [logs, setLogs] = useState('');
   const [csv, setCsv] = useState([]);
   const [selectedCols, setSelectedCols] = useState([]);
@@ -128,8 +128,8 @@ function App() {
       <DefaultXRControllers />
       <Console position={[0, 6, -4]} rotation={[Math.PI*2.2, 0, 0]} logs={logs} />
       <SpreadSheet 
-        position={[0, 2, -7]}
-        gridSize={[10,10]}
+        position={[0, 3, -7]}
+        gridSize={gridSize}
         data={csv}
         colInterval={colInterval} 
         rowInterval={rowInterval}
