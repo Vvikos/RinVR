@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
 import ReactDOM from 'react-dom'
 import { VRCanvas, DefaultXRControllers } from '@react-three/xr'
+import { useFrame } from "@react-three/fiber";
 import { Sky } from '@react-three/drei'
 import Console from './components/Console'
 import SpreadSheet from './components/SpreadSheet'
 import ButtonPanel from './components/ButtonPanel'
 import RService from './services/RService'
+import Controllers from './components/Controllers'
 import '@react-three/fiber'
 import './styles.css'
 
@@ -125,7 +127,7 @@ function App() {
       <Floor />
       <ambientLight />
       <pointLight position={[10, 10, 10]} />
-      <DefaultXRControllers />
+      <Controllers />
       <Console position={[0, 6, -4]} rotation={[Math.PI*2.2, 0, 0]} logs={logs} />
       <SpreadSheet 
         position={[0, 3, -7]}
