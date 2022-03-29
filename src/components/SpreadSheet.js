@@ -48,7 +48,7 @@ function DataCol({data, colId, colSize, firstcol, rowInterval, onClickCol, posit
 
       for (let i=0; i < colSize; i++){
         let rowIdx = rowInterval[0] + i;
-        let size = [((cellSize[0]<longest.length*fontSize/2) ? longest.length*fontSize/2 : cellSize[0]), cellSize[1], 0.02];
+        let scale = [((cellSize[0]<longest.length*fontSize/2) ? longest.length*fontSize/2 : cellSize[0]), cellSize[1], 0.02];
         let position = [0, cellSize[1]*(colSize/2-i), 0.1];
         let text = '';
         let colorBtn=color;
@@ -64,14 +64,14 @@ function DataCol({data, colId, colSize, firstcol, rowInterval, onClickCol, posit
           text = ((i==0) ? data[0] : data[rowIdx]+'');
         }
         
-        row.push(<Button key={i+'x'+colSize} position={position} fontSize={fontSize} fontColor={fontColor} color={colorBtn} size={size}>{text}</Button>);
+        row.push(<Button key={i+'x'+colSize} position={position} fontSize={fontSize} fontColor={fontColor} color={colorBtn} scale={scale}>{text}</Button>);
       }
 
       return row;
     }
   
     return (
-        <Box scale={hover ? [1.01, 1.01, 1.01] : [1, 1, 1]} position={position} rotation={rotation} size={[0,0,0]}>
+        <Box scale={[1, 1, 0.001]} position={position} rotation={rotation}>
           <Interactive onSelect={function() { onClickCol(colId); }} onHover={onHover} onBlur={onBlur}>
             {generateCells()}
           </Interactive>

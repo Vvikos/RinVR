@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Interactive } from '@react-three/xr'
-import { Text } from '@react-three/drei'
 import Button from './Button'
-import Box from './Box'
 
 function DropDown({ position, dropDownValue, cellSize, onChangeValue, ...rest}) {
   const [visible, setVisible] = useState(false)
@@ -24,7 +22,7 @@ function DropDown({ position, dropDownValue, cellSize, onChangeValue, ...rest}) 
             color={0xffffff} 
             fontColor={0x000000} 
             fontSize={0.015} 
-            size={[0.2, 0.1, 0.02]} 
+            scale={[0.2, 0.1, 0.02]} 
             position={pos} 
           >
             {dropDownValue[1][i]}
@@ -36,15 +34,15 @@ function DropDown({ position, dropDownValue, cellSize, onChangeValue, ...rest}) 
   }
   
   return (
-    <Box size={[0, 0, 0]} position={position} color={0xffffff} {...rest}>
-      <Button fontSize={0.015} position={[-0.1,0,0]} color={0xffffff} fontColor={0x000000} size={[0.2, 0.1, 0.02]}>
+    <mesh scale={[2, 2, 0.001]} position={position} {...rest}>
+      <Button fontSize={0.015} position={[-0.1,0,0]} color={0xffffff} fontColor={0x000000} scale={[0.2, 0.1, 0.3]}>
         {dropDownValue[0]}
       </Button>
       <Interactive onSelect={function() { onSelect(); }}>
-        <Button color={0xffffff} fontColor={0x000000} fontSize={0.015} position={[0.06, 0, 0]} size={[0.15, 0.1, 0.02]}>Choose File</Button>
+        <Button color={0xffffff} fontColor={0x000000} fontSize={0.015} position={[0.06, 0, 0]} scale={[0.15, 0.1, 0.3]}>Choose File</Button>
       </Interactive>
       {visible && generateComboBox()}
-    </Box>
+    </mesh>
   )
 }
 

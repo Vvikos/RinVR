@@ -26,24 +26,24 @@ function ButtonPanel({ position, rotation, onDropDownChangeValue, dropDownValue,
     }
     
     return (
-      <Box color={color} size={[1, 1, 0.01]} position={position} rotation={rotation}>
-        <DropDown color={0xffffff} onChangeValue={onDropDownChangeValue} dropDownValue={dropDownValue} position={[-0.25, 0.35, 0.02]}/>
+      <Box color={color} scale={[1, 1, 0.001]} position={position} rotation={rotation}>
+        <DropDown color={0xffffff} onChangeValue={onDropDownChangeValue} dropDownValue={dropDownValue} position={[-0.25, 0.35, 0.6]}/>
         <Interactive onSelect={function() { onSelect(); onClickRefresh(); }} onHover={onHover} onBlur={onBlur}>
-          <Button color={0x16a5f2} fontColor={0xffffff} fontSize={0.03} size={[0.2, 0.12, 0.02]} position={[0, 0.35, 0.03]}>Refresh</Button>
+          <Button color={0x16a5f2} fontColor={0xffffff} fontSize={0.03} scale={[0.2, 0.12, 0.02]} position={[0.3, 0, 0.6]}>Refresh</Button>
         </Interactive>
         
         <Interactive onSelect={function() { onSelect(); onClickRowNext(); }} onHover={onHover} onBlur={onBlur}>
-          <Button color={0xfc2617} fontColor={0xffffff} fontSize={0.03} size={[0.15, 0.1, 0.02]} position={[0, -0.15, 0.03]}>Up</Button>
+          <Button color={0xfc2617} fontColor={0xffffff} fontSize={0.03} scale={[0.15, 0.1, 0.02]} position={[0, -0.15, 0.6]}>Up</Button>
         </Interactive>
         <Interactive onSelect={function() { onSelect(); onClickRowPrev(); }} onHover={onHover} onBlur={onBlur}>
-          <Button color={0xfc2617} fontColor={0xffffff} fontSize={0.03} size={[0.15, 0.1, 0.02]} position={[0, 0.15, 0.03]}>Down</Button>
+          <Button color={0xfc2617} fontColor={0xffffff} fontSize={0.03} scale={[0.15, 0.1, 0.02]} position={[0, 0.15, 0.6]}>Down</Button>
         </Interactive>
         
         <Interactive onSelect={function() { onSelect(); onClickColNext(); }} onHover={onHover} onBlur={onBlur}>
-          <Button color={0xfc2617} fontColor={0xffffff} fontSize={0.03} size={[0.15, 0.1, 0.02]} position={[0.15, 0, 0.03]}>Right</Button>
+          <Button color={0xfc2617} fontColor={0xffffff} fontSize={0.03} scale={[0.15, 0.1, 0.02]} position={[0.15, 0, 0.6]}>Right</Button>
         </Interactive>
         <Interactive onSelect={function() { onSelect(); onClickColPrev(); }} onHover={onHover} onBlur={onBlur}>
-          <Button color={0xfc2617} fontColor={0xffffff} fontSize={0.03} size={[0.15, 0.1, 0.02]} position={[-0.15, 0, 0.03]}>Left</Button>
+          <Button color={0xfc2617} fontColor={0xffffff} fontSize={0.03} scale={[0.15, 0.1, 0.02]} position={[-0.15, 0, 0.6]}>Left</Button>
         </Interactive>
       </Box>
     )

@@ -1,43 +1,82 @@
 import { useState, useEffect } from 'react'
-import ReactDOM from 'react-dom'
-import { useXR, VRCanvas, DefaultXRControllers } from '@react-three/xr'
+import { useController, DefaultXRControllers } from '@react-three/xr'
 import { useFrame } from "@react-three/fiber";
-import { Interactive } from '@react-three/xr'
-import DropDown from './DropDown'
-import RoundedButton from './RoundedButton'
+import { Billboard, Text } from "@react-three/drei";
 
 function Controllers() {
-    const { controllers } = useXR();
+    const leftController = useController('left');
     const [wristlePosition, setWristlePosition] = useState([0, 8, -3]);
-    const [wristleRotation, setWristleRotation] = useState([0, 0, 0]);
-    const [wristleColor, setWristleColor] = useState(0x999999);
+    const [buttonXPressed, setButtonXPressed] = useState(false);
+    const [buttonXActivated, setButtonXActivated] = useState(true);
+    const [inAnimation, setInAnimation] = useState(false);
+    const [panelSize, setPanelSize] = useState([0,0,0.001]);
+
+    const finalPanelSize = [0.80, 0.50, 0.001];
 
     useFrame(() => {
-        if (controllers && controllers.length>0 && controllers[0].grip && controllers[0].grip.position) {
-            let position = [controllers[0].grip.position.x-0.1, controllers[0].grip.position.y, controllers[0].grip.position.z];
-            let rotation = [controllers[0].grip.rotation.x, controllers[0].grip.rotation.y, controllers[0].grip.rotation.z];
-            //let rotation = [0,0,0];
-            setWristlePosition(position);
-            setWristleRotation(rotation);
-            console.log(controllers);
+        if (leftController) {
+            if (leftController.grip && leftController.grip.position) {
+                let position = [leftController.grip.position.x, leftController.grip.position.y+0.55, leftController.grip.position.z];
+                setWristlePosition(position);
+            }
+            if (leftController.inputSource && leftController.inputSource.gamepad && leftController.inputSource.gamepad.buttons && !inAnimation) {
+                let XButton = leftController.inputSource.gamepad.buttons[5];
+                setButtonXPressed(XButton.pressed);
+            }
+            if (inAnimation){
+                if(buttonXActivated){
+                    if(panelSize[0] >= finalPanelSize[0] && panelSize[1] >= finalPanelSize[1]){
+                        setInAnimation(false);
+                        setPanelSize(finalPanelSize);
+                    }else if(panelSize[0] < finalPanelSize[0]){
+                        let nextSizeX = (panelSize[0]+1./10.*finalPanelSize[0] > finalPanelSize[0] ? finalPanelSize[0] : panelSize[0]+1./10.*finalPanelSize[0]);
+                        setPanelSize([nextSizeX, panelSize[1], panelSize[2]]);
+                    }else if(panelSize[1] < finalPanelSize[1]){
+                        let nextSizeY = (panelSize[1]+1./10.*finalPanelSize[1] > finalPanelSize[1] ? finalPanelSize[1] : panelSize[1]+1./10.*finalPanelSize[1]);
+                        setPanelSize([panelSize[0], nextSizeY, panelSize[2]]);
+                    }
+                }else{
+                    if(panelSize[0] <= 0.001 && panelSize[1] <= 0.001){
+                        setInAnimation(false);
+                        setPanelSize([0, 0.001, 0.001]);
+                    }else if(panelSize[1] > 0.001){
+                        setPanelSize([panelSize[0], panelSize[1]-1./10.*finalPanelSize[1], panelSize[2]]);
+                    }else if(panelSize[0] > 0.001){
+                        setPanelSize([panelSize[0]-1./10.*finalPanelSize[0], 0.001, panelSize[2]]);
+                    }
+                }
+            }
         }
     });
 
-    const onWrislteClick = () => {
-        let color = 0x999999;
-        if(wristleColor==0x999999)
-            color=0xe28743
-        setWristleColor(color);
-    }
+    useEffect(() => {
+        // When we release the button
+        if(!buttonXPressed){
+            setButtonXActivated(!buttonXActivated);
+        }
+    }, [buttonXPressed]);
+
+    useEffect(() => {
+        setInAnimation(true);
+    }, [buttonXActivated]);
 
     return (
         <>
             <DefaultXRControllers />
-            <Interactive onSelect={onWrislteClick} >
-                <RoundedButton color={wristleColor} fontColor={0xffffff} fontSize={0.015} size={[0.05, 0.05, 0.001]} position={wristlePosition} rotation={wristleRotation}>WRISTLE</RoundedButton>
-            </Interactive>
+            <Billboard
+                follow={true}
+                lockX={false}
+                lockY={false}
+                lockZ={false} // Lock the rotation on the z axis (default=false)
+                position={wristlePosition}
+                scale={panelSize}
+            >
+                <Text anchorX="left" anchorY="top-baseline" fontSize={0.07} position={[0,0.5,0]} color={0x000000}>Control Panel</Text>
+            </Billboard>
         </>
     )
 }
+
+//<RoundedButton color={wristleColor} fontColor={0xffffff} fontSize={0.015} size={[0.05, 0.05, 0.001]} position={wristlePosition} rotation={wristleRotation}>WRISTLE</RoundedButton>
 
 export default Controllers;

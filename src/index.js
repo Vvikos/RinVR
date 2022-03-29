@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom'
 import { VRCanvas, DefaultXRControllers } from '@react-three/xr'
 import { useFrame } from "@react-three/fiber";
 import { Sky } from '@react-three/drei'
-import Console from './components/Console'
 import SpreadSheet from './components/SpreadSheet'
 import ButtonPanel from './components/ButtonPanel'
 import RService from './services/RService'
@@ -37,7 +36,7 @@ function App() {
 
   useEffect(() => {
     if(csvFiles[0]=='') {
-      addLogs('INFO', 'NO FILE FETCHED BECAUSE NO FILE SELECTED');
+      console.log('INFO', 'NO FILE FETCHED BECAUSE NO FILE SELECTED');
       return;
     }
     if(rowInterval[1]+rowInterval[0]>=fetchInterval[0]+fetchInterval[1]){
@@ -48,14 +47,13 @@ function App() {
 
   useEffect(() => {
     if(csvFiles[0]=='') {
-      addLogs('INFO', 'NO FILE FETCHED BECAUSE NO FILE SELECTED');
+      console.log('INFO', 'NO FILE FETCHED BECAUSE NO FILE SELECTED');
       return;
     }
 
     RService.getCsv(csvFiles[0], fetchInterval)
     .then(response => setCsv(response))
-    .catch(error => addLogs('ERROR', error));
-    addLogs('INFO', '['+fetchInterval[0]+','+(fetchInterval[0]+fetchInterval[1])+']');
+    .catch(error => console.log('ERROR', error));
   }, [fetchInterval]);
 
   useEffect(() => {
@@ -65,59 +63,42 @@ function App() {
     }
     setSelectedCols(Array(csv.length).fill(false));
     if (csv.length>0)
-      addLogs('INFO', 'REQUEST 200 OK : CSV SIZE ' + csv.length + 'x' + csv[0].length);
+    console.log('INFO', 'REQUEST 200 OK : CSV SIZE ' + csv.length + 'x' + csv[0].length);
   }, [csv]);
 
   useEffect(() => {
     RService.getCsvFiles()
-    .then(function(response) {setCsvFiles([response[0], response]); addLogs('INFO', 'FILES FETCHED');})
-    .catch(error => addLogs('ERROR', error));
+    .then(function(response) {setCsvFiles([response[0], response]);})
+    .catch(error =>  console.log('ERROR', error));
   }, []);
 
-  const addLogs = (type, log) => {
-    const MAX_CHAR = 750;
-    let added_logs = '> '+type+' : ' + log;
-    if(logs.length + added_logs.length < MAX_CHAR)
-      setLogs(logs+'\n'+added_logs);
-    else
-      setLogs(added_logs);
-  }
-
   const onDropDownChange = (file) => {
-    addLogs('INFO', 'DropDown value changed');
     setCsvFiles(prevstate => ([file, prevstate[1]]));
   }
 
   const onClickRefresh = () => {
-    addLogs('INFO', 'Clicked Refresh');
     setRowInterval(rowInterval);
   }
 
   const onClickRowPrev = () => {
-    addLogs('INFO', 'Clicked Previous Row');
     setRowInterval(prevstate => ((prevstate[0]==0) ? prevstate : [prevstate[0]-1, prevstate[1]]));
   }
 
   const onClickRowNext = () => {
-    addLogs('INFO', '['+(rowInterval[0]+1)+','+(rowInterval[0]+rowInterval[1]+1)+'] '+csv.length+'x'+csv[0].length);
     setRowInterval(prevstate => ((prevstate[0]+prevstate[1]>=csv.length-2) ? prevstate : [prevstate[0]+1, prevstate[1]]));
   }
 
   const onClickColPrev = () => {
-    addLogs('INFO', 'Clicked Previous Col');
     setColInterval(prevstate => ((prevstate[0]==0) ? prevstate : [prevstate[0]-1, prevstate[1]]));
   }
 
   const onClickColNext = () => {
-    addLogs('INFO', '['+(colInterval[0]+1)+','+(colInterval[0]+colInterval[1]+1)+'] '+csv.length+'x'+csv[0].length);
     setColInterval(prevstate => ((prevstate[0]+prevstate[1]>=csv[0].length-2) ? prevstate : [prevstate[0]+1, prevstate[1]]));
   }
 
   const onClickCol = (colIdx) => {
     let selected = selectedCols;
     selected[colIdx] = !selected[colIdx];
-    let info = ((selected[colIdx]) ? 'Selected' : 'Unselected')
-    addLogs('INFO', 'Col '+colIdx+' '+info);
     setSelectedCols(selected);
   }
   
@@ -128,7 +109,6 @@ function App() {
       <ambientLight />
       <pointLight position={[10, 10, 10]} />
       <Controllers />
-      <Console position={[0, 6, -4]} rotation={[Math.PI*2.2, 0, 0]} logs={logs} />
       <SpreadSheet 
         position={[0, 3, -7]}
         gridSize={gridSize}
