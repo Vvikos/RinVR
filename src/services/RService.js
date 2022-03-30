@@ -1,7 +1,7 @@
 import Papa from 'papaparse';
 
-//const API_R = 'https://vr.achencraft.fr';
-const API_R = 'http://localhost:8000';
+const API_R = 'https://vr.achencraft.fr';
+//const API_R = 'http://localhost:8000';
 
 class RService {
     async getCsvFiles() {

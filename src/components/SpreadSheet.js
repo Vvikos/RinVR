@@ -4,22 +4,7 @@ import Button from './Button'
 import Box from './Box'
 
 function DataCol({data, colId, colSize, firstcol, rowInterval, onClickCol, position, cellSize, rotation, selected}){
-    const [hover, setHover] = useState(false)
-    const [color, setColor] = useState(0xffffff)
-
-    useEffect(() => {
-      if (selected)
-        setColor(0xffa36e);
-      else
-        setColor(0xffffff);
-    }, []);
-
-    useEffect(() => {
-      if (selected)
-        setColor(0xffa36e);
-      else
-        setColor(0xffffff);
-    }, [selected]);
+    const [hover, setHover] = useState(false);
   
     const onHover = () => {
       setHover(true);
@@ -50,14 +35,18 @@ function DataCol({data, colId, colSize, firstcol, rowInterval, onClickCol, posit
         let rowIdx = rowInterval[0] + i;
         let scale = [((cellSize[0]<longest.length*fontSize/2) ? longest.length*fontSize/2 : cellSize[0]), cellSize[1], 0.02];
         let position = [0, cellSize[1]*(colSize/2-i), 0.1];
-        let text = '';
-        let colorBtn=color;
+        let colorBtn;
         let fontColor=0x000000;
         if(firstcol || i==0){
           colorBtn=0x000000;
           fontColor=0xffffff;
+        }else{
+          let normal = (selected ? 0xffa36e : 0xffffff);
+          let oposite = (selected ? 0xff7221 : 0xdedcdc);
+          colorBtn = (i%2==0 ? oposite : normal);
         }
         
+        let text = '';
         if(firstcol){
           text = ((i==0) ? '' : rowIdx+'');
         } else if(i < data.length) {
@@ -71,11 +60,11 @@ function DataCol({data, colId, colSize, firstcol, rowInterval, onClickCol, posit
     }
   
     return (
-        <Box scale={[1, 1, 0.001]} position={position} rotation={rotation}>
+        <mesh scale={[1, 1, 0.001]} position={position} rotation={rotation}>
           <Interactive onSelect={function() { onClickCol(colId); }} onHover={onHover} onBlur={onBlur}>
             {generateCells()}
           </Interactive>
-        </Box>
+        </mesh>
     )
   }
 

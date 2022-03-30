@@ -26,7 +26,6 @@ function Floor() {
 
 function App() {
   const [gridSize, setGridSize] = useState([10, 20]);
-  const [logs, setLogs] = useState('');
   const [csv, setCsv] = useState([]);
   const [selectedCols, setSelectedCols] = useState([]);
   const [csvFiles, setCsvFiles] = useState(['', []]);
@@ -60,15 +59,14 @@ function App() {
     if (csv.length>0 && csv[1].length>0 && csv[1][0].length>0) {
       setRowInterval([0, ((csv[1][0].length < gridSize[1]-1) ? csv[1][0].length : gridSize[1]-1)]);
       setColInterval([0, ((csv[1].length < gridSize[0]-1) ? csv[1].length : gridSize[0]-1)]);
+      console.log('INFO', 'REQUEST 200 OK : CSV SIZE ' + csv.length + 'x' + csv[0].length);
     }
     setSelectedCols(Array(csv.length).fill(false));
-    if (csv.length>0)
-    console.log('INFO', 'REQUEST 200 OK : CSV SIZE ' + csv.length + 'x' + csv[0].length);
   }, [csv]);
 
   useEffect(() => {
     RService.getCsvFiles()
-    .then(function(response) {setCsvFiles([response[0], response]);})
+    .then(function(response) {setCsvFiles([response[1], response]);})
     .catch(error =>  console.log('ERROR', error));
   }, []);
 
