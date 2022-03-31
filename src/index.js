@@ -25,7 +25,7 @@ function Floor() {
 }
 
 function App() {
-  const [gridSize, setGridSize] = useState([10, 20]);
+  const [gridSize, setGridSize] = useState([20, 20]);
   const [csv, setCsv] = useState([]);
   const [selectedCols, setSelectedCols] = useState([]);
   const [csvFiles, setCsvFiles] = useState(['', []]);
