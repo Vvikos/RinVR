@@ -34,7 +34,7 @@ function DropDown({ position, dropDownValue, cellSize, onChangeValue, ...rest}) 
   }
   
   return (
-    <mesh scale={[2, 2, 0.001]} position={position} {...rest}>
+    <group scale={[2, 2, 0.001]} position={position} {...rest}>
       <Button fontSize={0.015} position={[-0.1,0,0]} color={0xffffff} fontColor={0x000000} scale={[0.2, 0.1, 0.3]}>
         {dropDownValue[0]}
       </Button>
@@ -42,7 +42,7 @@ function DropDown({ position, dropDownValue, cellSize, onChangeValue, ...rest}) 
         <Button color={0xffffff} fontColor={0x000000} fontSize={0.015} position={[0.06, 0, 0]} scale={[0.15, 0.1, 0.3]}>Choose File</Button>
       </Interactive>
       {visible && generateComboBox()}
-    </mesh>
+    </group>
   )
 }
 

@@ -1,19 +1,28 @@
 import { useState, useEffect } from 'react'
+import { useRContext } from '../RContextProvider'
 import { Interactive } from '@react-three/xr'
 import Button from './Button'
-import Box from './Box'
 
-function DataCol({data, colId, colSize, firstcol, rowInterval, onClickCol, position, cellSize, rotation, selected}){
-    const [hover, setHover] = useState(false);
-  
-    const onHover = () => {
-      setHover(true);
+function DataCol({data, colId, colSize, firstcol, rowInterval, position, cellSize, rotation}){
+    const { selectedCols, setSelectedCols} = useRContext();
+    const [selected, setSelected] = useState(false);
+
+    useEffect(() =>{
+      let selected = (selectedCols.find(element => element == colId) ? true : false);
+      setSelected(selected);
+    }, [selectedCols]);
+
+    function clickCol(colIdx) {
+      let newSelectedCols = selectedCols.slice();
+      let idx = selectedCols.findIndex(element => element == colIdx);
+      if(idx!=-1){
+        newSelectedCols.splice(idx, 1);
+      } else {
+        newSelectedCols.push(colIdx);
+      }
+      setSelectedCols(newSelectedCols);
     }
   
-    const onBlur = () => {
-      setHover(false);
-    }
-    
     const generateCells = () => {
       const row = [];
       let fontSize = 0.1;
@@ -55,25 +64,24 @@ function DataCol({data, colId, colSize, firstcol, rowInterval, onClickCol, posit
         
         row.push(<Button key={i+'x'+colSize} position={position} fontSize={fontSize} fontColor={fontColor} color={colorBtn} scale={scale}>{text}</Button>);
       }
-
       return row;
     }
   
     return (
-        <mesh scale={[1, 1, 0.001]} position={position} rotation={rotation}>
-          <Interactive onSelect={function() { onClickCol(colId); }} onHover={onHover} onBlur={onBlur}>
+      <Interactive onSelect={function() { clickCol(colId); }}>
+        <group scale={[1, 1, 0.001]} position={position} rotation={rotation}>
             {generateCells()}
-          </Interactive>
-        </mesh>
+        </group>
+      </Interactive>
     )
   }
 
-  function SpreadSheet({data, selectedCols, position, colInterval, rowInterval, gridSize, cellSize, anglemax, onClickCol}){
-
+  function SpreadSheet({position, cellSize, anglemax }){
+    const { csv, rowInterval, colInterval, gridSize } = useRContext();
+    
     function range([start, end]) {
       return Array(end - start + 1).fill().map((_, idx) => start + idx)
     }
-  
     const generateGrid = () => {
       const rows = [];
       const startY = position[1]+gridSize[1]/2*cellSize[1];
@@ -89,7 +97,7 @@ function DataCol({data, colId, colSize, firstcol, rowInterval, onClickCol, posit
       let data_col = range(rowInterval);
       //let rotation = [0, 0, 0];
       //let pos = [position[0]+cellSize[0]*(-maxRows/2+1)-firstColSize, position[1], position[2]];
-      rows.push(
+      /*rows.push(
         <DataCol 
           key={'Col0'}
           colId={0} 
@@ -103,7 +111,7 @@ function DataCol({data, colId, colSize, firstcol, rowInterval, onClickCol, posit
           selected={false}
           onClickCol={function() {}}
         />
-      );
+      );*/
       size = [cellSize[0], cellSize[1], 0.01];
       for (let i=0; i < maxRows; i++){
         let colId = i+1, colIdx = i+colInterval[0];
@@ -111,14 +119,12 @@ function DataCol({data, colId, colSize, firstcol, rowInterval, onClickCol, posit
         pos = [0+circle_ray*Math.cos(-1*(maxRows-i)*pi_coeff), position[1], circle_ray*Math.sin(-1*(maxRows-i)*pi_coeff)];
         //pos = [position[0]+cellSize[0]*(colId-maxRows/2+1/2), position[1], position[2]];
         data_col=[i];
-        if(colIdx < data.length){
-          data_col=data[colIdx];
+        if(colIdx < csv.length){
+          data_col=csv[colIdx];
         }
         rows.push(
           <DataCol
             key={'Col'+colId}
-            onClickCol={function() {onClickCol(colIdx);}} 
-            selected={selectedCols[colIdx]} 
             colId={i} 
             data={data_col} 
             firstcol={false} 
@@ -130,7 +136,7 @@ function DataCol({data, colId, colSize, firstcol, rowInterval, onClickCol, posit
           />
         );
       }
-      console.log(data);
+      console.log('RENDERED GRID');
       return rows;
     }
   

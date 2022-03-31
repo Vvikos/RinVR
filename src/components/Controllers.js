@@ -1,77 +1,123 @@
 import { useState, useEffect } from 'react'
-import { useController, DefaultXRControllers } from '@react-three/xr'
+import { useXREvent, useController, DefaultXRControllers } from '@react-three/xr'
 import { useFrame } from "@react-three/fiber";
 import { Billboard, Text } from "@react-three/drei";
+import { useRContext } from '../RContextProvider'
+import DropDown from './DropDown'
+import Box from './Box'
 
 function Controllers() {
+    const { csvNames, rowInterval, setRowInterval, colInterval, setColInterval, gridSize } = useRContext();
     const leftController = useController('left');
     const [wristlePosition, setWristlePosition] = useState([0, 8, -3]);
-    const [buttonXPressed, setButtonXPressed] = useState(false);
-    const [buttonXActivated, setButtonXActivated] = useState(true);
+    const [wristlePanel, setWristlePanel] = useState(true);
+    const [joystickDirections, setJoystickDirections] = useState(['center']);
     const [inAnimation, setInAnimation] = useState(false);
     const [panelSize, setPanelSize] = useState([0,0,0.001]);
 
     const finalPanelSize = [0.80, 0.50, 0.001];
 
-    useFrame(() => {
-        if (leftController) {
-            if (leftController.grip && leftController.grip.position) {
-                let position = [leftController.grip.position.x, leftController.grip.position.y+0.55, leftController.grip.position.z];
-                setWristlePosition(position);
+    useXREvent('squeezeend', (e) => {if(!inAnimation) setWristlePanel(!wristlePanel)}, {handedness: 'left'});
+
+    useEffect(() => {
+        if(Array.isArray(joystickDirections)){
+            if(joystickDirections.indexOf('center')){
+                joystickDirections.forEach(element => {
+                    if(element == 'left')
+                        setColInterval(prevstate => ((prevstate[0]==0) ? prevstate : [prevstate[0]-1, prevstate[1]]));
+                    else if(element == 'right')
+                        setColInterval(prevstate => ((prevstate[0]+prevstate[1]>=csv[0].length-2) ? prevstate : [prevstate[0]+1, prevstate[1]]));
+                    else if(element == 'top')
+                        setRowInterval(prevstate => ((prevstate[0]==0) ? prevstate : [prevstate[0]-1, prevstate[1]]));
+                    else if(element == 'bottom')
+                        setRowInterval(prevstate => ((prevstate[0]+prevstate[1]>=csv.length-2) ? prevstate : [prevstate[0]+1, prevstate[1]]));
+                    
+                    setJoystickDirections(['center']);
+                });
             }
-            if (leftController.inputSource && leftController.inputSource.gamepad && leftController.inputSource.gamepad.buttons && !inAnimation) {
-                let XButton = leftController.inputSource.gamepad.buttons[5];
-                setButtonXPressed(XButton.pressed);
-            }
-            if (inAnimation){
-                if(buttonXActivated){
-                    if(panelSize[0] >= finalPanelSize[0] && panelSize[1] >= finalPanelSize[1]){
-                        setInAnimation(false);
-                        setPanelSize(finalPanelSize);
-                    }else if(panelSize[0] < finalPanelSize[0]){
-                        let nextSizeX = (panelSize[0]+1./10.*finalPanelSize[0] > finalPanelSize[0] ? finalPanelSize[0] : panelSize[0]+1./10.*finalPanelSize[0]);
-                        setPanelSize([nextSizeX, panelSize[1], panelSize[2]]);
-                    }else if(panelSize[1] < finalPanelSize[1]){
-                        let nextSizeY = (panelSize[1]+1./10.*finalPanelSize[1] > finalPanelSize[1] ? finalPanelSize[1] : panelSize[1]+1./10.*finalPanelSize[1]);
-                        setPanelSize([panelSize[0], nextSizeY, panelSize[2]]);
-                    }
+        }
+    }, [joystickDirections]);
+
+    /*useEffect(() => {
+        if (rightController) {
+            if (rightController.inputSource && rightController.inputSource.gamepad && leftController.inputSource.gamepad.axes) {
+                let joystickX = leftController.inputSource.gamepad.axes[2];
+                let joystickY = leftController.inputSource.gamepad.axes[3];
+                let newJoystickDirections = [];
+                if(joystickX<0.85 && joystickX>-0.85 && joystickY<0.85 && joystickY>-0.85){
+                    newJoystickDirections.push('center');
                 }else{
-                    if(panelSize[0] <= 0.001 && panelSize[1] <= 0.001){
-                        setInAnimation(false);
-                        setPanelSize([0, 0.001, 0.001]);
-                    }else if(panelSize[1] > 0.001){
-                        setPanelSize([panelSize[0], panelSize[1]-1./10.*finalPanelSize[1], panelSize[2]]);
-                    }else if(panelSize[0] > 0.001){
-                        setPanelSize([panelSize[0]-1./10.*finalPanelSize[0], 0.001, panelSize[2]]);
-                    }
+                    if(joystickX<-0.85)
+                        newJoystickDirections.push('left');
+                    else if(joystickY <-0.85)
+                        newJoystickDirections.push('top');
+                    else if(joystickX > 0.85)
+                        newJoystickDirections.push('right');
+                    else if(joystickY > 0.85)
+                        newJoystickDirections.push('bottom');
+                }
+                setJoystickDirections(newJoystickDirections);
+            }
+        }
+    }, [rightController]);*/
+
+    const onDropDownChange = (file) => {
+        setCsvFiles(prevstate => ([file, prevstate[1]]));
+    }
+
+    const onClickRefresh = () => {
+        setRowInterval(rowInterval);
+    }
+
+    useFrame(() => {
+        if (leftController && leftController.grip && leftController.grip.position) {
+            let position = [leftController.grip.position.x, leftController.grip.position.y+0.55, leftController.grip.position.z-0.3];
+            setWristlePosition(position);
+        }
+            
+        if (leftController && inAnimation) {
+            if(wristlePanel){
+                if(panelSize[0] >= finalPanelSize[0] && panelSize[1] >= finalPanelSize[1]){
+                    setInAnimation(false);
+                    setPanelSize(finalPanelSize);
+                }else if(panelSize[0] < finalPanelSize[0]){
+                    let nextSizeX = (panelSize[0]+1./10.*finalPanelSize[0] > finalPanelSize[0] ? finalPanelSize[0] : panelSize[0]+1./10.*finalPanelSize[0]);
+                    setPanelSize([nextSizeX, panelSize[1], panelSize[2]]);
+                }else if(panelSize[1] < finalPanelSize[1]){
+                    let nextSizeY = (panelSize[1]+1./10.*finalPanelSize[1] > finalPanelSize[1] ? finalPanelSize[1] : panelSize[1]+1./10.*finalPanelSize[1]);
+                    setPanelSize([panelSize[0], nextSizeY, panelSize[2]]);
+                }
+            }else{
+                if(panelSize[0] <= 0.001 && panelSize[1] <= 0.001){
+                    setInAnimation(false);
+                    setPanelSize([0, 0.001, 0.001]);
+                }else if(panelSize[1] > 0.001){
+                    setPanelSize([panelSize[0], panelSize[1]-1./10.*finalPanelSize[1], panelSize[2]]);
+                }else if(panelSize[0] > 0.001){
+                    setPanelSize([panelSize[0]-1./10.*finalPanelSize[0], 0.001, panelSize[2]]);
                 }
             }
         }
     });
 
     useEffect(() => {
-        // When we release the button
-        if(!buttonXPressed){
-            setButtonXActivated(!buttonXActivated);
-        }
-    }, [buttonXPressed]);
-
-    useEffect(() => {
         setInAnimation(true);
-    }, [buttonXActivated]);
+    }, [wristlePanel]);
 
     return (
         <>
             <DefaultXRControllers />
             <Billboard
                 follow={true}
-                lockX={false}
+                lockX={true}
                 lockY={false}
-                lockZ={false} // Lock the rotation on the z axis (default=false)
+                lockZ={true} // Lock the rotation on the z axis (default=false)
                 position={wristlePosition}
                 scale={panelSize}
             >
-                <Text anchorX="left" anchorY="top-baseline" fontSize={0.07} position={[0,0.5,0]} color={0x000000}>Control Panel</Text>
+                <Box>
+                    <DropDown color={0xffffff} onChangeValue={onDropDownChange} dropDownValue={csvNames} position={[0, 0.35, 0.6]}/>
+                </Box>
             </Billboard>
         </>
     )
