@@ -112,32 +112,29 @@ function DataCol({data, colId, colSize, firstcol, rowInterval, position, cellSiz
           onClickCol={function() {}}
         />
       );*/
-      size = [cellSize[0], cellSize[1], 0.01];
-
       let posX0 = (circle_ray*Math.cos(-1*(maxRows-1)*pi_coeff));
       let posZ0 = (circle_ray*Math.sin(-1*(maxRows-1)*pi_coeff));
+
+      let posX1 = (circle_ray*Math.cos(-1*(maxRows)*pi_coeff));
+      let posZ1 = (circle_ray*Math.sin(-1*(maxRows)*pi_coeff));
+
+      size=[ Math.sqrt(((posX1-posX0)**2)+((posZ1-posZ0)**2)), cellSize[1], 0.01 ];
 
       for (let i=0; i < maxRows; i++){
         let colId = i+1, colIdx = i+colInterval[0];
         
-        let posX1 = (circle_ray*Math.cos(-1*(maxRows-i)*pi_coeff));
-        let posZ1 = (circle_ray*Math.sin(-1*(maxRows-i)*pi_coeff));
+        posX1 = (circle_ray*Math.cos(-1*(maxRows-i)*pi_coeff));
+        posZ1 = (circle_ray*Math.sin(-1*(maxRows-i)*pi_coeff));
         
-        size=[ Math.sqrt(((posX1-posX0)**2)+((posZ1-posZ0)**2)), cellSize[1], 0.01 ];
-        
-        //rotation = [0, -Math.PI/2*Math.cos(-1*(maxRows-i)*pi_coeff), 0];
         rotation = [0, -((Math.PI/(maxRows))*i) + (Math.PI/2), 0];
 
-        //pos = [0+circle_ray*Math.cos(-1*(maxRows-i)*pi_coeff), position[1], circle_ray*Math.sin(-1*(maxRows-i)*pi_coeff)];
         pos = [posX1, position[1], posZ1];
-        pos = [pos[0]+2,pos[1]-5,pos[2]-9];
 
         posX0 = posX1;
         posZ0 = posZ1;
 
-
-        //pos = [position[0]+cellSize[0]*(colId-maxRows/2+1/2), position[1], position[2]];
         data_col=[i];
+
         if(colIdx < csv.length){
           data_col=csv[colIdx];
         }
