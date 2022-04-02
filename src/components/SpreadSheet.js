@@ -1,7 +1,15 @@
-import { useState, useEffect } from 'react'
-import { useRContext } from '../RContextProvider'
-import { Interactive } from '@react-three/xr'
-import Button from './Button'
+import { useState, useEffect } from 'react';
+import { Interactive } from '@react-three/xr';
+import { Text } from '@react-three/drei';
+import { BoxGeometry, MeshBasicMaterial, TextGeometry  } from "three";
+import { useRContext } from '../RContextProvider';
+
+const box = new BoxGeometry();
+const cselected_light = new MeshBasicMaterial({color: 0xffa36e});
+const cselected_darker = new MeshBasicMaterial({color: 0xff7221});
+const cnormal_light = new MeshBasicMaterial({color: 0xffffff});
+const cnormal_darker = new MeshBasicMaterial({color: 0xdedcdc});
+const cfirst_dark = new MeshBasicMaterial({color: 0x000000});
 
 function DataCol({data, colId, colSize, firstcol, rowInterval, position, cellSize, rotation}){
     const { selectedCols, setSelectedCols} = useRContext();
@@ -25,7 +33,7 @@ function DataCol({data, colId, colSize, firstcol, rowInterval, position, cellSiz
   
     const generateCells = () => {
       const row = [];
-      let fontSize = 0.1;
+      let fontSize = 0.22;
       let longest = data.reduce(
         function (a, b) {
             if (a == null && b == null){
@@ -44,15 +52,15 @@ function DataCol({data, colId, colSize, firstcol, rowInterval, position, cellSiz
         let rowIdx = rowInterval[0] + i;
         let scale = [((cellSize[0]<longest.length*fontSize/2) ? longest.length*fontSize/2 : cellSize[0]), cellSize[1], 0.02];
         let position = [0, cellSize[1]*(colSize/2-i), 0.1];
-        let colorBtn;
+        let materialColor;
         let fontColor=0x000000;
         if(firstcol || i==0){
-          colorBtn=0x000000;
+          materialColor=cfirst_dark;
           fontColor=0xffffff;
         }else{
-          let normal = (selected ? 0xffa36e : 0xffffff);
-          let oposite = (selected ? 0xff7221 : 0xdedcdc);
-          colorBtn = (i%2==0 ? oposite : normal);
+          let normal = (selected ? cselected_light : cnormal_light);
+          let darker = (selected ? cselected_darker : cnormal_darker);
+          materialColor = (i%2==0 ? darker : normal);
         }
         
         let text = '';
@@ -61,8 +69,8 @@ function DataCol({data, colId, colSize, firstcol, rowInterval, position, cellSiz
         } else if(i < data.length) {
           text = ((i==0) ? data[0] : data[rowIdx]+'');
         }
-        
-        row.push(<Button key={i+'x'+colSize} position={position} fontSize={fontSize} fontColor={fontColor} color={colorBtn} scale={scale}>{text}</Button>);
+        //row.push(<group key={'Col'+i} position={position}><mesh scale={scale} geometry={box} material={materialColor} > </mesh><Text fontSize={fontSize} position={[0,0,0.9]} maxWidth={scale[0]-0.2} color={fontColor}>{text}</Text></group>);
+        row.push(<group key={'Col'+i} position={position}><mesh scale={scale} geometry={box} material={materialColor} ></mesh></group>);
       }
       return row;
     }

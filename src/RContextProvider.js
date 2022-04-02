@@ -5,8 +5,8 @@ const API_R = 'https://vr.achencraft.fr';
 //const API_R = 'http://localhost:8000';
 
 const RContext = createContext({
-  csvNames: [],
-  setCsvNames: () => {},
+  csvFiles: [],
+  setCsvFiles: () => {},
   csv: [],
   setCsv: () => {},
   selectedCols: [],
@@ -29,7 +29,7 @@ function RContextProvider({children}) {
     const [gridSize, setGridSize] = useState([19, 20]);
     const [csv, setCsv] = useState([]);
     const [selectedCols, setSelectedCols] = useState([]);
-    const [csvFiles, setCsvFiles] = useState(['', []]);
+    const [csvFiles, setCsvFiles] = useState(['']);
     const [fetchInterval, setFetchInterval] = useState([0, 0]);
     const [rowInterval, setRowInterval] = useState([0, 9]);
     const [colInterval, setColInterval] = useState([0, 9]);
@@ -38,7 +38,7 @@ function RContextProvider({children}) {
 
     useEffect(() => {
         RService.getCsvFiles()
-        .then(function(response) {setCsvFiles([response[1], response]);})
+        .then(function(response) {let res = response.slice(); res.splice(res.indexOf('email.csv'), 1);console.log(res);setCsvFiles(res);})
         .catch(error =>  console.log('ERROR', error));
     }, []);
 
@@ -65,7 +65,7 @@ function RContextProvider({children}) {
     }, [fetchInterval]);
     
     useEffect(() => {
-        if (csv.length>0 && csv[1].length>0 && csv[1][0].length>0) {
+        if (csv && csv.length>0 && csv[1].length>0 && csv[1][0].length>0) {
             setRowInterval([0, ((csv[1][0].length < gridSize[1]-1) ? csv[1][0].length : gridSize[1]-1)]);
             setColInterval([0, ((csv[1].length < gridSize[0]-1) ? csv[1].length : gridSize[0]-1)]);
             console.log('INFO', 'REQUEST 200 OK : CSV SIZE ' + csv.length + 'x' + csv[0].length);
@@ -75,8 +75,8 @@ function RContextProvider({children}) {
 
     return (
         <RContext.Provider value={{
-            csvNames: csvFiles, 
-            setCsvNames: setCsvFiles, 
+            csvFiles: csvFiles, 
+            setCsvFiles: setCsvFiles, 
             csv: csv, 
             setCsv: setCsv, 
             selectedCols: selectedCols,

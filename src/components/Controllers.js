@@ -7,15 +7,16 @@ import DropDown from './DropDown'
 import Box from './Box'
 
 function Controllers() {
-    const { csvNames, rowInterval, setRowInterval, colInterval, setColInterval, gridSize } = useRContext();
+    const { csvFiles, setCsvFiles, rowInterval, setRowInterval, colInterval, setColInterval, gridSize } = useRContext();
     const leftController = useController('left');
     const [wristlePosition, setWristlePosition] = useState([0, 8, -3]);
-    const [wristlePanel, setWristlePanel] = useState(true);
+    const [wristlePanel, setWristlePanel] = useState(false);
     const [joystickDirections, setJoystickDirections] = useState(['center']);
     const [inAnimation, setInAnimation] = useState(false);
     const [panelSize, setPanelSize] = useState([0,0,0.001]);
 
-    const finalPanelSize = [0.80, 0.50, 0.001];
+    const finalPanelSize = [1.5, 1, 0.001];
+    const animationFrameCount = 4.;
 
     useXREvent('squeezeend', (e) => {if(!inAnimation) setWristlePanel(!wristlePanel)}, {handedness: 'left'});
 
@@ -62,7 +63,11 @@ function Controllers() {
     }, [rightController]);*/
 
     const onDropDownChange = (file) => {
-        setCsvFiles(prevstate => ([file, prevstate[1]]));
+        let newCsvFiles = csvFiles.slice();
+        let idx = newCsvFiles.indexOf(file);
+        //swap selected file to first file
+        [newCsvFiles[0], newCsvFiles[idx]] = [newCsvFiles[idx], newCsvFiles[0]];
+        setCsvFiles(newCsvFiles);
     }
 
     const onClickRefresh = () => {
@@ -71,7 +76,7 @@ function Controllers() {
 
     useFrame(() => {
         if (leftController && leftController.grip && leftController.grip.position) {
-            let position = [leftController.grip.position.x, leftController.grip.position.y+0.55, leftController.grip.position.z-0.3];
+            let position = [leftController.grip.position.x-panelSize[0]/4., leftController.grip.position.y+4*panelSize[1]/5, leftController.grip.position.z-(panelSize[0]+panelSize[1])/2.];
             setWristlePosition(position);
         }
             
@@ -81,10 +86,10 @@ function Controllers() {
                     setInAnimation(false);
                     setPanelSize(finalPanelSize);
                 }else if(panelSize[0] < finalPanelSize[0]){
-                    let nextSizeX = (panelSize[0]+1./10.*finalPanelSize[0] > finalPanelSize[0] ? finalPanelSize[0] : panelSize[0]+1./10.*finalPanelSize[0]);
+                    let nextSizeX = (panelSize[0]+1./animationFrameCount*finalPanelSize[0] > finalPanelSize[0] ? finalPanelSize[0] : panelSize[0]+1./animationFrameCount*finalPanelSize[0]);
                     setPanelSize([nextSizeX, panelSize[1], panelSize[2]]);
                 }else if(panelSize[1] < finalPanelSize[1]){
-                    let nextSizeY = (panelSize[1]+1./10.*finalPanelSize[1] > finalPanelSize[1] ? finalPanelSize[1] : panelSize[1]+1./10.*finalPanelSize[1]);
+                    let nextSizeY = (panelSize[1]+1./animationFrameCount*finalPanelSize[1] > finalPanelSize[1] ? finalPanelSize[1] : panelSize[1]+1./animationFrameCount*finalPanelSize[1]);
                     setPanelSize([panelSize[0], nextSizeY, panelSize[2]]);
                 }
             }else{
@@ -92,9 +97,9 @@ function Controllers() {
                     setInAnimation(false);
                     setPanelSize([0, 0.001, 0.001]);
                 }else if(panelSize[1] > 0.001){
-                    setPanelSize([panelSize[0], panelSize[1]-1./10.*finalPanelSize[1], panelSize[2]]);
+                    setPanelSize([panelSize[0], panelSize[1]-1./animationFrameCount*finalPanelSize[1], panelSize[2]]);
                 }else if(panelSize[0] > 0.001){
-                    setPanelSize([panelSize[0]-1./10.*finalPanelSize[0], 0.001, panelSize[2]]);
+                    setPanelSize([panelSize[0]-1./animationFrameCount*finalPanelSize[0], 0.001, panelSize[2]]);
                 }
             }
         }
@@ -115,9 +120,8 @@ function Controllers() {
                 position={wristlePosition}
                 scale={panelSize}
             >
-                <Box>
-                    <DropDown color={0xffffff} onChangeValue={onDropDownChange} dropDownValue={csvNames} position={[0, 0.35, 0.6]}/>
-                </Box>
+                <DropDown scale={[1, 1.5, 1]} color={0xffffff} onChangeValue={onDropDownChange} dropDownValue={csvFiles} position={[0, panelSize[1]/8, 0]}/>
+                <Box position={[0, 0, -panelSize[1]/2]}></Box>
             </Billboard>
         </>
     )
