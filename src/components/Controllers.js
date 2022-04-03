@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useXREvent, useController, DefaultXRControllers } from '@react-three/xr'
 import { useFrame } from "@react-three/fiber";
 import { Billboard, Text } from "@react-three/drei";
@@ -9,13 +9,12 @@ import Box from './Box'
 function Controllers() {
     const { csvFiles, setCsvFiles, rowInterval, setRowInterval, colInterval, setColInterval, gridSize } = useRContext();
     const leftController = useController('left');
-    const [wristlePosition, setWristlePosition] = useState([0, 8, -3]);
+    const ref = useRef();
     const [wristlePanel, setWristlePanel] = useState(false);
     const [joystickDirections, setJoystickDirections] = useState(['center']);
     const [inAnimation, setInAnimation] = useState(false);
-    const [panelSize, setPanelSize] = useState([0,0,0.001]);
 
-    const finalPanelSize = [1.5, 1, 0.001];
+    const finalPanelSize = { x:1.5, y:1, z:0.001 };
     const animationFrameCount = 4.;
 
     useXREvent('squeezeend', (e) => {if(!inAnimation) setWristlePanel(!wristlePanel)}, {handedness: 'left'});
@@ -75,31 +74,38 @@ function Controllers() {
     }
 
     useFrame(() => {
+        let currentSize = ref.current.scale;
         if (leftController && leftController.grip && leftController.grip.position) {
-            let position = [leftController.grip.position.x-panelSize[0]/4., leftController.grip.position.y+4*panelSize[1]/5, leftController.grip.position.z-(panelSize[0]+panelSize[1])/2.];
-            setWristlePosition(position);
+            ref.current.position.x = leftController.grip.position.x-currentSize.x/4.;
+            ref.current.position.y = leftController.grip.position.y+4*currentSize.y/5;
+            ref.current.position.z = leftController.grip.position.z-(currentSize.x+currentSize.y)/2.;
         }
             
         if (leftController && inAnimation) {
             if(wristlePanel){
-                if(panelSize[0] >= finalPanelSize[0] && panelSize[1] >= finalPanelSize[1]){
+                if(currentSize.x >= finalPanelSize.x && currentSize.y >= finalPanelSize.y){
                     setInAnimation(false);
-                    setPanelSize(finalPanelSize);
-                }else if(panelSize[0] < finalPanelSize[0]){
-                    let nextSizeX = (panelSize[0]+1./animationFrameCount*finalPanelSize[0] > finalPanelSize[0] ? finalPanelSize[0] : panelSize[0]+1./animationFrameCount*finalPanelSize[0]);
-                    setPanelSize([nextSizeX, panelSize[1], panelSize[2]]);
-                }else if(panelSize[1] < finalPanelSize[1]){
-                    let nextSizeY = (panelSize[1]+1./animationFrameCount*finalPanelSize[1] > finalPanelSize[1] ? finalPanelSize[1] : panelSize[1]+1./animationFrameCount*finalPanelSize[1]);
-                    setPanelSize([panelSize[0], nextSizeY, panelSize[2]]);
+                    ref.current.scale.x = finalPanelSize.x;
+                    ref.current.scale.y = finalPanelSize.y;
+                    ref.current.scale.z = finalPanelSize.z;
+                }else if(currentSize.x < finalPanelSize.x){
+                    let nextSizeX = (currentSize.x+1./animationFrameCount*finalPanelSize.x > finalPanelSize.x ? finalPanelSize.x : currentSize.x+1./animationFrameCount*finalPanelSize.x);
+                    ref.current.scale.x = nextSizeX;
+                }else if(currentSize.y < finalPanelSize.y){
+                    let nextSizeY = (currentSize.y+1./animationFrameCount*finalPanelSize.y > finalPanelSize.y ? finalPanelSize.y : currentSize.y+1./animationFrameCount*finalPanelSize.y);
+                    ref.current.scale.y = nextSizeY;
                 }
             }else{
-                if(panelSize[0] <= 0.001 && panelSize[1] <= 0.001){
+                if(currentSize.x <= 0.001 && currentSize.y <= 0.001){
                     setInAnimation(false);
-                    setPanelSize([0, 0.001, 0.001]);
-                }else if(panelSize[1] > 0.001){
-                    setPanelSize([panelSize[0], panelSize[1]-1./animationFrameCount*finalPanelSize[1], panelSize[2]]);
-                }else if(panelSize[0] > 0.001){
-                    setPanelSize([panelSize[0]-1./animationFrameCount*finalPanelSize[0], 0.001, panelSize[2]]);
+                    ref.current.scale.x = 0;
+                    ref.current.scale.y = 0.001;
+                    ref.current.scale.z = 0.001;
+                }else if(currentSize.y > 0.001){
+                    ref.current.scale.y = currentSize.y-1./animationFrameCount*finalPanelSize.y;
+                }else if(currentSize.x > 0.001){
+                    ref.current.scale.x = currentSize.x-1./animationFrameCount*finalPanelSize.x;
+                    ref.current.scale.y = 0.001;
                 }
             }
         }
@@ -113,15 +119,14 @@ function Controllers() {
         <>
             <DefaultXRControllers />
             <Billboard
+                ref={ref}
                 follow={true}
                 lockX={true}
                 lockY={false}
                 lockZ={true} // Lock the rotation on the z axis (default=false)
-                position={wristlePosition}
-                scale={panelSize}
             >
-                <DropDown scale={[1, 1.5, 1]} color={0xffffff} onChangeValue={onDropDownChange} dropDownValue={csvFiles} position={[0, panelSize[1]/8, 0]}/>
-                <Box position={[0, 0, -panelSize[1]/2]}></Box>
+                <DropDown scale={[1, 1.5, 1]} color={0xffffff} onChangeValue={onDropDownChange} dropDownValue={csvFiles} position={[0, ref?.current?.scale?.y/8, 0]}/>
+                <Box position={[0, 0, -ref?.current?.scale?.y/2]}></Box>
             </Billboard>
         </>
     )

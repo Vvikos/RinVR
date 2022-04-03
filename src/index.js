@@ -4,6 +4,7 @@ import { Sky } from '@react-three/drei'
 import SpreadSheet from './components/SpreadSheet'
 import Controllers from './components/Controllers'
 import { RContextProvider } from './RContextProvider'
+import TextSprite from './components/TextSprite';
 import '@react-three/fiber'
 import './styles.css'
 

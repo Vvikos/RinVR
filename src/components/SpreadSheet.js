@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react';
 import { Interactive } from '@react-three/xr';
 import { Text } from '@react-three/drei';
-import { BoxGeometry, MeshBasicMaterial, TextGeometry  } from "three";
+import { BufferGeometry, BoxBufferGeometry, BoxGeometry, MeshBasicMaterial, TextGeometry  } from "three";
 import { useRContext } from '../RContextProvider';
+import TextSprite from './TextSprite';
 
-const box = new BoxGeometry();
 const cselected_light = new MeshBasicMaterial({color: 0xffa36e});
 const cselected_darker = new MeshBasicMaterial({color: 0xff7221});
 const cnormal_light = new MeshBasicMaterial({color: 0xffffff});
 const cnormal_darker = new MeshBasicMaterial({color: 0xdedcdc});
 const cfirst_dark = new MeshBasicMaterial({color: 0x000000});
+const MAX_CHAR = 35;
 
 function DataCol({data, colId, colSize, firstcol, rowInterval, position, cellSize, rotation}){
     const { selectedCols, setSelectedCols} = useRContext();
@@ -53,10 +54,10 @@ function DataCol({data, colId, colSize, firstcol, rowInterval, position, cellSiz
         let scale = [((cellSize[0]<longest.length*fontSize/2) ? longest.length*fontSize/2 : cellSize[0]), cellSize[1], 0.02];
         let position = [0, cellSize[1]*(colSize/2-i), 0.1];
         let materialColor;
-        let fontColor=0x000000;
+        let fontColor='#000000';
         if(firstcol || i==0){
           materialColor=cfirst_dark;
-          fontColor=0xffffff;
+          fontColor='#ffffff';
         }else{
           let normal = (selected ? cselected_light : cnormal_light);
           let darker = (selected ? cselected_darker : cnormal_darker);
@@ -65,19 +66,21 @@ function DataCol({data, colId, colSize, firstcol, rowInterval, position, cellSiz
         
         let text = '';
         if(firstcol){
-          text = ((i==0) ? '' : rowIdx+'');
+          text = ((i==0) ? '' : rowIdx)+'';
         } else if(i < data.length) {
-          text = ((i==0) ? data[0] : data[rowIdx]+'');
+          text = ((i==0) ? data[0] : data[rowIdx])+'';
         }
-        //row.push(<group key={'Col'+i} position={position}><mesh scale={scale} geometry={box} material={materialColor} > </mesh><Text fontSize={fontSize} position={[0,0,0.9]} maxWidth={scale[0]-0.2} color={fontColor}>{text}</Text></group>);
-        row.push(<group key={'Col'+i} position={position}><mesh scale={scale} geometry={box} material={materialColor} ></mesh></group>);
+        text = text.substring(0, MAX_CHAR) + (text.length > MAX_CHAR ? "..." : "");
+        row.push(
+          <TextSprite key={'Col'+i} position={position} scale={scale} color={fontColor} backgroundMaterial={materialColor} >{text}</TextSprite>
+        );
       }
       return row;
     }
   
     return (
-      <Interactive onSelect={function() { clickCol(colId); }}>
-        <group scale={[1, 1, 0.001]} position={position} rotation={rotation}>
+      <Interactive onSelectStart={function() { clickCol(colId); }}>
+        <group position={position} rotation={rotation}>
             {generateCells()}
         </group>
       </Interactive>
@@ -96,7 +99,6 @@ function DataCol({data, colId, colSize, firstcol, rowInterval, position, cellSiz
   
       let firstColSize = 0.2;
       let maxRows = gridSize[0];
-      // Circle geometry TODO
       let pi_coeff = Math.PI/maxRows;
       let circle_ray = 16;
       let rotation = [0,-Math.PI/2*Math.cos(-1*maxRows*pi_coeff),0];
@@ -160,7 +162,6 @@ function DataCol({data, colId, colSize, firstcol, rowInterval, position, cellSiz
           />
         );
       }
-      console.log('RENDERED GRID');
       return rows;
     }
   
