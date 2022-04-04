@@ -7,10 +7,12 @@ import DropDown from './DropDown'
 import Box from './Box'
 
 function Controllers() {
-    const { csvFiles, setCsvFiles, rowInterval, setRowInterval, colInterval, setColInterval, gridSize } = useRContext();
+    const { csvFiles, setCsvFiles, incrementRowInterval, decrementRowInterval, incrementColInterval, decrementColInterval, gridSize } = useRContext();
     const leftController = useController('left');
     const ref = useRef();
     const [wristlePanel, setWristlePanel] = useState(false);
+    const [swipeColMode, setSwipeColMode] = useState(false);
+    const [swipeRowMode, setSwipeRowMode] = useState(false);
     const [joystickDirections, setJoystickDirections] = useState(['center']);
     const [inAnimation, setInAnimation] = useState(false);
 
@@ -18,6 +20,18 @@ function Controllers() {
     const animationFrameCount = 4.;
 
     useXREvent('squeezeend', (e) => {if(!inAnimation) setWristlePanel(!wristlePanel)}, {handedness: 'left'});
+    
+    // Swipe Colomns mode
+    useXREvent('squeezestart', (e) => {if(!swipeRowMode) setSwipeColMode(true)}, {handedness: 'right'});
+    useXREvent('squeezeend', (e) => {if(!swipeRowMode) setSwipeColMode(false)}, {handedness: 'right'});    
+    useXREvent('selectend', (e) => {if(swipeColMode && !swipeRowMode) incrementColInterval();}, {handedness: 'right'});
+    useXREvent('selectend', (e) => {if(swipeColMode && !swipeRowMode) decrementColInterval();}, {handedness: 'left'});
+
+    // Swipe Rows mode
+    useXREvent('selectstart', (e) => {if(!swipeColMode) setSwipeRowMode(true)}, {handedness: 'left'});
+    useXREvent('selectend', (e) => {if(!swipeColMode) setSwipeRowMode(false)}, {handedness: 'left'});
+    useXREvent('selectend', (e) => {if(swipeRowMode && !swipeColMode) incrementRowInterval();}, {handedness: 'right'});
+    useXREvent('squeezeend', (e) => {if(swipeRowMode && !swipeColMode) decrementRowInterval();}, {handedness: 'right'});
 
     useEffect(() => {
         if(Array.isArray(joystickDirections)){
@@ -76,7 +90,7 @@ function Controllers() {
     useFrame(() => {
         let currentSize = ref.current.scale;
         if (leftController && leftController.grip && leftController.grip.position) {
-            ref.current.position.x = leftController.grip.position.x-currentSize.x/4.;
+            ref.current.position.x = leftController.grip.position.x-leftController.grip.scale.x;
             ref.current.position.y = leftController.grip.position.y+4*currentSize.y/5;
             ref.current.position.z = leftController.grip.position.z-(currentSize.x+currentSize.y)/2.;
         }
