@@ -12,8 +12,11 @@ const RContext = createContext({
     selectedCols: [],
     setSelectedCols: () => { },
     rowInterval: [],
-    setRowInterval: () => { },
+    incrementRowInterval: () => { },
+    decrementRowInterval: () => { },
     colInterval: [],
+    incrementColInterval: () => { },
+    decrementColInterval: () => { },
     setColInterval: () => { },
     fetchInterval: [],
     setFetchInterval: () => { },
@@ -26,7 +29,7 @@ function useRContext() {
 }
 
 function RContextProvider({ children }) {
-    const [gridSize, setGridSize] = useState([12, 20]);
+    const [gridSize, setGridSize] = useState([20, 40]);
     const [csv, setCsv] = useState([]);
     const [selectedCols, setSelectedCols] = useState([]);
     const [csvFiles, setCsvFiles] = useState(['']);
@@ -69,8 +72,27 @@ function RContextProvider({ children }) {
             setRowInterval([0, ((csv[1][0].length < gridSize[1] - 1) ? csv[1][0].length : gridSize[1] - 1)]);
             setColInterval([0, ((csv[1].length < gridSize[0] - 1) ? csv[1].length : gridSize[0] - 1)]);
         }
-        setSelectedCols(Array(csv.length).fill(false));
     }, [csv]);
+
+    function incrementColInterval() {
+        if(colInterval[1] < csv.length)
+            setColInterval([colInterval[0]+1, colInterval[1]+1]);
+    }
+
+    function decrementColInterval() {
+        if(colInterval[0] > 0)
+            setColInterval([colInterval[0]-1, colInterval[1]-1]);
+    }
+
+    function incrementRowInterval() {
+        if(csv.length>0 && rowInterval[1]<csv[0].length)
+            setRowInterval([rowInterval[0]+1, rowInterval[1]+1]);
+    }
+
+    function decrementRowInterval() {
+        if(rowInterval[0] > 0)
+            setRowInterval([rowInterval[0]-1, rowInterval[1]-1]);
+    }
 
     return (
         <RContext.Provider value={{
@@ -81,9 +103,11 @@ function RContextProvider({ children }) {
             selectedCols: selectedCols,
             setSelectedCols: setSelectedCols,
             rowInterval: rowInterval,
-            setRowInterval: setRowInterval,
+            incrementRowInterval: incrementRowInterval,
+            decrementRowInterval: decrementRowInterval,
             colInterval: colInterval,
-            setColInterval: setColInterval,
+            incrementColInterval: incrementColInterval,
+            decrementColInterval: decrementColInterval,
             fetchInterval: fetchInterval,
             setFetchInterval: setFetchInterval,
             gridSize: gridSize,

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Interactive } from '@react-three/xr';
 import Button from './Button';
 
-function DropDown({ scale, position, dropDownValue, cellSize, onChangeValue}) {
+function DropDown({ scale, position, dropDownValue, onChangeValue}) {
   const [visible, setVisible] = useState(false);
   const [currentHovered, setCurrentHovered] = useState('');
   
