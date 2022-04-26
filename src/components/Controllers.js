@@ -9,6 +9,7 @@ import Box from './Box'
 function Controllers() {
     const { csvFiles, setCsvFiles, incrementRowInterval, decrementRowInterval, incrementColInterval, decrementColInterval, gridSize } = useRContext();
     const leftController = useController('left');
+    const rightController = useController('right');
     const ref = useRef();
     const [wristlePanel, setWristlePanel] = useState(false);
     const [swipeColMode, setSwipeColMode] = useState(false);
@@ -38,21 +39,37 @@ function Controllers() {
             if(joystickDirections.indexOf('center')){
                 joystickDirections.forEach(element => {
                     if(element == 'left')
-                        setColInterval(prevstate => ((prevstate[0]==0) ? prevstate : [prevstate[0]-1, prevstate[1]]));
+                        decrementColInterval();
                     else if(element == 'right')
-                        setColInterval(prevstate => ((prevstate[0]+prevstate[1]>=csv[0].length-2) ? prevstate : [prevstate[0]+1, prevstate[1]]));
+                        incrementColInterval();
                     else if(element == 'top')
-                        setRowInterval(prevstate => ((prevstate[0]==0) ? prevstate : [prevstate[0]-1, prevstate[1]]));
+                        decrementRowInterval();
                     else if(element == 'bottom')
-                        setRowInterval(prevstate => ((prevstate[0]+prevstate[1]>=csv.length-2) ? prevstate : [prevstate[0]+1, prevstate[1]]));
+                        incrementRowInterval();
                     
                     setJoystickDirections(['center']);
                 });
             }
         }
+        console.log(joystickDirections);
     }, [joystickDirections]);
 
-    /*useEffect(() => {
+    const onDropDownChange = (file) => {
+        let newCsvFiles = csvFiles.slice();
+        let idx = newCsvFiles.indexOf(file);
+        //swap selected file to first file
+        [newCsvFiles[0], newCsvFiles[idx]] = [newCsvFiles[idx], newCsvFiles[0]];
+        setCsvFiles(newCsvFiles);
+    }
+
+    useFrame(() => {
+        let currentSize = ref.current.scale;
+        if (leftController && leftController.grip && leftController.grip.position) {
+            ref.current.position.x = leftController.grip.position.x-leftController.grip.scale.x;
+            ref.current.position.y = leftController.grip.position.y+4*currentSize.y/5;
+            ref.current.position.z = leftController.grip.position.z-(currentSize.x+currentSize.y)/2.;
+        }
+
         if (rightController) {
             if (rightController.inputSource && rightController.inputSource.gamepad && leftController.inputSource.gamepad.axes) {
                 let joystickX = leftController.inputSource.gamepad.axes[2];
@@ -72,27 +89,6 @@ function Controllers() {
                 }
                 setJoystickDirections(newJoystickDirections);
             }
-        }
-    }, [rightController]);*/
-
-    const onDropDownChange = (file) => {
-        let newCsvFiles = csvFiles.slice();
-        let idx = newCsvFiles.indexOf(file);
-        //swap selected file to first file
-        [newCsvFiles[0], newCsvFiles[idx]] = [newCsvFiles[idx], newCsvFiles[0]];
-        setCsvFiles(newCsvFiles);
-    }
-
-    const onClickRefresh = () => {
-        setRowInterval(rowInterval);
-    }
-
-    useFrame(() => {
-        let currentSize = ref.current.scale;
-        if (leftController && leftController.grip && leftController.grip.position) {
-            ref.current.position.x = leftController.grip.position.x-leftController.grip.scale.x;
-            ref.current.position.y = leftController.grip.position.y+4*currentSize.y/5;
-            ref.current.position.z = leftController.grip.position.z-(currentSize.x+currentSize.y)/2.;
         }
             
         if (leftController && inAnimation) {
