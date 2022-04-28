@@ -5,6 +5,7 @@ import { Billboard, Text } from "@react-three/drei";
 import { useRContext } from '../RContextProvider'
 import DropDown from './DropDown'
 import Box from './Box'
+import UserPreferences from './UserPreferences'
 
 function Controllers() {
     const { csvFiles, setCsvFiles, incrementRowInterval, decrementRowInterval, incrementColInterval, decrementColInterval, gridSize } = useRContext();
@@ -135,8 +136,12 @@ function Controllers() {
                 lockY={false}
                 lockZ={true} // Lock the rotation on the z axis (default=false)
             >
-                <DropDown scale={[1, 1.5, 1]} color={0xffffff} onChangeValue={onDropDownChange} dropDownValue={csvFiles} position={[0, ref?.current?.scale?.y/8, 0]}/>
+                <DropDown scale={[1, 1.5, 0.1]} color={0xffffff} onChangeValue={onDropDownChange} dropDownValue={csvFiles} position={[0, ref?.current?.scale?.y/8, 0]}/>
                 <Box position={[0, 0, -ref?.current?.scale?.y/2]}></Box>
+                <Box position={[0.8, 0, -ref?.current?.scale?.y/2]} scale={[0.5, 1, 0.1]} color="grey" >
+                    <UserPreferences/>
+                </Box>
+
             </Billboard>
         </>
     )
