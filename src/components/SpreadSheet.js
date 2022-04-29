@@ -2,6 +2,8 @@ import { useMemo, useState, useEffect } from 'react';
 import { Interactive } from '@react-three/xr';
 import { MeshBasicMaterial, FrontSide, PlaneBufferGeometry, CanvasTexture, LinearFilter, RepeatWrapping } from 'three';
 import { useRContext } from '../RContextProvider';
+import Box from './Box'
+import { DoubleSide } from 'three';
 
 const selected_light = '#ffa36e';
 const selected_darker = '#ff7221';
@@ -94,7 +96,7 @@ function DataCol({colId, firstcol, position, rotation, scale}){
       texture.wrapT = RepeatWrapping;
       const labelMaterial = new MeshBasicMaterial({
           map: texture,
-          side: FrontSide,
+          side: DoubleSide,
           transparent: false,
         });
 
@@ -112,13 +114,13 @@ function DataCol({colId, firstcol, position, rotation, scale}){
   }
 
   function SpreadSheet({ position }){
-    const { gridSize } = useRContext();
+    const { gridSize, displayAngle } = useRContext();
     
     const generateGrid = () => {
       const rows = [];
 
       let maxRows = gridSize[0];
-      let pi_coeff = Math.PI/maxRows;
+      let pi_coeff = (displayAngle*(Math.PI/180.))/maxRows;
       let circle_ray = 30;
       let size, pos, rotation;
       
@@ -134,7 +136,7 @@ function DataCol({colId, firstcol, position, rotation, scale}){
         posX1 = (circle_ray*Math.cos(-1*(maxRows-i)*pi_coeff));
         posZ1 = (circle_ray*Math.sin(-1*(maxRows-i)*pi_coeff));
         
-        rotation = [0, -((Math.PI/(maxRows))*i) + (Math.PI/2), 0];
+        rotation = [0, -(pi_coeff*i) + (Math.PI/2), 0];
 
         pos = [posX1, position[1], posZ1];
 
@@ -155,6 +157,36 @@ function DataCol({colId, firstcol, position, rotation, scale}){
       return rows;
     }
   
+ /*
+    const generateGrid = () => {
+      const rows = [];
+      const radius = 3;
+      let i = 0;
+      let maxRows = gridSize[0];
+      console.log((Math.PI*4)/maxRows);
+      for(let radian = 0.0; radian<Math.PI*4; radian+=((Math.PI*2)/maxRows*2))
+      {
+        let x = radius*Math.cos(radian);
+        let y = 0;
+        let z = radius*Math.sin(radian);
+
+        rows.push(
+          <DataCol
+            key={'Col'+i}
+            position={[x,y,z]} 
+            scale={[1,1,1]}
+            colId={i} 
+            firstcol={false}  
+          />
+        );
+
+        i++;
+        console.log(i);
+      }
+      return rows;
+
+    };
+    */
     return (
         <>
           {generateGrid()}

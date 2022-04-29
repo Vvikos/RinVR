@@ -53,7 +53,7 @@ function InsertText({position, backgroundColor, textColor, fontSize, text, width
 
 function ChangeGrid({position})
 {
-    const { gridSize, incrementColGrid, incrementRowGrid, decrementColGrid, decrementRowGrid } = useRContext();
+    const { gridSize, incrementColGrid, incrementRowGrid, decrementColGrid, decrementRowGrid, setDisplayAngle } = useRContext();
     
     const backgroundColor = "grey";
     const textColor = "#cc5500";
@@ -85,7 +85,7 @@ function ChangeGrid({position})
             /***************** 360/180 PART ****************/
 
             <InsertText position={[0,-0.5, 1]} backgroundColor={backgroundColor} textColor={textColor} fontSize={100} text={"Modifier l'angle d'affichage"} width={150} height={100} meshScale={[0.8,0.1,0.15]}/>
-            <DropDown position={[0, -0.62, 1]} scale={[0.8, 1.5, 0.1]} color={textColor}  dropDownValue={["180°", "360°"]}  fontSize={0.04}/>
+            <DropDown position={[0, -0.62, 1]} scale={[0.8, 1.5, 0.1]} color={textColor} onChangeValue={setDisplayAngle} dropDownValue={["180°", "360°"]}  fontSize={0.04}/>
 
         </>
     );

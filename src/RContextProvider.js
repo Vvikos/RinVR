@@ -26,6 +26,8 @@ const RContext = createContext({
     decrementColGrid: () =>{ },
     incrementRowGrid: () => { },
     decrementRowGrid: () =>{ },
+    displayAngle: 180,
+    setDisplayAngle: () =>{ }
 });
 
 function useRContext() {
@@ -40,6 +42,7 @@ function RContextProvider({ children }) {
     const [fetchInterval, setFetchInterval] = useState([0, 0]);
     const [rowInterval, setRowInterval] = useState([0, 9]);
     const [colInterval, setColInterval] = useState([0, 9]);
+    const [displayAngle, setDisplayAngle] = useState(180);
 
     const FETCH_SIZE = 40;
 
@@ -118,6 +121,10 @@ function RContextProvider({ children }) {
             setGridSize([gridSize[0], gridSize[1]-1]);
     }
 
+    function setConvertedDisplayAngle(stringvalue) {
+        setDisplayAngle(parseInt(stringvalue));
+    }
+
     return (
         <RContext.Provider value={{
             csvFiles: csvFiles,
@@ -140,6 +147,8 @@ function RContextProvider({ children }) {
             decrementColGrid: decrementColGrid,
             incrementRowGrid: incrementRowGrid,
             decrementRowGrid: decrementRowGrid,
+            displayAngle: displayAngle,
+            setDisplayAngle: setConvertedDisplayAngle
         }}>
             {children}
         </RContext.Provider>
