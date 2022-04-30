@@ -2,14 +2,14 @@ import { useState, useEffect } from 'react';
 import { Interactive } from '@react-three/xr';
 import Button from './Button';
 
-function DropDown({ scale, position, dropDownValue, onChangeValue}) {
+function DropDown({ scale, position, dropDownValue, onChangeValue, fontSize}) {
   const [visible, setVisible] = useState(false);
   const [currentHovered, setCurrentHovered] = useState('');
   
   const MAX_CHAR = 100;
   const hoveredColor = 0xB0E2FF;
   const normalColor = 0xffffff;
-  const currentColor = 0x808080;
+  const currentColor = 0xcc5500;
 
   const generateComboBox = () => {
     const row = [];
@@ -27,7 +27,7 @@ function DropDown({ scale, position, dropDownValue, onChangeValue}) {
             key={i} 
             color={(i==0 ? currentColor : (currentHovered==dropDownValue[i] ? hoveredColor : 0xffffff))} 
             fontColor={0x000000} 
-            fontSize={0.015} 
+            fontSize={fontSize} 
             scale={[1, 0.04, 0.3]}
             position={pos} 
           >
@@ -46,7 +46,7 @@ function DropDown({ scale, position, dropDownValue, onChangeValue}) {
         onHover={function(){ setCurrentHovered(dropDownValue[0]); }}
         onBlur={function(){ setCurrentHovered(''); }}
       >
-        <Button fontSize={0.015} position={[0,0,0]} color={(currentHovered==dropDownValue[0] ? hoveredColor: normalColor)} fontColor={0x000000} scale={[1, 0.04, 0.3]}>
+        <Button fontSize={fontSize} position={[0,0,0]} color={(currentHovered==dropDownValue[0] ? hoveredColor: normalColor)} fontColor={0x000000} scale={[1, 0.04, 0.3]}>
           {dropDownValue[0]}
         </Button>
       </Interactive>

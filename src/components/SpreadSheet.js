@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
-import { MeshBasicMaterial, FrontSide, PlaneBufferGeometry, CanvasTexture, LinearFilter, RepeatWrapping } from 'three';
+import { MeshBasicMaterial, DoubleSide, PlaneBufferGeometry, CanvasTexture, LinearFilter, RepeatWrapping } from 'three';
 import { Interactive } from '@react-three/xr';
 import { useRContext } from '../RContextProvider';
 import { normal_light, normal_darker, normalMaterial, hoveredMaterial, selectedMaterial } from '../helpers/colors';
@@ -132,7 +132,7 @@ function DataCol({colId, position, rotation, scale}){
     texture.wrapT = RepeatWrapping;
     const material = new MeshBasicMaterial({
         map: texture,
-        side: FrontSide,
+        side: DoubleSide,
         transparent: false,
       });
 
@@ -172,13 +172,13 @@ function DataCol({colId, position, rotation, scale}){
 }
 
 function SpreadSheet({ position }){
-  const { gridSize } = useRContext();
+  const { gridSize, displayAngle } = useRContext();
   
   const generateGrid = () => {
     const rows = [];
 
     let maxRows = gridSize[0];
-    let pi_coeff = Math.PI/maxRows;
+    let pi_coeff = (displayAngle*(Math.PI/180.))/maxRows;
     let circle_ray = 30;
     let size, pos, rotation;
     

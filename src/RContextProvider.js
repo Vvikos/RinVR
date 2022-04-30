@@ -23,7 +23,13 @@ const RContext = createContext({
     fetchInterval: [],
     setFetchInterval: () => { },
     gridSize: [],
-    setGridSize: () => { }
+    setGridSize: () => { },
+    incrementColGrid: () =>{ },
+    decrementColGrid: () =>{ },
+    incrementRowGrid: () => { },
+    decrementRowGrid: () =>{ },
+    displayAngle: 180,
+    setDisplayAngle: () =>{ }
 });
 
 function useRContext() {
@@ -39,6 +45,7 @@ function RContextProvider({ children }) {
     const [fetchInterval, setFetchInterval] = useState([0, 0]);
     const [rowInterval, setRowInterval] = useState([0, 9]);
     const [colInterval, setColInterval] = useState([0, 9]);
+    const [displayAngle, setDisplayAngle] = useState(180);
 
     const FETCH_SIZE = 40;
 
@@ -97,6 +104,30 @@ function RContextProvider({ children }) {
             setRowInterval([rowInterval[0]-1, rowInterval[1]-1]);
     }
 
+    function incrementColGrid() {
+        if(gridSize[0] < 30)
+            setGridSize([gridSize[0]+1, gridSize[1]]);
+    }
+
+    function decrementColGrid() {
+        if(gridSize[0] > 3)
+            setGridSize([gridSize[0]-1, gridSize[1]]);
+    }
+
+    function incrementRowGrid() {
+        if(gridSize[1] < 50)
+            setGridSize([gridSize[0], gridSize[1]+1]);
+    }
+
+    function decrementRowGrid() {
+        if(gridSize[1] > 10)
+            setGridSize([gridSize[0], gridSize[1]-1]);
+    }
+
+    function setConvertedDisplayAngle(stringvalue) {
+        setDisplayAngle(parseInt(stringvalue));
+    }
+
     return (
         <RContext.Provider value={{
             csvFiles: csvFiles,
@@ -116,7 +147,13 @@ function RContextProvider({ children }) {
             fetchInterval: fetchInterval,
             setFetchInterval: setFetchInterval,
             gridSize: gridSize,
-            setGridSize: setGridSize
+            setGridSize: setGridSize,
+            incrementColGrid: incrementColGrid,
+            decrementColGrid: decrementColGrid,
+            incrementRowGrid: incrementRowGrid,
+            decrementRowGrid: decrementRowGrid,
+            displayAngle: displayAngle,
+            setDisplayAngle: setConvertedDisplayAngle
         }}>
             {children}
         </RContext.Provider>
