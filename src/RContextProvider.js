@@ -11,6 +11,8 @@ const RContext = createContext({
     setCsv: () => { },
     selectedCols: [],
     setSelectedCols: () => { },
+    selectedCells: [],
+    setSelectedCells: () => { },
     rowInterval: [],
     incrementRowInterval: () => { },
     decrementRowInterval: () => { },
@@ -29,9 +31,10 @@ function useRContext() {
 }
 
 function RContextProvider({ children }) {
-    const [gridSize, setGridSize] = useState([20, 40]);
+    const [gridSize, setGridSize] = useState([20, 20]);
     const [csv, setCsv] = useState([]);
     const [selectedCols, setSelectedCols] = useState([]);
+    const [selectedCells, setSelectedCells] = useState([]);
     const [csvFiles, setCsvFiles] = useState(['']);
     const [fetchInterval, setFetchInterval] = useState([0, 0]);
     const [rowInterval, setRowInterval] = useState([0, 9]);
@@ -102,6 +105,8 @@ function RContextProvider({ children }) {
             setCsv: setCsv,
             selectedCols: selectedCols,
             setSelectedCols: setSelectedCols,
+            selectedCells: selectedCells,
+            setSelectedCells: setSelectedCells,
             rowInterval: rowInterval,
             incrementRowInterval: incrementRowInterval,
             decrementRowInterval: decrementRowInterval,

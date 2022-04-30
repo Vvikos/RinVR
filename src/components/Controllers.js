@@ -51,7 +51,6 @@ function Controllers() {
                 });
             }
         }
-        console.log(joystickDirections);
     }, [joystickDirections]);
 
     const onDropDownChange = (file) => {
