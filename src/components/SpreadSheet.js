@@ -138,15 +138,15 @@ function DataCol({colId, position, rotation, scale}){
 
     return material;
 
-  }, [csv, colInterval, rowInterval]);
+  }, [csv, colInterval, rowInterval, canvas]);
 
 
   const generateInteractiveCol = () => {
     const cells = [];
 
-    let maxRows = gridSize[0];
+    let maxRows = gridSize[1];
     let cellScale = [scale[0], scale[1]/maxRows, scale[2]];
-    let pos = [position[0], position[1]+cellScale[1]*gridSize[0]/2-0.5, position[2]+0.05];
+    let pos = [position[0], position[1]+cellScale[1]*maxRows/2-0.5, position[2]+0.05];
     for (let i=0; i < maxRows; i++){
       cells.push(
         <InteractiveCell
@@ -172,36 +172,37 @@ function DataCol({colId, position, rotation, scale}){
 }
 
 function SpreadSheet({ position }){
-  const { gridSize, displayAngle } = useRContext();
+  const { gridSize, displayAngles } = useRContext();
   
   const generateGrid = () => {
-    const rows = [];
+    const cols = [];
 
-    let maxRows = gridSize[0];
-    let pi_coeff = (displayAngle*(Math.PI/180.))/maxRows;
+    let disAnge = parseInt(displayAngles[0]);
+    let maxCols = gridSize[0];
+    let pi_coeff = (disAnge*(Math.PI/180.))/maxCols;
     let circle_ray = 30;
     let size, pos, rotation;
     
-    let posX0 = (circle_ray*Math.cos(-1*(maxRows-1)*pi_coeff));
-    let posZ0 = (circle_ray*Math.sin(-1*(maxRows-1)*pi_coeff));
+    let posX0 = (circle_ray*Math.cos(-1*(maxCols-1)*pi_coeff));
+    let posZ0 = (circle_ray*Math.sin(-1*(maxCols-1)*pi_coeff));
 
-    let posX1 = (circle_ray*Math.cos(-1*(maxRows)*pi_coeff));
-    let posZ1 = (circle_ray*Math.sin(-1*(maxRows)*pi_coeff));
+    let posX1 = (circle_ray*Math.cos(-1*(maxCols)*pi_coeff));
+    let posZ1 = (circle_ray*Math.sin(-1*(maxCols)*pi_coeff));
 
-    size=[ Math.sqrt(((posX1-posX0)**2)+((posZ1-posZ0)**2)), maxRows, 1 ];
+    size=[Math.sqrt(((posX1-posX0)**2)+((posZ1-posZ0)**2)), gridSize[1], 1];
 
-    for (let i=0; i < maxRows; i++){
-      posX1 = (circle_ray*Math.cos(-1*(maxRows-i)*pi_coeff));
-      posZ1 = (circle_ray*Math.sin(-1*(maxRows-i)*pi_coeff));
+    for (let i=0; i < maxCols; i++){
+      posX1 = (circle_ray*Math.cos(-1*(maxCols-i)*pi_coeff));
+      posZ1 = (circle_ray*Math.sin(-1*(maxCols-i)*pi_coeff));
       
-      rotation = [0, -(pi_coeff*i) + (Math.PI/2), 0];
+      rotation = [0, -(pi_coeff*i) + (disAnge==360 ? -Math.PI/2 : +Math.PI/2), 0];
 
       pos = [posX1, position[1], posZ1];
 
       posX0 = posX1;
       posZ0 = posZ1;
 
-      rows.push(
+      cols.push(
         <DataCol
           key={'Col'+i}
           position={pos} 
@@ -211,7 +212,7 @@ function SpreadSheet({ position }){
         />
       );
     }
-    return rows;
+    return cols;
   }
 
   return (
