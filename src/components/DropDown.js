@@ -16,7 +16,7 @@ function DropDown({ scale, position, dropDownValue, onChangeValue}) {
     let pos = [0, 0, 0];
     for (let i=0; i < dropDownValue.length; i++){
       pos=[0, -(i+1)*0.05, 0];
-      var text = dropDownValue[i].substring(0, MAX_CHAR) + (dropDownValue[i].length > MAX_CHAR ? "..." : "");
+      const text = dropDownValue[i].substring(0, MAX_CHAR) + (dropDownValue[i].length > MAX_CHAR ? "..." : "");
       row.push(
         <Interactive 
           onSelect={function(){ setVisible(false);onChangeValue(dropDownValue[i]); }}
