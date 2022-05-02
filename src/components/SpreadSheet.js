@@ -7,7 +7,7 @@ import { normal_light, normal_darker, normalMaterial, hoveredMaterial, selectedM
 const backgroundGeometry = new PlaneBufferGeometry(1, 1);
 
 function InteractiveCell({colId, cellId, position, rotation, scale}){
-  const { rowInterval, colInterval, selectedCols, setSelectedCols, selectedCells, setSelectedCells } = useRContext();
+  const { rowInterval, colInterval, selectedCols, setSelectedCols, selectedCells, setSelectedCells, cellSelectionMode, colSelectionMode } = useRContext();
   const [selected, setSelected] = useState(false);
   const [hovered, setHovered] = useState(false);
 
@@ -55,25 +55,31 @@ function InteractiveCell({colId, cellId, position, rotation, scale}){
   }
 
   return (
-    <Interactive onSelect={select} onHover={hoverCell} onBlur={blurCell} >
-      {(!selected && !hovered) || cellId==0 ?
-        <mesh rotation={rotation} scale={scale} position={position} geometry={backgroundGeometry} material={normalMaterial} />
-      :
-        null
-      }
+    <>
+      {(cellSelectionMode && cellId!=0) || (colSelectionMode && cellId==0)? 
+        <Interactive onSelect={select} onHover={hoverCell} onBlur={blurCell} >
+          {(!selected && !hovered) || cellId==0 ?
+            <mesh rotation={rotation} scale={scale} position={position} geometry={backgroundGeometry} material={normalMaterial} />
+          :
+            null
+          }
 
-      {selected && cellId!=0 ? 
-        <mesh rotation={rotation} scale={scale} position={position} geometry={backgroundGeometry} material={selectedMaterial} />
-      :
-        null
-      }
+          {selected && cellId!=0 ? 
+            <mesh rotation={rotation} scale={scale} position={position} geometry={backgroundGeometry} material={selectedMaterial} />
+          :
+            null
+          }
 
-      {hovered && cellId!=0 ? 
-        <mesh rotation={rotation} scale={scale} position={position} geometry={backgroundGeometry} material={hoveredMaterial} />
-      :
+          {hovered && cellId!=0 ? 
+            <mesh rotation={rotation} scale={scale} position={position} geometry={backgroundGeometry} material={hoveredMaterial} />
+          :
+            null
+          }
+        </Interactive>
+        :
         null
       }
-    </Interactive>
+    </>
   )
 }
 

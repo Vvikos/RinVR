@@ -24,12 +24,19 @@ const RContext = createContext({
     setFetchInterval: () => { },
     gridSize: [],
     setGridSize: () => { },
-    incrementColGrid: () =>{ },
-    decrementColGrid: () =>{ },
+    incrementColGrid: () => { },
+    decrementColGrid: () => { },
     incrementRowGrid: () => { },
-    decrementRowGrid: () =>{ },
+    decrementRowGrid: () => { },
     displayAngles: [],
-    setDisplayAngles: () =>{ }
+    setDisplayAngles: () =>{ },
+    clearColSelection: () =>{ },
+    colSelectionMode: false,
+    setColSelectionMode: () => { },
+    clearCellSelection: () => { },
+    cellSelectionMode: false,
+    setCellSelectionMode: () => { },
+
 });
 
 function useRContext() {
@@ -46,6 +53,9 @@ function RContextProvider({ children }) {
     const [rowInterval, setRowInterval] = useState([0, 9]);
     const [colInterval, setColInterval] = useState([0, 9]);
     const [displayAngles, setDisplayAngles] = useState(["180","360"]);
+    const [cellSelectionMode, setCellSelectionMode] = useState(false);
+    const [colSelectionMode, setColSelectionMode] = useState(false);
+    const [selectQueryPool, setSelectQueryPool] = useState({});
 
     const FETCH_SIZE = 40;
 
@@ -76,6 +86,17 @@ function RContextProvider({ children }) {
             .then(response => setCsv(response))
             .catch(error => console.log('ERROR', error));
     }, [fetchInterval]);
+
+    useEffect(() => {
+        /*if (csvFiles[0] == '') {
+            console.log('INFO', 'NO FILE FETCHED BECAUSE NO FILE SELECTED');
+            return;
+        }
+
+        RService.getCsv(csvFiles[0], fetchInterval)
+            .then(response => setCsv(response))
+            .catch(error => console.log('ERROR', error));*/
+    }, [selectQueryPool]);
 
     useEffect(() => {
         if (csv && csv.length > 0 && csv[1].length > 0 && csv[1][0].length > 0) {
@@ -132,6 +153,14 @@ function RContextProvider({ children }) {
         setDisplayAngles(newDisplayAngles);
     }
 
+    function clearColSelection() {
+        setSelectedCols([]);
+    }
+
+    function clearCellSelection() {
+        setSelectedCells([]);
+    }
+
     return (
         <RContext.Provider value={{
             csvFiles: csvFiles,
@@ -157,7 +186,13 @@ function RContextProvider({ children }) {
             incrementRowGrid: incrementRowGrid,
             decrementRowGrid: decrementRowGrid,
             displayAngles: displayAngles,
-            setDisplayAngles: setFirstDisplayAngles
+            setDisplayAngles: setFirstDisplayAngles,
+            clearColSelection: clearColSelection,
+            colSelectionMode: colSelectionMode,
+            setColSelectionMode: setColSelectionMode,
+            clearCellSelection: clearCellSelection,
+            cellSelectionMode: cellSelectionMode,
+            setCellSelectionMode: setCellSelectionMode,
         }}>
             {children}
         </RContext.Provider>
