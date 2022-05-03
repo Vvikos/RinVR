@@ -85,7 +85,7 @@ function ChangeGrid({position})
             /***************** 360/180 PART ****************/
 
             <InsertText position={[0,-0.5, 1]} backgroundColor={normal_light} textColor={textColor} fontSize={42} text={"Modifier l'angle d'affichage"} width={150} meshScale={[0.8,0.1,0.15]}/>
-            <DropDown position={[0, -0.62, 1]} scale={[0.8, 1.5, 0.1]} color={textColor} onChangeValue={setDisplayAngles} dropDownValue={displayAngles} fontSize={0.04}/>
+            <DropDown position={[0, -0.62, 10]} scale={[1, 0.38, 0.1]} color={textColor} onChangeValue={setDisplayAngles} dropDownValue={displayAngles} fontSize={0.04}/>
 
         </>
     );

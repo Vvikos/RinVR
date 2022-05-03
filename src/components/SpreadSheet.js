@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { MeshBasicMaterial, DoubleSide, PlaneBufferGeometry, CanvasTexture, LinearFilter, RepeatWrapping } from 'three';
 import { Interactive } from '@react-three/xr';
 import { useRContext } from '../RContextProvider';
-import { normal_light, normal_darker, normalMaterial, hoveredMaterial, selectedMaterial } from '../helpers/colors';
+import { normal_light, normal_darker, normalMaterial, hoveredMaterial, hoveredFirstMaterial, selectedMaterial } from '../helpers/colors';
 
 const backgroundGeometry = new PlaneBufferGeometry(1, 1);
 
@@ -70,14 +70,20 @@ function InteractiveCell({colId, cellId, position, rotation, scale}){
             null
           }
 
-          {hovered && cellId!=0 ? 
-            <mesh rotation={rotation} scale={scale} position={position} geometry={backgroundGeometry} material={hoveredMaterial} />
+          {hovered ?
+            cellId==0 ?
+              <mesh rotation={rotation} scale={scale} position={position} geometry={backgroundGeometry} material={hoveredFirstMaterial} />
+            :
+              <mesh rotation={rotation} scale={scale} position={position} geometry={backgroundGeometry} material={hoveredMaterial} />
           :
             null
           }
         </Interactive>
         :
-        null
+          selected && cellId!=0 ? 
+            <mesh rotation={rotation} scale={scale} position={position} geometry={backgroundGeometry} material={selectedMaterial} />
+          :
+            null
       }
     </>
   )

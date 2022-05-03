@@ -12,6 +12,7 @@ function hsl(h, s, l) {
 
 const color_normal = hsl(0, 1, .5);
 const color_selected = hsl(0.4, 1, .5);
+const color_selected_first = hsl(0.33, 1, .5);
 const color_hovered = hsl(0.05, 1, .5);
 
 export const backgroundGeometry = new PlaneBufferGeometry(1, 1);
@@ -24,6 +25,12 @@ export const normalMaterial = new MeshPhongMaterial({
 
 export const hoveredMaterial = new MeshPhongMaterial({
   color: color_selected,
+  opacity: 0.5,
+  transparent: true,
+});
+
+export const hoveredFirstMaterial = new MeshPhongMaterial({
+  color: color_selected_first,
   opacity: 0.5,
   transparent: true,
 });

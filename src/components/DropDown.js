@@ -15,7 +15,7 @@ function DropDown({ scale, position, dropDownValue, onChangeValue, fontSize}) {
     const row = [];
     let pos = [0, 0, 0];
     for (let i=0; i < dropDownValue.length; i++){
-      pos=[0, -(i+1)*0.05, 0];
+      pos=[0, -(i+1)*scale[1], 0];
       const text = dropDownValue[i].substring(0, MAX_CHAR) + (dropDownValue[i].length > MAX_CHAR ? "..." : "");
       row.push(
         <Interactive 
@@ -28,7 +28,7 @@ function DropDown({ scale, position, dropDownValue, onChangeValue, fontSize}) {
             color={(i==0 ? currentColor : (currentHovered==dropDownValue[i] ? hoveredColor : 0xffffff))} 
             fontColor={0x000000} 
             fontSize={fontSize} 
-            scale={[1, 0.04, 0.3]}
+            scale={scale}
             position={pos} 
           >
             {text}
@@ -46,7 +46,7 @@ function DropDown({ scale, position, dropDownValue, onChangeValue, fontSize}) {
         onHover={function(){ setCurrentHovered(dropDownValue[0]); }}
         onBlur={function(){ setCurrentHovered(''); }}
       >
-        <Button fontSize={fontSize} position={[0,0,0]} color={(currentHovered==dropDownValue[0] ? hoveredColor: normalColor)} fontColor={0x000000} scale={[1, 0.04, 0.3]}>
+        <Button fontSize={fontSize} position={[0,0,0]} color={(currentHovered==dropDownValue[0] ? hoveredColor: normalColor)} fontColor={0x000000} scale={scale}>
           {dropDownValue[0]}
         </Button>
       </Interactive>
