@@ -6,6 +6,7 @@ import { useRContext } from '../RContextProvider'
 import DropDown from './DropDown'
 import Box from './Box'
 import UserPreferences from './UserPreferences'
+import QueryBuilder from './QueryBuilder'
 
 function Controllers() {
     const { csvFiles, setCsvFiles, incrementRowInterval, decrementRowInterval, incrementColInterval, decrementColInterval, gridSize } = useRContext();
@@ -135,8 +136,10 @@ function Controllers() {
                 lockY={false}
                 lockZ={true} // Lock the rotation on the z axis (default=false)
             >
-                <DropDown scale={[1, 1.5, 0.1]} color={0xffffff} onChangeValue={onDropDownChange} dropDownValue={csvFiles} position={[0, ref?.current?.scale?.y/8, 0]} fontSize={0.015} />
-                <Box position={[0, 0, -ref?.current?.scale?.y/2]}></Box>
+                <DropDown scale={[1, 0.25, 0.1]} color={0xffffff} onChangeValue={onDropDownChange} dropDownValue={csvFiles} position={[0, ref?.current?.scale?.y/8, 0]} fontSize={0.04} />
+                
+                <QueryBuilder position={[0, -0.01, -ref?.current?.scale?.y/2]} scale={[1, 1, 0.1]} />
+
                 <Box position={[0.8, 0, -ref?.current?.scale?.y/2]} scale={[0.5, 1, 0.1]} >
                     <UserPreferences/>
                 </Box>
@@ -145,7 +148,5 @@ function Controllers() {
         </>
     )
 }
-
-//<RoundedButton color={wristleColor} fontColor={0xffffff} fontSize={0.015} size={[0.05, 0.05, 0.001]} position={wristlePosition} rotation={wristleRotation}>WRISTLE</RoundedButton>
 
 export default Controllers;
