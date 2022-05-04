@@ -140,7 +140,7 @@ function Controllers() {
                 
                 <QueryBuilder position={[0, -0.01, -ref?.current?.scale?.y/2]} scale={[1, 1, 0.1]} />
 
-                <Box position={[0.8, 0, -ref?.current?.scale?.y/2]} scale={[0.5, 1, 0.1]} >
+                <Box position={[0.8, 0, -ref?.current?.scale?.y/2]} scale={[0.5, 1, 0.1]} color={"grey"}>
                     <UserPreferences/>
                 </Box>
 
