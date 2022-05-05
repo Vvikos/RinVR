@@ -36,6 +36,7 @@ const RContext = createContext({
     clearCellSelection: () => { },
     cellSelectionMode: false,
     setCellSelectionMode: () => { },
+    sendSelectRequest: () => { }
 
 });
 
@@ -82,20 +83,20 @@ function RContextProvider({ children }) {
             return;
         }
 
-        RService.getCsv(csvFiles[0], fetchInterval)
+        RService.getCsv(csvFiles[1], fetchInterval)
             .then(response => setCsv(response))
             .catch(error => console.log('ERROR', error));
     }, [fetchInterval]);
 
     useEffect(() => {
-        /*if (csvFiles[0] == '') {
+        if (csvFiles[0] == '') {
             console.log('INFO', 'NO FILE FETCHED BECAUSE NO FILE SELECTED');
             return;
         }
 
-        RService.getCsv(csvFiles[0], fetchInterval)
+        RService.getCsvWithSelect(csvFiles[1], fetchInterval, selectQueryPool)
             .then(response => setCsv(response))
-            .catch(error => console.log('ERROR', error));*/
+            .catch(error => console.log('ERROR', error));
     }, [selectQueryPool]);
 
     useEffect(() => {
@@ -193,6 +194,7 @@ function RContextProvider({ children }) {
             clearCellSelection: clearCellSelection,
             cellSelectionMode: cellSelectionMode,
             setCellSelectionMode: setCellSelectionMode,
+            sendSelectRequest: setSelectQueryPool
         }}>
             {children}
         </RContext.Provider>
@@ -222,6 +224,36 @@ class RService {
 
     static async getCsv(csvName, fetchInterval) {
         return fetch(API_R + "/csv?name=" + csvName + "&offset=" + fetchInterval[0] + "&limit=" + fetchInterval[1], { mode: 'cors' })
+            .then(res => {
+                const reader = res.body.getReader();
+                return reader.read();
+            })
+            .then(result => {
+                const decoder = new TextDecoder('utf-8');
+                return decoder.decode(result.value);
+            })
+            .then(csvStr => {
+                const csv_data = Papa.parse(csvStr).data;
+                const csv_flip = csv_data[0].map((col, i) => csv_data.map(row => row[i]));
+                return csv_flip;
+            })
+            .catch(e => {
+                console.log(e);
+                return e;
+            });
+    }
+
+    static async getCsvWithSelect(csvName, fetchInterval, selectQuery) {
+        const requestOptions = {
+            method: 'POST',
+            mode: 'cors',
+            headers: { 'Content-Type': 'application/json'},
+            body: JSON.stringify(selectQuery)
+        };
+
+        console.log(selectQuery);
+
+        return fetch(API_R + "/csv?name=" + csvName + "&offset=" + fetchInterval[0] + "&limit=" + fetchInterval[1], requestOptions)
             .then(res => {
                 const reader = res.body.getReader();
                 return reader.read();
