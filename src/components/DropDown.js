@@ -18,6 +18,7 @@ function DropDown({ scale, position, dropDownValue, onChangeValue, fontSize, bac
       const text = dropDownValue[i].substring(0, MAX_CHAR) + (dropDownValue[i].length > MAX_CHAR ? "..." : "");
       row.push(
         <Interactive 
+          key={'int'+i} 
           onSelect={function(){ setVisible(false);onChangeValue(dropDownValue[i]); }}
           onHover={function(){ setCurrentHovered(dropDownValue[i]); }}
           onBlur={function(){ setCurrentHovered(''); }}

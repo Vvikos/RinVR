@@ -14,9 +14,9 @@ function InteractiveCell({colId, cellId, position, rotation, scale}){
   useEffect(() =>{
     let colIdx = colId+colInterval[0];
     let cellIdx = cellId+rowInterval[0];
-    let elementToFind = 1/2*(colIdx+cellIdx)*(colIdx+cellIdx+1)+cellIdx;
-    let selectedCell = (selectedCells.find(element => element == elementToFind)>=0 ? true : false);
-    let selectedCol = (selectedCols.find(element => element == colIdx)>=0 ? true : false);
+    let elementToFind = [colIdx, cellIdx];
+    let selectedCell = (selectedCells.findIndex(element => element[0] == elementToFind[0] && element[1] == elementToFind[1])>=0 ? true : false);
+    let selectedCol = (selectedCols.findIndex(element => element == colIdx)>=0 ? true : false);
     setSelected(selectedCell || selectedCol);
   }, [selectedCols, selectedCells, colInterval, rowInterval]);
 
@@ -35,8 +35,8 @@ function InteractiveCell({colId, cellId, position, rotation, scale}){
       setSelectedCols(newSelectedCols);
     }else{
       let newSelectedCells = selectedCells.slice();
-      let elementToFind = 1/2*(colIdx+cellIdx)*(colIdx+cellIdx+1)+cellIdx;
-      let idx = selectedCells.findIndex(element => element == elementToFind);
+      let elementToFind = [colIdx, cellIdx];
+      let idx = selectedCells.findIndex(element => element[0] == elementToFind[0] && element[1] == elementToFind[1]);
       if(idx!=-1){
         newSelectedCells.splice(idx, 1);
       } else {
