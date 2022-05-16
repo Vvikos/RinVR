@@ -45,7 +45,7 @@ function useRContext() {
 }
 
 function RContextProvider({ children }) {
-    const [gridSize, setGridSize] = useState([20, 20]);
+    const [gridSize, setGridSize] = useState([5, 5]);
     const [csv, setCsv] = useState([]);
     const [selectedCols, setSelectedCols] = useState([]);
     const [selectedCells, setSelectedCells] = useState([]);
@@ -106,15 +106,15 @@ function RContextProvider({ children }) {
 
     useEffect(() => {
         console.log(csv);
-        if (csv && csv.length > 0 && csv[1].length > 0 && csv[1][0].length > 0) {
-            setRowInterval([0, ((csv[1][0].length < gridSize[1] - 1) ? csv[1][0].length : gridSize[1] - 1)]);
-            setColInterval([0, ((csv[1].length < gridSize[0] - 1) ? csv[1].length : gridSize[0] - 1)]);
+        if (csv && csv.length > 0 && csv[0].length > 0) {
+            setRowInterval([0, ((csv[0].length < gridSize[1] - 1) ? csv[0].length : gridSize[1] - 1)]);
+            setColInterval([0, ((csv.length < gridSize[0] - 1) ? csv.length : gridSize[0] - 1)]);
         }
     }, [csv]);
 
     function getSessionCodeId(){
         RService.getSessionCodeId()
-            .then(code => { console.log(code); setSessionCodeId(code); })
+            .then(code => setSessionCodeId(code))
             .catch(error => console.log('ERROR', error));
     }
 
@@ -271,7 +271,7 @@ class RService {
 
         console.log(selectQuery);
 
-        return fetch(API_R + "/csv?session_code="+sessionCodeId+"&name="+csvName+"&offset="+fetchInterval[0]+"&limit="+fetchInterval[1], requestOptions)
+        return fetch(API_R + "/csv?session_code="+sessionCodeId+"&name="+csvName/*+"&offset="+fetchInterval[0]+"&limit="+fetchInterval[1]*/, requestOptions)
             .then(res => {
                 const reader = res.body.getReader();
                 return reader.read();
