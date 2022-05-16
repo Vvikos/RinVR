@@ -57,14 +57,19 @@ function RContextProvider({ children }) {
     const [cellSelectionMode, setCellSelectionMode] = useState(false);
     const [colSelectionMode, setColSelectionMode] = useState(false);
     const [selectQueryPool, setSelectQueryPool] = useState({});
+    const [sessionCodeId, setSessionCodeId] = useState(null);
 
     const FETCH_SIZE = 40;
 
     useEffect(() => {
-        RService.getCsvFiles()
-            .then(function (response) { let res = response.slice(); res.splice(res.indexOf('email.csv'), 1); console.log(res); setCsvFiles(res); })
-            .catch(error => console.log('ERROR', error));
-    }, []);
+        if(sessionCodeId){
+            RService.getCsvFiles()
+                .then((res) => setCsvFiles(['sample.csv']))
+                .catch(error => console.log('ERROR', error));
+        }else{
+            getSessionCodeId();
+        }
+    }, [sessionCodeId]);
 
     useEffect(() => {
         if (csvFiles[0] == '') {
@@ -83,7 +88,7 @@ function RContextProvider({ children }) {
             return;
         }
 
-        RService.getCsv(csvFiles[1], fetchInterval)
+        RService.getCsv(sessionCodeId, csvFiles[0], fetchInterval)
             .then(response => setCsv(response))
             .catch(error => console.log('ERROR', error));
     }, [fetchInterval]);
@@ -94,17 +99,24 @@ function RContextProvider({ children }) {
             return;
         }
 
-        RService.getCsvWithSelect(csvFiles[1], fetchInterval, selectQueryPool)
+        RService.getCsvWithSelect(sessionCodeId, csvFiles[0], fetchInterval, selectQueryPool)
             .then(response => setCsv(response))
             .catch(error => console.log('ERROR', error));
     }, [selectQueryPool]);
 
     useEffect(() => {
+        console.log(csv);
         if (csv && csv.length > 0 && csv[1].length > 0 && csv[1][0].length > 0) {
             setRowInterval([0, ((csv[1][0].length < gridSize[1] - 1) ? csv[1][0].length : gridSize[1] - 1)]);
             setColInterval([0, ((csv[1].length < gridSize[0] - 1) ? csv[1].length : gridSize[0] - 1)]);
         }
     }, [csv]);
+
+    function getSessionCodeId(){
+        RService.getSessionCodeId()
+            .then(code => { console.log(code); setSessionCodeId(code); })
+            .catch(error => console.log('ERROR', error));
+    }
 
     function incrementColInterval() {
         if(colInterval[1] < csv.length)
@@ -222,8 +234,14 @@ class RService {
             });
     }
 
-    static async getCsv(csvName, fetchInterval) {
-        return fetch(API_R + "/csv?name=" + csvName + "&offset=" + fetchInterval[0] + "&limit=" + fetchInterval[1], { mode: 'cors' })
+    static async getCsv(sessionCodeId, csvName, fetchInterval) {
+        const requestOptions = {
+            method: 'POST',
+            mode: 'cors',
+            headers: { 'Content-Type': 'application/json'}
+        };
+
+        return fetch(API_R + "/csv?session_code="+sessionCodeId+"&name="+csvName/*+"&offset="+fetchInterval[0]+"&limit="+fetchInterval[1]*/, requestOptions)
             .then(res => {
                 const reader = res.body.getReader();
                 return reader.read();
@@ -243,7 +261,7 @@ class RService {
             });
     }
 
-    static async getCsvWithSelect(csvName, fetchInterval, selectQuery) {
+    static async getCsvWithSelect(sessionCodeId, csvName, fetchInterval, selectQuery) {
         const requestOptions = {
             method: 'POST',
             mode: 'cors',
@@ -253,7 +271,7 @@ class RService {
 
         console.log(selectQuery);
 
-        return fetch(API_R + "/csv?name=" + csvName + "&offset=" + fetchInterval[0] + "&limit=" + fetchInterval[1], requestOptions)
+        return fetch(API_R + "/csv?session_code="+sessionCodeId+"&name="+csvName+"&offset="+fetchInterval[0]+"&limit="+fetchInterval[1], requestOptions)
             .then(res => {
                 const reader = res.body.getReader();
                 return reader.read();
@@ -266,6 +284,30 @@ class RService {
                 const csv_data = Papa.parse(csvStr).data;
                 const csv_flip = csv_data[0].map((col, i) => csv_data.map(row => row[i]));
                 return csv_flip;
+            })
+            .catch(e => {
+                console.log(e);
+                return e;
+            });
+    }
+
+    static async getSessionCodeId() {
+        const requestOptions = {
+            method: 'POST',
+            mode: 'cors'
+        };
+
+        return fetch(API_R + "/session", requestOptions)
+            .then(res => {
+                const reader = res.body.getReader();
+                return reader.read();
+            })
+            .then(result => {
+                const decoder = new TextDecoder('utf-8');
+                return decoder.decode(result.value);
+            })
+            .then(body => {
+                return JSON.parse(body).session_code;
             })
             .catch(e => {
                 console.log(e);
