@@ -67,20 +67,20 @@ function ChangeGrid({position})
 
             <InsertText position={[-0.30,-0.15,1]} backgroundColor={backgroundColor} textColor={textColor} fontSize={100} text={"Lignes"} width={150} height={100} meshScale={[0.15,0.07,0.15]}/>
             <Interactive onSelectStart={decrementRowGrid}>
-                <Button color={textColor} fontColor={"black"} fontSize={.1} scale={[0.1,0.1, 0.01]} position={[-0.1,-0.15,1]} rotation={[0,0,0]} >-</Button>
+                <Button color={textColor} fontColor={"black"} fontSize={.08} scale={[0.1,0.1, 0.001]} position={[-0.1,-0.15,1]} rotation={[0,0,0]} >-</Button>
             </Interactive>
             <InsertText position={[0.1,-0.15,1]} backgroundColor={backgroundColor} textColor={textColor} fontSize={100} text={gridSize[1]} width={150} height={100} meshScale={[0.15,0.07,0.15]}/>
             <Interactive onSelectStart={incrementRowGrid}>
-                <Button color={textColor} fontColor={"black"} fontSize={.1} scale={[0.1,0.1, 0.001]} position={[0.3,-0.15,1]} rotation={[0,0,0]}>+</Button>
+                <Button color={textColor} fontColor={"black"} fontSize={.08} scale={[0.1,0.1, 0.001]} position={[0.3,-0.15,1]} rotation={[0,0,0]}>+</Button>
             </Interactive>
 
             <InsertText position={[-0.30,-0.30,1]} backgroundColor={backgroundColor} textColor={textColor} fontSize={100} text={"Colonnes"} width={150} height={100} meshScale={[0.15,0.07,0.15]}/>
             <Interactive onSelectStart={decrementColGrid}>
-                <Button color={textColor} fontColor={"black"} fontSize={.1} scale={[0.1,0.1, 0.001]} position={[-0.1,-0.30,1]} rotation={[0,0,0]} >-</Button>
+                <Button color={textColor} fontColor={"black"} fontSize={.08} scale={[0.1,0.1, 0.001]} position={[-0.1,-0.30,1]} rotation={[0,0,0]} >-</Button>
             </Interactive>
             <InsertText position={[0.1,-0.3,1]} backgroundColor={backgroundColor} textColor={textColor} fontSize={100} text={gridSize[0]} width={150} height={100} meshScale={[0.15,0.07,0.15]}/>
             <Interactive onSelectStart={incrementColGrid}>
-                <Button color={textColor} fontColor={"black"} fontSize={.1} scale={[0.1,0.1, 0.001]} position={[0.3,-0.30,1]} rotation={[0,0,0]}>+</Button>
+                <Button color={textColor} fontColor={"black"} fontSize={.08} scale={[0.1,0.1, 0.001]} position={[0.3,-0.30,1]} rotation={[0,0,0]}>+</Button>
             </Interactive>
 
             /***************** 360/180 PART ****************/
