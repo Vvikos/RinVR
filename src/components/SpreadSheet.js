@@ -118,7 +118,7 @@ function DataCol({colId, position, rotation, scale}){
       let backgroundColor=normal_light;
       let fontColor='#000000';
       if(i==0){
-        backgroundColor='#000000';
+        backgroundColor='#080505';
         fontColor='#ffffff';
       }else if (i%2!=0){
         backgroundColor = normal_darker;
@@ -157,8 +157,8 @@ function DataCol({colId, position, rotation, scale}){
     const cells = [];
 
     let maxRows = gridSize[1];
-    let cellScale = [scale[0], scale[1]/maxRows, scale[2]];
-    let pos = [position[0], position[1]+cellScale[1]*maxRows/2-0.5, position[2]+0.05];
+    let cellScale = [scale[0], scale[1]/maxRows, scale[2]+0.1];
+    let pos = [position[0], position[1]+cellScale[1]*maxRows/2-cellScale[1]/2, position[2]+0.2];
     for (let i=0; i < maxRows; i++){
       cells.push(
         <InteractiveCell
@@ -201,7 +201,7 @@ function SpreadSheet({ position }){
     let posX1 = (circle_ray*Math.cos(-1*(maxCols)*pi_coeff));
     let posZ1 = (circle_ray*Math.sin(-1*(maxCols)*pi_coeff));
 
-    size=[Math.sqrt(((posX1-posX0)**2)+((posZ1-posZ0)**2)), gridSize[1], 1];
+    size=[Math.sqrt(((posX1-posX0)**2)+((posZ1-posZ0)**2)), gridSize[1]*1.5, 1];
 
     for (let i=0; i < maxCols; i++){
       posX1 = (circle_ray*Math.cos(-1*(maxCols-i)*pi_coeff));

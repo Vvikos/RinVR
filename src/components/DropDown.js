@@ -40,9 +40,9 @@ function DropDown({ scale, position, dropDownValue, onChangeValue, fontSize, bac
   }
   
   return (
-    <group scale={scale} position={position} >
+    <group scale={[1,1, scale[2]]} position={position} >
       <Interactive 
-        onSelect={function(){setVisible(prevstate => (!prevstate));}} 
+        onSelectStart={function(){setVisible(prevstate => (!prevstate));}} 
         onHover={function(){ setCurrentHovered(dropDownValue[0]); }}
         onBlur={function(){ setCurrentHovered(''); }}
       >

@@ -4,16 +4,16 @@ import { Interactive } from '@react-three/xr';
 import { useRContext } from '../RContextProvider';
 import Box from './Box';
 import DropDown from './DropDown';
-import { normal_light, normal_darker, selected_light, normal_hovered } from '../helpers/colors';
+import { normal_darker, selected_light, normal_hovered, disabled_button, darker_panel, blue_button, hovered_button } from '../helpers/colors';
 
 const backgroundGeometry = new PlaneBufferGeometry(1, 1);
 
-function ColumnsField({ position, rotation, scale, selectedColsValue, onColSelection }) {
+function ColumnsField({ position, rotation, scale, maxLines, selectedColsValue, onColSelection }) {
     const { csv, selectedCols, setSelectedCols, colSelectionMode, cellSelectionMode, setColSelectionMode } = useRContext();
     const [inSelection, setInSelection] = useState(false);
     const [hovered, setHovered] = useState(false);
 
-    const fontSize = 45;
+    const fontSize = 18;
 
     function hoverCell() {
         setHovered(true);
@@ -29,26 +29,31 @@ function ColumnsField({ position, rotation, scale, selectedColsValue, onColSelec
             setColSelectionMode(true);
         }
         if(inSelection && colSelectionMode){
-            setInSelection(false);
-            setColSelectionMode(false);
             let selection = [];
             if(selectedCols.length>0){
-                selectedCols.forEach((colid) => { selection.push(csv.length>colid && csv[0].length>0 ? csv[colid][0] : '?')});
-            } else if (selectedColsValue.length>0){
-                selectedColsValue.forEach((colid) => { selection.push(csv.length>colid && csv[0].length>0 ? csv[colid][0] : '?')});
+                selectedCols.forEach((colid) => { selection.push(csv.length>colid && csv[colid].length>0 ? csv[colid][0] : '?')});
             } else {
                 selection.push('*');
             }
             onColSelection(selection);
             setSelectedCols([]);
+            setInSelection(false);
+            setColSelectionMode(false);
         }
     }
+
+    useEffect(() => {
+        if(inSelection && colSelectionMode && selectedCols.length>maxLines-1){
+            setInSelection(false);
+            setColSelectionMode(false);
+        }
+    }, [selectedCols, inSelection, colSelectionMode])
 
     const canvas = useMemo(() => {
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
-        canvas.width = scale[0]*100;
-        canvas.height = fontSize;
+        canvas.width = scale[0]*maxLines*50;
+        canvas.height = fontSize*maxLines;
         context.textBaseline = 'top';
         context.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial, sans-serif`;
     
@@ -57,25 +62,30 @@ function ColumnsField({ position, rotation, scale, selectedColsValue, onColSelec
     
     const dataMaterial = useMemo(() => {
         const context = canvas.getContext('2d');
-        const maxChar = canvas.width/fontSize;
+        const maxChar = canvas.width/fontSize*15;
 
         context.lineWidth = 0;
         context.clearRect(0, 0, canvas.width, canvas.height);
 
         const backgroundColor = inSelection ? selected_light : (hovered ? normal_hovered : normal_darker);
         context.fillStyle = backgroundColor;
-        context.fillRect(0, 0, canvas.width, fontSize);
+        context.fillRect(0, 0, canvas.width, canvas.height);
 
-        let selection = '';
-        if(inSelection && selectedCols.length>0){
-            selectedCols.forEach((colid) => { selection += (csv.length>colid && csv[0].length>0 ? csv[colid][0] : '?')+', '});
+        let selection = [];
+        if(inSelection){
+            selectedCols.forEach((colid) => { selection .push(csv.length>colid && csv[colid].length>0 && csv[colid][0]!='*' ? csv[colid][0] : '?')});
         } else if (selectedColsValue.length>0){
-            selectedColsValue.forEach((colid) => { selection += (csv.length>colid && csv[0].length>0 ? csv[colid][0] : '?')+', '});
+            selectedColsValue.forEach((colname) => selection.push(colname));
+        } else {
+            selection.push('*');
         }
 
-        let text = selection;
+        let lineHeight = canvas.height/maxLines;
+
         context.fillStyle = '#000000';
-        context.fillText(text, 0, 0, canvas.width);
+        selection.forEach((colname, idx) => {
+            context.fillText(colname.slice(0, maxChar), 0, idx*lineHeight, colname.length*fontSize);
+        })
 
         const texture = new CanvasTexture(canvas);
         // because our canvas is likely not a power of 2
@@ -90,7 +100,7 @@ function ColumnsField({ position, rotation, scale, selectedColsValue, onColSelec
         });
         return material;
 
-    }, [canvas, hovered, inSelection]);
+    }, [canvas, hovered, inSelection, selectedColsValue]);
     
   return (
     <Interactive onSelectStart={changeSelectionMode} onHover={hoverCell} onBlur={blurCell} >
@@ -284,7 +294,8 @@ function CellField({ position, rotation, scale, selectedCellValue, onCellSelecti
     </Interactive>
   )
 }
-function ButtonQuery({text, position, scale, mainColor, backColor='#ffffff'})
+
+function ButtonQuery({text, position, scale, textColor='#000000', backColor='#ffffff'})
 {
     const fontSize = 35;
     const canvas = useMemo(() => {
@@ -300,18 +311,14 @@ function ButtonQuery({text, position, scale, mainColor, backColor='#ffffff'})
     
     const dataMaterial = useMemo(() => {
         const context = canvas.getContext('2d');
-
+        
         context.lineWidth = 0;
         context.clearRect(0, 0, canvas.width, canvas.height);
 
         context.fillStyle = backColor;
         context.fillRect(0, 0, canvas.width, canvas.height);
 
-        context.lineWidth = 4;
-        context.strokeStyle= mainColor;
-        context.strokeRect(0, 0, canvas.width, canvas.height);
-
-        context.fillStyle = mainColor;
+        context.fillStyle = textColor;
         context.fillText(text, 0, 0, canvas.width);
 
         const texture = new CanvasTexture(canvas);
@@ -335,10 +342,10 @@ function ButtonQuery({text, position, scale, mainColor, backColor='#ffffff'})
 
 function SelectBuilder({ position, scale, selectedCols, onColSelection }) {
     return (
-        <>
-            <ButtonQuery position={[position[0]-scale[0]/3,position[1],position[2]]} scale={[scale[0]/4, scale[1], scale[2]]} mainColor={"#BB0B0B"} text={"SELECT"}/>
-            <ColumnsField position={[position[0]+scale[0]/8,position[1],position[2]]} scale={[2*scale[0]/3, scale[1], scale[2]]} selectedColsValue={selectedCols} onColSelection={onColSelection} />
-        </>
+        <Box position={position} scale={scale} color={darker_panel}>
+            <ButtonQuery position={[0,position[1],position[2]]} scale={[0.5, 0.2, scale[2]]} backColor={blue_button} textColor={'#ffffff'} text={"SELECT"}/>
+            <ColumnsField position={[0, 0.39-0.9, position[2]]} scale={[0.9, 0.75, scale[2]]} maxLines={8} selectedColsValue={selectedCols} onColSelection={onColSelection} />
+        </Box>
     )
 }
 
@@ -355,27 +362,27 @@ function FilterBuilder({ position, scale, operatorFilter, setOperatorFilter, sel
     }
 
     return (
-    <>
-        <Interactive onSelectStart={() => setActivated(!activated)} onHover={hoverCell} onBlur={blurCell}>
-            <ButtonQuery 
-                position={[position[0]-scale[0]/3,position[1],position[2]]} 
-                scale={[scale[0]/4, scale[1], scale[2]]} 
-                mainColor={activated ? '#096A09' : '#666565'}
-                backColor={hovered ? normal_hovered : '#ffffff'}
-                text={'FILTER'}
-            />
-        </Interactive>
-        {activated ?
-        <>
-            <ColumnField position={[position[0]-scale[0]/16,position[1],position[2]]} scale={[scale[0]/5, scale[1], scale[2]]} selectedColValue={selectedColFilter} onColSelection={setSelectedColFilter} />
-            <DropDown position={[position[0]-scale[0]/16+scale[0]/5,position[1],position[2]]} scale={[3*scale[0]/8, scale[1]*3, scale[2]]} color={0xffffff} onChangeValue={(value) => {setOperatorFilter(value)}} dropDownValue={operatorFilter} fontSize={0.08} />
-            <CellField position={[position[0]-scale[0]/16+2*scale[0]/5,position[1],position[2]]} scale={[scale[0]/5, scale[1], scale[2]]} selectedCellValue={selectedCellFilter} onCellSelection={setSelectedCellFilter} />
-        </>
-        : 
-            null
-        }
-    </>
-  )
+        <Box position={position} scale={scale} color={darker_panel}>
+            <Interactive onSelectStart={() => setActivated(!activated)} onHover={hoverCell} onBlur={blurCell}>
+                <ButtonQuery 
+                    position={[position[0]-scale[0]/3,-0.4,position[2]]} 
+                    scale={[scale[0]/4, 0.8, scale[2]]}  
+                    textColor={'#ffffff'}
+                    backColor={hovered ? hovered_button : (activated ? blue_button : disabled_button)}
+                    text={'FILTER'}
+                />
+            </Interactive>
+            {activated ?
+            <>
+                <ColumnField position={[position[0]-scale[0]/16,-0.4,position[2]]} scale={[scale[0]/4, 0.8, scale[2]]}  selectedColValue={selectedColFilter} onColSelection={setSelectedColFilter} />
+                <DropDown position={[position[0]-scale[0]/16+scale[0]/5,-0.4,position[2]]} scale={[0.15, 0.8, scale[2]]}  color={0xffffff} onChangeValue={(value) => {setOperatorFilter(value)}} dropDownValue={operatorFilter} fontSize={0.08} />
+                <CellField position={[position[0]-scale[0]/16+2*scale[0]/5,-0.4,position[2]]} scale={[scale[0]/4, 0.8, scale[2]]}  selectedCellValue={selectedCellFilter} onCellSelection={setSelectedCellFilter} />
+            </>
+            : 
+                null
+            }
+        </Box>
+    )
 }
 
 function GroupByBuilder({ position, scale, groupbyCols, onGroupByChange }) {
@@ -391,27 +398,26 @@ function GroupByBuilder({ position, scale, groupbyCols, onGroupByChange }) {
     }
 
     return (
-    <>
-        <Interactive onSelectStart={() => setActivated(!activated)} onHover={hoverCell} onBlur={blurCell}>
-          <ButtonQuery 
-            position={[position[0]-scale[0]/3,position[1],position[2]]} 
-            scale={[scale[0]/4, scale[1], scale[2]]} 
-            mainColor={activated ? '#0080FF' : '#666565'}
-            backColor={hovered ? normal_hovered : '#ffffff'}
-            text={'GROUP BY'}
-        />
-        </Interactive>
-        {activated ?
-            <ColumnsField position={[position[0]+scale[0]/8,position[1],position[2]]} scale={[2*scale[0]/3, scale[1], scale[2]]} selectedColsValue={groupbyCols} onColSelection={onGroupByChange} />
-        : 
-            null
-        }
-    </>
+        <Box position={position} scale={scale} color={darker_panel}>
+            <Interactive onSelectStart={() => setActivated(!activated)} onHover={hoverCell} onBlur={blurCell}>
+                <ButtonQuery 
+                    position={[0, 0, position[2]+0.1]} 
+                    scale={[0.5, 0.15, scale[2]]} 
+                    textColor={'#ffffff'}
+                    backColor={hovered ? hovered_button : (activated ? blue_button : disabled_button)}
+                    text={'GROUP BY'}
+                />
+            </Interactive>
+            {activated ?
+                <ColumnsField position={[0,-0.50,position[2]+0.1]} scale={[0.95, 0.78, scale[2]]} maxLines={3} selectedColsValue={groupbyCols} onColSelection={onGroupByChange} />
+            : 
+                null
+            }
+        </Box>
     )
 }
 
 function SummarizeBuilder({ position, scale, summariseOperatorValue, onSummariseOperatorChange, summariseColValue, onSummariseColChange }){
-    const [selectedCol, setSelectCol] = useState('');
 
     const onDropDownChange = (op) => {
         let newOperators = summariseOperatorValue.slice();
@@ -422,31 +428,47 @@ function SummarizeBuilder({ position, scale, summariseOperatorValue, onSummarise
     }
 
     return (
-        <>
-            <ButtonQuery position={[position[0]-scale[0]/3,position[1],position[2]]} scale={[scale[0]/4, scale[1], scale[2]]} mainColor={"#5E2664"} text={"SUMMARIZE"}/>
-            <DropDown position={[position[0]-scale[0]/16,position[1],position[2]]} scale={[scale[0]/2, scale[1]*2, scale[2]]} color={0xffffff} onChangeValue={onDropDownChange} dropDownValue={operator} fontSize={0.08} />
-            <ColumnField position={[position[0]+scale[0]/4,position[1],position[2]]} scale={[scale[0]/3, scale[1], scale[2]]} selectedColValue={summariseColValue} onColSelection={onSummariseColChange} />
-        </>
+        <Box position={position} scale={scale} color={darker_panel}>
+            <ButtonQuery position={[0,0,position[2]+0.1]} scale={[0.5, 0.15, scale[2]]} textColor={'#ffffff'} backColor={blue_button} text={"SUMMARIZE"}/>
+            <DropDown position={[-0.3,-0.25,position[2]+0.1]} scale={[0.3, 0.2, scale[2]]} color={0xffffff} dropDownValue={summariseOperatorValue} onChangeValue={onDropDownChange} fontSize={0.08} />
+            <ColumnField position={[0.15, -0.25,position[2]+0.1]} scale={[0.5, 0.2, scale[2]]} selectedColValue={summariseColValue} onColSelection={onSummariseColChange} />
+        </Box>
       )
 }
 
 function Submit({ position, scale, onSubmitSend }){
+    const [hovered, setHovered] = useState(false);
+
+    function hoverCell() {
+        setHovered(true);
+    }
+
+    function blurCell() {
+        setHovered(false);
+    }
+
     return (
-        <>
-            <Interactive onSelectStart={onSubmitSend} >
-                <ButtonQuery position={[position[0]-scale[0]/3,position[1],position[2]]} scale={[scale[0]/4, scale[1], scale[2]]} mainColor={"#582900"} text={"SUBMIT"}/>
-            </Interactive>
-        </>
+        <Interactive onSelectStart={onSubmitSend} onHover={hoverCell} onBlur={blurCell} >
+            <ButtonQuery position={[position[0]-scale[0]/3,position[1],position[2]]} scale={[scale[0]/4, scale[1], scale[2]]} textColor={'#ffffff'} backColor={(hovered ? hovered_button : blue_button)} text={"SUBMIT"}/>
+        </Interactive>
       )
 }
 
 function Reset({ position, scale, onReset }){
+    const [hovered, setHovered] = useState(false);
+
+    function hoverCell() {
+        setHovered(true);
+    }
+
+    function blurCell() {
+        setHovered(false);
+    }
+
     return (
-        <>
-            <Interactive onSelectStart={onReset} >
-                <ButtonQuery position={[position[0]-scale[0]/3,position[1],position[2]]} scale={[scale[0]/4, scale[1], scale[2]]} mainColor={"#582900"} text={"RESET"}/>
-            </Interactive>
-        </>
+        <Interactive onSelectStart={onReset} onHover={hoverCell} onBlur={blurCell} >
+            <ButtonQuery position={[position[0]-scale[0]/3,position[1],position[2]]} scale={[scale[0]/4, scale[1], scale[2]]} textColor={'#ffffff'} backColor={(hovered ? hovered_button : blue_button)} text={"RESET"}/>
+        </Interactive>
       )
 }
 
@@ -474,14 +496,14 @@ function QueryBuilder({ position, scale }) {
         if(filter!='')
             query.filter = filter;
         
-        if(groupby!='')
-            query.group_by = groupby;
+        if(groupbyCols.legnth>0)
+            query.group_by = groupbyCols;
 
         let summarize = '';
-        if(summariseColValue!='')
-            summarize = [{"operation": summarizeOperator[0], "column":summariseColValue}];
+        if(summarizeCol!='')
+            summarize = [{"operation": summarizeOperator[0], "column":summarizeCol}];
 
-        if(groupby!='' && summarize!='')
+        if(groupbyCols.legnth>0 && summarize!='')
             query.summarize = summarize;
 
         if(query != {})
@@ -497,11 +519,11 @@ function QueryBuilder({ position, scale }) {
     }
     
     return (
-        <Box position={position} scale={scale}>
-            <SelectBuilder position={[0,-scale[1]/16,1]} scale={[scale[0], scale[1]/8, scale[2]]} selectedCols={selectCols} onColSelection={setSelectCols} />
+        <>
+            <SelectBuilder position={[position[0]-1,0,1]} scale={[0.99, 1, scale[2]]} selectedCols={selectCols} onColSelection={setSelectCols} />
             <FilterBuilder 
-                position={[0,-scale[1]/8-0.1,1]} 
-                scale={[scale[0], scale[1]/8, scale[2]]} 
+                position={[0,0,1]} 
+                scale={[1, 0.25, scale[2]+0.2]}  
                 operatorFilter={operatorFilter}
                 setOperatorFilter={setOperatorFilter}
                 selectedColFilter={selectedColFilter}
@@ -509,11 +531,11 @@ function QueryBuilder({ position, scale }) {
                 selectedCellFilter={selectedCellFilter}
                 setSelectedCellFilter={setSelectedCellFilter}
             />
-            <GroupByBuilder position={[0,-scale[1]/4-0.15,1]} scale={[scale[0], scale[1]/8, scale[2]]} groupbyCols={groupbyCols} onGroupByChange={setGroupbyCols} />
+            <GroupByBuilder position={[-scale[0]/4,-scale[1]/4-0.06,1]} scale={[scale[0]/2, 3*scale[1]/4, scale[2]]} groupbyCols={groupbyCols} onGroupByChange={setGroupbyCols} />
             {groupbyCols.length>0 ?
                 <SummarizeBuilder 
-                    position={[0,-scale[1]/2-0.07,1]} 
-                    scale={[scale[0], scale[1]/8, scale[2]]}
+                    position={[scale[0]/4,-scale[1]/4-0.06,1]}
+                    scale={[scale[0]/2, 3*scale[1]/4, scale[2]]}
                     summariseOperatorValue={summarizeOperator} 
                     onSummariseOperatorChange={setSummarizeOperator} 
                     summariseColValue={summarizeCol} 
@@ -522,9 +544,9 @@ function QueryBuilder({ position, scale }) {
             :
                 null
             }
-            <Submit position={[0.6,-scale[1]/2-0.3,1]} scale={[scale[0], scale[1]/8, scale[2]]} onSubmitSend={submitRequest}/>
-            <Reset position={[0.6-scale[0]/2,-scale[1]/2-0.3,1]} scale={[scale[0], scale[1]/8, scale[2]]} onReset={resetRequest}/>
-        </Box>
+            <Submit position={[0.6,-scale[1]-scale[1]/8,1]} scale={[scale[0], scale[1]/8, scale[2]]} onSubmitSend={submitRequest}/>
+            <Reset position={[0.6-scale[0]/2,-scale[1]-scale[1]/8,1]} scale={[scale[0], scale[1]/8, scale[2]]} onReset={resetRequest}/>
+        </>
     )
 }
 

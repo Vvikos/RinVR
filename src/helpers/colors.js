@@ -2,9 +2,13 @@ import { Color, MeshPhongMaterial, PlaneBufferGeometry} from 'three';
 
 export const selected_light = '#ffa36e';
 export const selected_darker = '#ff7221';
-export const normal_light = '#ffffff';
-export const normal_darker = '#dedcdc';
+export const normal_light = '#6a6271';
+export const normal_darker = '#523432';
 export const normal_hovered = '#B0E2FF';
+export const darker_panel = "#525356";
+export const blue_button = "#174eab";
+export const disabled_button = "#6b706c";
+export const hovered_button = "#1f6ced";
 
 function hsl(h, s, l) {
   return (new Color()).setHSL(h, s, l);

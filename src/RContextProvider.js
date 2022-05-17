@@ -243,7 +243,7 @@ class RService {
             headers: { 'Content-Type': 'application/json'}
         };
 
-        return fetch(API_R + "/csv?session_code="+sessionCodeId+"&name="+csvName/*+"&offset="+fetchInterval[0]+"&limit="+fetchInterval[1]*/, requestOptions)
+        return fetch(API_R + "/csv?session_code="+sessionCodeId+"&name="+csvName+"&offset="+fetchInterval[0]+"&limit="+fetchInterval[1], requestOptions)
             .then(res => {
                 const reader = res.body.getReader();
                 return reader.read();
