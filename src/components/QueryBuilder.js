@@ -4,7 +4,7 @@ import { Interactive } from '@react-three/xr';
 import { useRContext } from '../RContextProvider';
 import Box from './Box';
 import DropDown from './DropDown';
-import { normal_light, normal_darker, selected_light, normal_hovered, normalMaterial, hoveredMaterial, selectedMaterial } from '../helpers/colors';
+import { normal_light, normal_darker, selected_light, normal_hovered, normalMaterial, hoveredMaterial, selectedMaterial, darker_panel, blue_button } from '../helpers/colors';
 
 const backgroundGeometry = new PlaneBufferGeometry(1, 1);
 
@@ -306,18 +306,14 @@ function ButtonQuery({text, position, scale, mainColor})
     
     const dataMaterial = useMemo(() => {
         const context = canvas.getContext('2d');
-
+        
         context.lineWidth = 0;
         context.clearRect(0, 0, canvas.width, canvas.height);
 
-        context.fillStyle = '#ffffff';
+        context.fillStyle = blue_button;
         context.fillRect(0, 0, canvas.width, canvas.height);
 
-        context.lineWidth = 4;
-        context.strokeStyle= mainColor;
-        context.strokeRect(0, 0, canvas.width, canvas.height);
-
-        context.fillStyle = mainColor;
+        context.fillStyle = "#ffffff";
         context.fillText(text, 0, 0, canvas.width);
 
         const texture = new CanvasTexture(canvas);
@@ -342,8 +338,10 @@ function ButtonQuery({text, position, scale, mainColor})
 function SelectBuilder({ position, scale, onColSelection }) {
     return (
         <>
-            <ButtonQuery position={[position[0]-scale[0]/3,position[1],position[2]]} scale={[scale[0]/4, scale[1], scale[2]]} mainColor={"#BB0B0B"} text={"SELECT"}/>
-            <ColumnsField position={[position[0]+scale[0]/8,position[1],position[2]]} scale={[2*scale[0]/3, scale[1], scale[2]]} onColSelection={onColSelection} />
+            <Box position={[-0.755, 0, -0.5]} scale={[0.5, 1, 0.1]} color={darker_panel}>
+                <ButtonQuery position={[position[0]-scale[0]/3,position[1],position[2]]} scale={[scale[0]/4, scale[1], scale[2]]} mainColor={"#BB0B0B"} text={"SELECT"}/>
+                <ColumnsField position={[position[0]+scale[0]/8,position[1],position[2]]} scale={[2*scale[0]/3, scale[1], scale[2]]} onColSelection={onColSelection} />
+            </Box>
         </>
     )
 }
@@ -361,22 +359,22 @@ function FilterBuilder({ position, scale, onFilterChange }) {
     }, [operator, selectedCell, selectedCol]);
 
   return (
-    <>
-        <ButtonQuery position={[position[0]-scale[0]/3,position[1],position[2]]} scale={[scale[0]/4, scale[1], scale[2]]} mainColor={"#096A09"} text={"FILTER"}/>
-        <ColumnField position={[position[0]-scale[0]/16,position[1],position[2]]} scale={[scale[0]/5, scale[1], scale[2]]} onColSelection={setSelectedCol} />
-        <DropDown position={[position[0]-scale[0]/16+scale[0]/5,position[1],position[2]]} scale={[3*scale[0]/8, scale[1]*3, scale[2]]} color={0xffffff} onChangeValue={(value) => {setOperator(value)}} dropDownValue={operator} fontSize={0.08} />
-        <CellField position={[position[0]-scale[0]/16+2*scale[0]/5,position[1],position[2]]} scale={[scale[0]/5, scale[1], scale[2]]} onCellSelection={setSelectedCell} />
-    </>
+        <Box position={[0, 0.06, -0.5]} scale={[1, 0.20, 0.1]} color={darker_panel}>
+            <ButtonQuery position={[position[0]-scale[0]/3,position[1]-0.15,position[2]]} scale={[scale[0]/4, scale[1]*5, scale[2]]} mainColor={"#096A09"} text={"FILTER"}/>
+            <ColumnField position={[position[0]-scale[0]/16,position[1]-0.15,position[2]]} scale={[scale[0]/5, scale[1]*5, scale[2]]} onColSelection={setSelectedCol} />
+            <DropDown position={[position[0]-scale[0]/16+scale[0]/5,position[1]-0.15,position[2]]} scale={[3*scale[0]/8, scale[1]*6, scale[2]]} color={0xffffff} onChangeValue={(value) => {setOperator(value)}} dropDownValue={operator} fontSize={0.08} />
+            <CellField position={[position[0]-scale[0]/16+2*scale[0]/5,position[1]-0.15,position[2]]} scale={[scale[0]/5, scale[1]*5, scale[2]]} onCellSelection={setSelectedCell} />
+        </Box>
   )
 }
 
 function GroupByBuilder({ position, scale, onGroupByChange }) {
 
     return (
-      <>
-          <ButtonQuery position={[position[0]-scale[0]/3,position[1],position[2]]} scale={[scale[0]/4, scale[1], scale[2]]} mainColor={"#0080FF"} text={"GROUP BY"}/>
-          <ColumnsField position={[position[0]+scale[0]/8,position[1],position[2]]} scale={[2*scale[0]/3, scale[1], scale[2]]} onColSelection={onGroupByChange} />
-      </>
+        <Box position={[0, -0.15, -0.5]} scale={[1, 0.20, 0.1]} color={darker_panel}>
+            <ButtonQuery position={[position[0]-scale[0]/3,position[1],position[2]]} scale={[scale[0]/4, scale[1]*5, scale[2]]} mainColor={"#0080FF"} text={"GROUP BY"}/>
+            <ColumnsField position={[position[0]+scale[0]/8,position[1],position[2]]} scale={[2*scale[0]/3, scale[1]*5, scale[2]]} onColSelection={onGroupByChange} />
+        </Box>
     )
 }
 
@@ -400,11 +398,11 @@ function SummerizeBuilder({ position, scale, onSummariseChange }){
     }, [operator, selectedCol]);
 
     return (
-        <>
-            <ButtonQuery position={[position[0]-scale[0]/3,position[1],position[2]]} scale={[scale[0]/4, scale[1], scale[2]]} mainColor={"#5E2664"} text={"SUMMERIZE"}/>
-            <DropDown position={[position[0]-scale[0]/16,position[1],position[2]]} scale={[scale[0]/2, scale[1]*2, scale[2]]} color={0xffffff} onChangeValue={onDropDownChange} dropDownValue={operator} fontSize={0.08} />
-            <ColumnField position={[position[0]+scale[0]/4,position[1],position[2]]} scale={[scale[0]/3, scale[1], scale[2]]} onColSelection={setSelectCol} />
-        </>
+        <Box position={[0, -0.375, -0.5]} scale={[1, 0.35, 0.1]} color={darker_panel}>
+            <ButtonQuery position={[position[0]-scale[0]/3,position[1]/4,position[2]]} scale={[scale[0]/4, scale[1]*2, scale[2]]} mainColor={"#5E2664"} text={"SUMMERIZE"}/>
+            <DropDown position={[position[0]-scale[0]/16,position[1]/4,position[2]]} scale={[scale[0]/2, scale[1]*4, scale[2]]} color={0xffffff} onChangeValue={onDropDownChange} dropDownValue={operator} fontSize={0.08} />
+            <ColumnField position={[position[0]+scale[0]/4,position[1]/4,position[2]]} scale={[scale[0]/3, scale[1]*2, scale[2]]} onColSelection={setSelectCol} />
+        </Box>
       )
 }
 
@@ -444,13 +442,13 @@ function QueryBuilder({ position, scale }) {
     }
     
     return (
-        <Box position={position} scale={scale}>
+        <>
             <SelectBuilder position={[0,-scale[1]/16,1]} scale={[scale[0], scale[1]/8, scale[2]]} onColSelection={setSelectCols} />
             <FilterBuilder position={[0,-scale[1]/8-0.1,1]} scale={[scale[0], scale[1]/8, scale[2]]} onFilterChange={setFilter} />
             <GroupByBuilder position={[0,-scale[1]/4-0.15,1]} scale={[scale[0], scale[1]/8, scale[2]]} onGroupByChange={setGroupby} />
             <SummerizeBuilder position={[0,-scale[1]/2-0.07,1]} scale={[scale[0], scale[1]/8, scale[2]]} onSummariseChange={setSummarize} />
             <Submit position={[0.6,-scale[1]/2-0.3,1]} scale={[scale[0], scale[1]/8, scale[2]]} onSubmitSend={submitRequest}/>
-        </Box>
+        </>
     )
 }
 

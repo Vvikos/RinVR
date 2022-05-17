@@ -5,6 +5,8 @@ export const selected_darker = '#ff7221';
 export const normal_light = '#6a6271';
 export const normal_darker = '#523432';
 export const normal_hovered = '#B0E2FF';
+export const darker_panel = "#525356";
+export const blue_button = "#174eab";
 
 function hsl(h, s, l) {
   return (new Color()).setHSL(h, s, l);
