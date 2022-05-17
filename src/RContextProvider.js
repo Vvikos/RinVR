@@ -36,7 +36,8 @@ const RContext = createContext({
     clearCellSelection: () => { },
     cellSelectionMode: false,
     setCellSelectionMode: () => { },
-    sendSelectRequest: () => { }
+    sendSelectRequest: () => { },
+    sessionCodeId: null
 
 });
 
@@ -206,7 +207,8 @@ function RContextProvider({ children }) {
             clearCellSelection: clearCellSelection,
             cellSelectionMode: cellSelectionMode,
             setCellSelectionMode: setCellSelectionMode,
-            sendSelectRequest: setSelectQueryPool
+            sendSelectRequest: setSelectQueryPool,
+            sessionCodeId: sessionCodeId
         }}>
             {children}
         </RContext.Provider>
@@ -271,7 +273,7 @@ class RService {
 
         console.log(selectQuery);
 
-        return fetch(API_R + "/csv?session_code="+sessionCodeId+"&name="+csvName/*+"&offset="+fetchInterval[0]+"&limit="+fetchInterval[1]*/, requestOptions)
+        return fetch(API_R + "/csv?session_code="+sessionCodeId+"&name="+csvName+"&offset="+fetchInterval[0]+"&limit="+fetchInterval[1], requestOptions)
             .then(res => {
                 const reader = res.body.getReader();
                 return reader.read();

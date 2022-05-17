@@ -10,3 +10,11 @@ body,
   margin: 0;
   padding: 0;
 }
+
+.sessionCodeId {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  color: white;
+  font-size: 0.8em;
+}

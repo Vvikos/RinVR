@@ -4,14 +4,13 @@ import { Interactive } from '@react-three/xr';
 import { useRContext } from '../RContextProvider';
 import Box from './Box';
 import DropDown from './DropDown';
-import { normal_light, normal_darker, selected_light, normal_hovered, normalMaterial, hoveredMaterial, selectedMaterial } from '../helpers/colors';
+import { normal_light, normal_darker, selected_light, normal_hovered } from '../helpers/colors';
 
 const backgroundGeometry = new PlaneBufferGeometry(1, 1);
 
-function ColumnsField({ position, rotation, scale, onColSelection }) {
+function ColumnsField({ position, rotation, scale, selectedColsValue, onColSelection }) {
     const { csv, selectedCols, setSelectedCols, colSelectionMode, cellSelectionMode, setColSelectionMode } = useRContext();
     const [inSelection, setInSelection] = useState(false);
-    const [currentSelection, setCurrentSelection] = useState([]);
     const [hovered, setHovered] = useState(false);
 
     const fontSize = 45;
@@ -32,12 +31,11 @@ function ColumnsField({ position, rotation, scale, onColSelection }) {
         if(inSelection && colSelectionMode){
             setInSelection(false);
             setColSelectionMode(false);
-            setCurrentSelection(selectedCols);
             let selection = [];
             if(selectedCols.length>0){
                 selectedCols.forEach((colid) => { selection.push(csv.length>colid && csv[0].length>0 ? csv[colid][0] : '?')});
-            } else if (currentSelection.length>0){
-                currentSelection.forEach((colid) => { selection.push(csv.length>colid && csv[0].length>0 ? csv[colid][0] : '?')});
+            } else if (selectedColsValue.length>0){
+                selectedColsValue.forEach((colid) => { selection.push(csv.length>colid && csv[0].length>0 ? csv[colid][0] : '?')});
             } else {
                 selection.push('*');
             }
@@ -71,8 +69,8 @@ function ColumnsField({ position, rotation, scale, onColSelection }) {
         let selection = '';
         if(inSelection && selectedCols.length>0){
             selectedCols.forEach((colid) => { selection += (csv.length>colid && csv[0].length>0 ? csv[colid][0] : '?')+', '});
-        } else if (currentSelection.length>0){
-            currentSelection.forEach((colid) => { selection += (csv.length>colid && csv[0].length>0 ? csv[colid][0] : '?')+', '});
+        } else if (selectedColsValue.length>0){
+            selectedColsValue.forEach((colid) => { selection += (csv.length>colid && csv[0].length>0 ? csv[colid][0] : '?')+', '});
         }
 
         let text = selection;
@@ -101,10 +99,9 @@ function ColumnsField({ position, rotation, scale, onColSelection }) {
   )
 }
 
-function ColumnField({ position, rotation, scale, onColSelection }) {
+function ColumnField({ position, rotation, scale, selectedColValue, onColSelection }) {
     const { csv, selectedCols, setSelectedCols, colSelectionMode, cellSelectionMode, setColSelectionMode } = useRContext();
     const [inSelection, setInSelection] = useState(false);
-    const [currentSelection, setCurrentSelection] = useState([]);
     const [hovered, setHovered] = useState(false);
 
     const fontSize = 45;
@@ -139,7 +136,6 @@ function ColumnField({ position, rotation, scale, onColSelection }) {
             if (colid>-1 && csv.length>colid){
                 selection = csv[colid][0];
                 onColSelection(selection);
-                setCurrentSelection(selection);
             }
             setInSelection(false);
             setColSelectionMode(false);
@@ -169,7 +165,7 @@ function ColumnField({ position, rotation, scale, onColSelection }) {
         context.fillStyle = backgroundColor;
         context.fillRect(0, 0, canvas.width, fontSize);
 
-        let text = currentSelection;
+        let text = selectedColValue;
         context.fillStyle = '#000000';
         context.fillText(text, 0, 0, canvas.width);
 
@@ -186,7 +182,7 @@ function ColumnField({ position, rotation, scale, onColSelection }) {
         });
         return material;
 
-    }, [canvas, hovered, currentSelection]);
+    }, [canvas, hovered, selectedColValue]);
     
   return (
     <Interactive onSelectStart={changeSelectionMode} onHover={hoverCell} onBlur={blurCell} >
@@ -195,10 +191,9 @@ function ColumnField({ position, rotation, scale, onColSelection }) {
   )
 }
 
-function CellField({ position, rotation, scale, onCellSelection }) {
+function CellField({ position, rotation, scale, selectedCellValue, onCellSelection }) {
     const { csv, selectedCells, setSelectedCells, colSelectionMode, cellSelectionMode, setCellSelectionMode } = useRContext();
     const [inSelection, setInSelection] = useState(false);
-    const [currentSelection, setCurrentSelection] = useState('');
     const [hovered, setHovered] = useState(false);
 
     const fontSize = 45;
@@ -234,7 +229,6 @@ function CellField({ position, rotation, scale, onCellSelection }) {
             let selection = '';
             if (colid>-1 && rowid>-1 && csv.length>colid && csv[0].length>rowid){
                 selection = csv[colid][rowid];
-                setCurrentSelection(selection);
                 onCellSelection(selection);
             }
             setInSelection(false);
@@ -265,7 +259,7 @@ function CellField({ position, rotation, scale, onCellSelection }) {
         context.fillStyle = backgroundColor;
         context.fillRect(0, 0, canvas.width, fontSize);
 
-        let text = currentSelection;
+        let text = selectedCellValue;
         context.fillStyle = '#000000';
         context.fillText(text, 0, 0, canvas.width);
 
@@ -282,7 +276,7 @@ function CellField({ position, rotation, scale, onCellSelection }) {
         });
         return material;
 
-    }, [canvas, hovered, currentSelection]);
+    }, [canvas, hovered, selectedCellValue]);
     
   return (
     <Interactive onSelectStart={changeSelectionMode} onHover={hoverCell} onBlur={blurCell} >
@@ -290,7 +284,7 @@ function CellField({ position, rotation, scale, onCellSelection }) {
     </Interactive>
   )
 }
-function ButtonQuery({text, position, scale, mainColor})
+function ButtonQuery({text, position, scale, mainColor, backColor='#ffffff'})
 {
     const fontSize = 35;
     const canvas = useMemo(() => {
@@ -310,7 +304,7 @@ function ButtonQuery({text, position, scale, mainColor})
         context.lineWidth = 0;
         context.clearRect(0, 0, canvas.width, canvas.height);
 
-        context.fillStyle = '#ffffff';
+        context.fillStyle = backColor;
         context.fillRect(0, 0, canvas.width, canvas.height);
 
         context.lineWidth = 4;
@@ -339,71 +333,99 @@ function ButtonQuery({text, position, scale, mainColor})
     );
 }
 
-function SelectBuilder({ position, scale, onColSelection }) {
+function SelectBuilder({ position, scale, selectedCols, onColSelection }) {
     return (
         <>
             <ButtonQuery position={[position[0]-scale[0]/3,position[1],position[2]]} scale={[scale[0]/4, scale[1], scale[2]]} mainColor={"#BB0B0B"} text={"SELECT"}/>
-            <ColumnsField position={[position[0]+scale[0]/8,position[1],position[2]]} scale={[2*scale[0]/3, scale[1], scale[2]]} onColSelection={onColSelection} />
+            <ColumnsField position={[position[0]+scale[0]/8,position[1],position[2]]} scale={[2*scale[0]/3, scale[1], scale[2]]} selectedColsValue={selectedCols} onColSelection={onColSelection} />
         </>
     )
 }
 
-function FilterBuilder({ position, scale, onFilterChange }) {
-    const [operator, setOperator] = useState(['==', '!=']);
-    const [selectedCol, setSelectedCol] = useState('');
-    const [selectedCell, setSelectedCell] = useState('');
+function FilterBuilder({ position, scale, operatorFilter, setOperatorFilter, selectedColFilter, setSelectedColFilter, selectedCellFilter, setSelectedCellFilter={setSelectedCellFilter} }) {
+    const [hovered, setHovered] = useState(false);
+    const [activated, setActivated] = useState(false);
 
-    useEffect(() => {
-        if(selectedCol!='' && selectedCell!='')
-            onFilterChange(selectedCol+' '+operator[0]+' \''+selectedCell+'\'');
-        else
-            onFilterChange('');
-    }, [operator, selectedCell, selectedCol]);
+    function hoverCell() {
+        setHovered(true);
+    }
 
-  return (
+    function blurCell() {
+        setHovered(false);
+    }
+
+    return (
     <>
-        <ButtonQuery position={[position[0]-scale[0]/3,position[1],position[2]]} scale={[scale[0]/4, scale[1], scale[2]]} mainColor={"#096A09"} text={"FILTER"}/>
-        <ColumnField position={[position[0]-scale[0]/16,position[1],position[2]]} scale={[scale[0]/5, scale[1], scale[2]]} onColSelection={setSelectedCol} />
-        <DropDown position={[position[0]-scale[0]/16+scale[0]/5,position[1],position[2]]} scale={[3*scale[0]/8, scale[1]*3, scale[2]]} color={0xffffff} onChangeValue={(value) => {setOperator(value)}} dropDownValue={operator} fontSize={0.08} />
-        <CellField position={[position[0]-scale[0]/16+2*scale[0]/5,position[1],position[2]]} scale={[scale[0]/5, scale[1], scale[2]]} onCellSelection={setSelectedCell} />
+        <Interactive onSelectStart={() => setActivated(!activated)} onHover={hoverCell} onBlur={blurCell}>
+            <ButtonQuery 
+                position={[position[0]-scale[0]/3,position[1],position[2]]} 
+                scale={[scale[0]/4, scale[1], scale[2]]} 
+                mainColor={activated ? '#096A09' : '#666565'}
+                backColor={hovered ? normal_hovered : '#ffffff'}
+                text={'FILTER'}
+            />
+        </Interactive>
+        {activated ?
+        <>
+            <ColumnField position={[position[0]-scale[0]/16,position[1],position[2]]} scale={[scale[0]/5, scale[1], scale[2]]} selectedColValue={selectedColFilter} onColSelection={setSelectedColFilter} />
+            <DropDown position={[position[0]-scale[0]/16+scale[0]/5,position[1],position[2]]} scale={[3*scale[0]/8, scale[1]*3, scale[2]]} color={0xffffff} onChangeValue={(value) => {setOperatorFilter(value)}} dropDownValue={operatorFilter} fontSize={0.08} />
+            <CellField position={[position[0]-scale[0]/16+2*scale[0]/5,position[1],position[2]]} scale={[scale[0]/5, scale[1], scale[2]]} selectedCellValue={selectedCellFilter} onCellSelection={setSelectedCellFilter} />
+        </>
+        : 
+            null
+        }
     </>
   )
 }
 
-function GroupByBuilder({ position, scale, onGroupByChange }) {
+function GroupByBuilder({ position, scale, groupbyCols, onGroupByChange }) {
+    const [hovered, setHovered] = useState(false);
+    const [activated, setActivated] = useState(false);
+
+    function hoverCell() {
+        setHovered(true);
+    }
+
+    function blurCell() {
+        setHovered(false);
+    }
 
     return (
-      <>
-          <ButtonQuery position={[position[0]-scale[0]/3,position[1],position[2]]} scale={[scale[0]/4, scale[1], scale[2]]} mainColor={"#0080FF"} text={"GROUP BY"}/>
-          <ColumnsField position={[position[0]+scale[0]/8,position[1],position[2]]} scale={[2*scale[0]/3, scale[1], scale[2]]} onColSelection={onGroupByChange} />
-      </>
+    <>
+        <Interactive onSelectStart={() => setActivated(!activated)} onHover={hoverCell} onBlur={blurCell}>
+          <ButtonQuery 
+            position={[position[0]-scale[0]/3,position[1],position[2]]} 
+            scale={[scale[0]/4, scale[1], scale[2]]} 
+            mainColor={activated ? '#0080FF' : '#666565'}
+            backColor={hovered ? normal_hovered : '#ffffff'}
+            text={'GROUP BY'}
+        />
+        </Interactive>
+        {activated ?
+            <ColumnsField position={[position[0]+scale[0]/8,position[1],position[2]]} scale={[2*scale[0]/3, scale[1], scale[2]]} selectedColsValue={groupbyCols} onColSelection={onGroupByChange} />
+        : 
+            null
+        }
+    </>
     )
 }
 
-function SummerizeBuilder({ position, scale, onSummariseChange }){
-    const [operator, setOperator] = useState(["mean", "sum", "min", "max"]);
+function SummarizeBuilder({ position, scale, summariseOperatorValue, onSummariseOperatorChange, summariseColValue, onSummariseColChange }){
     const [selectedCol, setSelectCol] = useState('');
 
     const onDropDownChange = (op) => {
-        let newOperators = operator.slice();
+        let newOperators = summariseOperatorValue.slice();
         let idx = newOperators.indexOf(op);
         //swap selected op to first op
         [newOperators[0], newOperators[idx]] = [newOperators[idx], newOperators[0]];
-        setOperator(newOperators);
+        onSummariseOperatorChange(newOperators);
     }
-
-    useEffect(() => {
-        if(selectedCol!='')
-            onSummariseChange([{"operation": operator[0], "column":selectedCol}])
-        else
-            onSummariseChange('');
-    }, [operator, selectedCol]);
 
     return (
         <>
-            <ButtonQuery position={[position[0]-scale[0]/3,position[1],position[2]]} scale={[scale[0]/4, scale[1], scale[2]]} mainColor={"#5E2664"} text={"SUMMERIZE"}/>
+            <ButtonQuery position={[position[0]-scale[0]/3,position[1],position[2]]} scale={[scale[0]/4, scale[1], scale[2]]} mainColor={"#5E2664"} text={"SUMMARIZE"}/>
             <DropDown position={[position[0]-scale[0]/16,position[1],position[2]]} scale={[scale[0]/2, scale[1]*2, scale[2]]} color={0xffffff} onChangeValue={onDropDownChange} dropDownValue={operator} fontSize={0.08} />
-            <ColumnField position={[position[0]+scale[0]/4,position[1],position[2]]} scale={[scale[0]/3, scale[1], scale[2]]} onColSelection={setSelectCol} />
+            <ColumnField position={[position[0]+scale[0]/4,position[1],position[2]]} scale={[scale[0]/3, scale[1], scale[2]]} selectedColValue={summariseColValue} onColSelection={onSummariseColChange} />
         </>
       )
 }
@@ -418,18 +440,36 @@ function Submit({ position, scale, onSubmitSend }){
       )
 }
 
+function Reset({ position, scale, onReset }){
+    return (
+        <>
+            <Interactive onSelectStart={onReset} >
+                <ButtonQuery position={[position[0]-scale[0]/3,position[1],position[2]]} scale={[scale[0]/4, scale[1], scale[2]]} mainColor={"#582900"} text={"RESET"}/>
+            </Interactive>
+        </>
+      )
+}
+
 function QueryBuilder({ position, scale }) {
     const { sendSelectRequest } = useRContext();
 
+    const [operatorFilter, setOperatorFilter] = useState(['==', '!=']);
+    const [selectedColFilter, setSelectedColFilter] = useState('');
+    const [selectedCellFilter, setSelectedCellFilter] = useState('');
+
     const [selectCols, setSelectCols] = useState(['*']);
-    const [filter, setFilter] = useState('');
-    const [groupby, setGroupby] = useState([]);
-    const [summarize, setSummarize] = useState('');
+    const [groupbyCols, setGroupbyCols] = useState([]);
+    const [summarizeOperator, setSummarizeOperator] = useState(["mean", "sum", "min", "max"]);
+    const [summarizeCol, setSummarizeCol] = useState('');
 
     function submitRequest() {
-        let query = { };
+        let query = {};
         if (selectCols[0]!='*')
             query.select = selectCols;
+        
+        let filter = '';
+        if(selectedColFilter!='' && selectedCellFilter!='')
+            filter = selectedColFilter+' '+operatorFilter[0]+' \''+selectedCellFilter+'\'';
         
         if(filter!='')
             query.filter = filter;
@@ -437,19 +477,53 @@ function QueryBuilder({ position, scale }) {
         if(groupby!='')
             query.group_by = groupby;
 
+        let summarize = '';
+        if(summariseColValue!='')
+            summarize = [{"operation": summarizeOperator[0], "column":summariseColValue}];
+
         if(groupby!='' && summarize!='')
             query.summarize = summarize;
 
-        sendSelectRequest(query);
+        if(query != {})
+            sendSelectRequest(query);
+    }
+
+    function resetRequest() {
+        setSelectCols(['*']);
+        setSelectedCellFilter('');
+        setSelectedColFilter('');
+        setGroupbyCols([]);
+        setSummarizeCol('');
     }
     
     return (
         <Box position={position} scale={scale}>
-            <SelectBuilder position={[0,-scale[1]/16,1]} scale={[scale[0], scale[1]/8, scale[2]]} onColSelection={setSelectCols} />
-            <FilterBuilder position={[0,-scale[1]/8-0.1,1]} scale={[scale[0], scale[1]/8, scale[2]]} onFilterChange={setFilter} />
-            <GroupByBuilder position={[0,-scale[1]/4-0.15,1]} scale={[scale[0], scale[1]/8, scale[2]]} onGroupByChange={setGroupby} />
-            <SummerizeBuilder position={[0,-scale[1]/2-0.07,1]} scale={[scale[0], scale[1]/8, scale[2]]} onSummariseChange={setSummarize} />
+            <SelectBuilder position={[0,-scale[1]/16,1]} scale={[scale[0], scale[1]/8, scale[2]]} selectedCols={selectCols} onColSelection={setSelectCols} />
+            <FilterBuilder 
+                position={[0,-scale[1]/8-0.1,1]} 
+                scale={[scale[0], scale[1]/8, scale[2]]} 
+                operatorFilter={operatorFilter}
+                setOperatorFilter={setOperatorFilter}
+                selectedColFilter={selectedColFilter}
+                setSelectedColFilter={setSelectedColFilter}
+                selectedCellFilter={selectedCellFilter}
+                setSelectedCellFilter={setSelectedCellFilter}
+            />
+            <GroupByBuilder position={[0,-scale[1]/4-0.15,1]} scale={[scale[0], scale[1]/8, scale[2]]} groupbyCols={groupbyCols} onGroupByChange={setGroupbyCols} />
+            {groupbyCols.length>0 ?
+                <SummarizeBuilder 
+                    position={[0,-scale[1]/2-0.07,1]} 
+                    scale={[scale[0], scale[1]/8, scale[2]]}
+                    summariseOperatorValue={summarizeOperator} 
+                    onSummariseOperatorChange={setSummarizeOperator} 
+                    summariseColValue={summarizeCol} 
+                    onSummariseColChange={setSummarizeCol} 
+                />
+            :
+                null
+            }
             <Submit position={[0.6,-scale[1]/2-0.3,1]} scale={[scale[0], scale[1]/8, scale[2]]} onSubmitSend={submitRequest}/>
+            <Reset position={[0.6-scale[0]/2,-scale[1]/2-0.3,1]} scale={[scale[0], scale[1]/8, scale[2]]} onReset={resetRequest}/>
         </Box>
     )
 }
