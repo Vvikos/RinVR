@@ -343,7 +343,7 @@ function ButtonQuery({text, position, scale, textColor='#000000', backColor='#ff
 function SelectBuilder({ position, scale, selectedCols, onColSelection }) {
     return (
         <Box position={position} scale={scale} color={darker_panel}>
-            <ButtonQuery position={[0,position[1],position[2]]} scale={[0.5, 0.2, scale[2]]} backColor={blue_button} textColor={'#ffffff'} text={"SELECT"}/>
+            <ButtonQuery position={[0,position[1]+0.05,position[2]]} scale={[0.3, 0.15, scale[2]]} backColor={blue_button} textColor={'#ffffff'} text={"SELECT"}/>
             <ColumnsField position={[0, 0.39-0.9, position[2]]} scale={[0.9, 0.75, scale[2]]} maxLines={8} selectedColsValue={selectedCols} onColSelection={onColSelection} />
         </Box>
     )
@@ -366,7 +366,7 @@ function FilterBuilder({ position, scale, operatorFilter, setOperatorFilter, sel
             <Interactive onSelectStart={() => setActivated(!activated)} onHover={hoverCell} onBlur={blurCell}>
                 <ButtonQuery 
                     position={[position[0]-scale[0]/3,-0.4,position[2]]} 
-                    scale={[scale[0]/4, 0.8, scale[2]]}  
+                    scale={[scale[0]/4, 0.6, scale[2]]}  
                     textColor={'#ffffff'}
                     backColor={hovered ? hovered_button : (activated ? blue_button : disabled_button)}
                     text={'FILTER'}
@@ -516,11 +516,12 @@ function QueryBuilder({ position, scale }) {
         setSelectedColFilter('');
         setGroupbyCols([]);
         setSummarizeCol('');
+        sendSelectRequest({});
     }
     
     return (
         <>
-            <SelectBuilder position={[position[0]-1,0,1]} scale={[0.99, 1, scale[2]]} selectedCols={selectCols} onColSelection={setSelectCols} />
+            <SelectBuilder position={[position[0]-1,-0.075,1]} scale={[0.99, 1.01, scale[2]]} selectedCols={selectCols} onColSelection={setSelectCols} />
             <FilterBuilder 
                 position={[0,0,1]} 
                 scale={[1, 0.25, scale[2]+0.2]}  
