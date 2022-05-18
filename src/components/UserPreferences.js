@@ -54,13 +54,17 @@ function InsertText({position, backgroundColor, textColor, fontSize, text, width
 
 function ChangeGrid({position})
 {
-    const { gridSize, incrementColGrid, incrementRowGrid, decrementColGrid, decrementRowGrid, displayAngles, setDisplayAngles } = useRContext();
+    const { gridSize, incrementColGrid, incrementRowGrid, decrementColGrid, decrementRowGrid, displayAngles, setDisplayAngles, sessionCodeId } = useRContext();
     
     const backgroundColor = darker_panel;
     const textColor = "#cc5500";
 
     return (
         <>
+            /*************** SESSION CODE ID ************/
+            
+            <InsertText position={[0,0.15,1]} backgroundColor={darker_panel} textColor={"black"} fontSize={50} text={"Session ID : "+ sessionCodeId} width={150} height={100} meshScale={[0.6,0.07,0.15]}/>
+
             /***************** GRID PART ****************/
 
             <InsertText position={[0,0,1]} backgroundColor={blue_button} textColor={"white"} fontSize={100} text={"Modifier la grille"} width={150} height={100} meshScale={[0.6,0.10,0.15]}/>
