@@ -16,7 +16,7 @@ services:
        - "traefik.http.routers.vr2.rule=Host(`vr.achencraft.fr`) && Path(`/traefik`)"
        - "traefik.http.routers.vr2.tls=true" # Routeur https activé
        - "traefik.http.routers.vr2.tls.certresolver=default" # Cert resolver
-       - "traefik.http.services.vr2.loadbalancer.server.port=3000"
+       - "traefik.http.services.vr2.loadbalancer.server.port=80"
 networks:
     web:
       external:
