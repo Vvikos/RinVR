@@ -1,4 +1,4 @@
-## Visualisation de données en réalité virtuelle
+# Visualisation de données en réalité virtuelle
 
 <p align="center">
   <img src="img/logo-vrhub.png" width="400"><br>
@@ -19,9 +19,11 @@ Ce projet vise à utiliser la réalité virtuelle pour visualiser des tableaux c
 
 ## Captures d'écran
 
-<img src="img/tableau.jfif" width="450" height="350"/>
-<img src="img/grid.jfif" width="450" height="350"/>
-<img src="img/select.jfif" width="450" height="350"/>
+<img src="img/tableau.png" width="450" height="350"/>
+<img src="img/grid.png" width="450" height="350"/>
+<img src="img/select.png" width="450" height="350"/>
+<img src="img/180.jpg" width="400" height="175"/>
+<img src="img/360.jpg" width="400" height="175"/>
 
 ## Fonctionnalités
 
