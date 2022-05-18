@@ -15,4 +15,4 @@ pages:
     paths:
     - public
   rules:
-    - if: '$CI_COMMIT_BRANCH == "sandbox"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
