@@ -113,6 +113,8 @@ function DataCol({colId, position, rotation, scale}){
     context.lineWidth = 0;
     context.clearRect(0, 0, canvas.width, canvas.height);
 
+    let data = csv[colInterval[0]+colId];
+
     for (let i=0; i < colSize; i++){
       let rowIdx = rowInterval[0] + i;
       let backgroundColor=normal_light;
@@ -126,7 +128,6 @@ function DataCol({colId, position, rotation, scale}){
       context.fillStyle = backgroundColor;
       context.fillRect(0, i*fontSize, canvas.width, fontSize);
       
-      let data = csv[colInterval[0]+colId];
       let text = '';
       if(data && i < data.length) {
         text = ((i==0) ? data[0] : data[rowIdx])+'';
@@ -151,7 +152,6 @@ function DataCol({colId, position, rotation, scale}){
     return material;
 
   }, [csv, colInterval, rowInterval, canvas]);
-
 
   const generateInteractiveCol = () => {
     const cells = [];

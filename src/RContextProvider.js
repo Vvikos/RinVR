@@ -61,25 +61,26 @@ function RContextProvider({ children }) {
     const [colSelectionMode, setColSelectionMode] = useState(false);
     const [selectQueryPool, setSelectQueryPool] = useState({});
     const [sessionCodeId, setSessionCodeId] = useState(null);
-    const [sessionState, setSessionState] = useState('DISCONNECTED');
+    const [sessionState, setSessionState] = useState('INIT');
 
-    const FETCH_SIZE = 40;
+    const FETCH_SIZE = 20;
 
     useEffect(() => {
         if(sessionState=='INIT'){
             createSessionCodeId();
         }else if(sessionState!='DISCONNECTED'){
+            console.log('SESSIONSTATE', sessionState);
             connectSessionCodeId(sessionState);
+        }else {
+            console.log('TAMERE', sessionState)
         }
     }, [sessionState]);
 
     useEffect(() => {
-        if(sessionCodeId){
-            RService.getCsvFiles()
-                .then((res) => setCsvFiles(['sample.csv']))
-                .catch(error => console.log('ERROR', error));
-        }
-    }, [sessionCodeId]);
+        RService.getCsvFiles()
+            .then((res) => setCsvFiles(res))
+            .catch(error => console.log('ERROR', error));
+    }, []);
 
     useEffect(() => {
         if (csvFiles[0] == '') {
@@ -98,10 +99,15 @@ function RContextProvider({ children }) {
             return;
         }
 
+        if (!sessionCodeId) {
+            console.log('INFO', 'SESSION ID NOT SET');
+            return;
+        }
+
         RService.getCsv(sessionCodeId, csvFiles[0], fetchInterval)
             .then(response => setCsv(response))
-            .catch(error => { setSessionCodeId(null); console.log('ERROR', error)});
-    }, [fetchInterval]);
+            .catch(error => console.log('ERROR', error));
+    }, [fetchInterval, sessionCodeId]);
 
     useEffect(() => {
         if (csvFiles[0] == '') {
@@ -115,7 +121,7 @@ function RContextProvider({ children }) {
     }, [selectQueryPool]);
 
     useEffect(() => {
-        console.log(csv);
+        console.log('CSV',csv);
         if (csv && csv.length > 0 && csv[0].length > 0) {
             setRowInterval([0, ((csv[0].length < gridSize[1] - 1) ? csv[0].length : gridSize[1] - 1)]);
             setColInterval([0, ((csv.length < gridSize[0] - 1) ? csv.length : gridSize[0] - 1)]);
@@ -137,7 +143,7 @@ function RContextProvider({ children }) {
                     setSessionCodeId(code);
                 }
             })
-            .catch(error => setSessionCodeId(null));
+            .catch(error => console.log('ERROR', error));
     }
 
     function incrementColInterval() {
