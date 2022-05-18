@@ -1,31 +1,43 @@
+/**
+ * @module SpreadSheet
+ */
 import { useMemo, useState, useEffect } from 'react';
+import { MeshBasicMaterial, DoubleSide, PlaneBufferGeometry, CanvasTexture, LinearFilter, RepeatWrapping } from 'three';
 import { Interactive } from '@react-three/xr';
-import { MeshBasicMaterial, FrontSide, PlaneBufferGeometry, CanvasTexture, LinearFilter, RepeatWrapping } from 'three';
 import { useRContext } from '../RContextProvider';
+import { normal_light, normal_darker, normalMaterial, hoveredMaterial, hoveredFirstMaterial, selectedMaterial } from '../helpers/colors';
 
-const selected_light = '#ffa36e';
-const selected_darker = '#ff7221';
-const normal_light = '#ffffff';
-const normal_darker = '#dedcdc';
-const normal_hovered = '#B0E2FF';
-const first_dark = '#000000';
+const backgroundGeometry = new PlaneBufferGeometry(1, 1);
 
-const MAX_CHAR = 35;
+/**
+ * Interaction des cellules
+ * @param {} colId - Id colonne
+ * @param {} cellId - Id Cellule
+ * @param {} position - Position
+ * @param {} rotation - Rotation
+ * @param {} scale - Echelle
+ * @returns {} - Cellule interactive
+ */
+function InteractiveCell({colId, cellId, position, rotation, scale}){
+  const { rowInterval, colInterval, selectedCols, setSelectedCols, selectedCells, setSelectedCells, cellSelectionMode, colSelectionMode } = useRContext();
+  const [selected, setSelected] = useState(false);
+  const [hovered, setHovered] = useState(false);
 
-function DataCol({colId, firstcol, position, rotation, scale}){
-    const { csv, gridSize, rowInterval, colInterval, selectedCols, setSelectedCols } = useRContext();
-    const [selected, setSelected] = useState(false);
-    const [hovered, setHovered] = useState(false);
+  useEffect(() =>{
+    let colIdx = colId+colInterval[0];
+    let cellIdx = cellId+rowInterval[0];
+    let elementToFind = [colIdx, cellIdx];
+    let selectedCell = (selectedCells.findIndex(element => element[0] == elementToFind[0] && element[1] == elementToFind[1])>=0 ? true : false);
+    let selectedCol = (selectedCols.findIndex(element => element == colIdx)>=0 ? true : false);
+    setSelected(selectedCell || selectedCol);
+  }, [selectedCols, selectedCells, colInterval, rowInterval]);
 
-    useEffect(() =>{
-      let colIdx = colId+colInterval[0];
-      let selected = (selectedCols.find(element => element == colIdx)>=0 ? true : false);
-      setSelected(selected);
-    }, [selectedCols, colInterval]);
+  function select() {
+    let colIdx = colId+colInterval[0];
+    let cellIdx = cellId+rowInterval[0];
 
-    function selectCol() {
+    if(cellId==0){
       let newSelectedCols = selectedCols.slice();
-      let colIdx = colId+colInterval[0];
       let idx = selectedCols.findIndex(element => element == colIdx);
       if(idx!=-1){
         newSelectedCols.splice(idx, 1);
@@ -33,133 +45,223 @@ function DataCol({colId, firstcol, position, rotation, scale}){
         newSelectedCols.push(colIdx);
       }
       setSelectedCols(newSelectedCols);
-    }
-
-    function hoverCol() {
-      setHovered(true);
-    }
-
-    function blurCol() {
-      setHovered(false);
-    }
-
-    const labelMaterial = useMemo(() => {
-      var fontSize = 50;
-      var borderThickness =  0;
-
-      var canvas = document.createElement('canvas');
-      var context = canvas.getContext('2d');
-      
-      var colSize = gridSize[1];
-      canvas.width = 750;
-      canvas.height = colSize*fontSize;
-      context.textBaseline = 'top';
-      context.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial, sans-serif`;
-
-      context.lineWidth = borderThickness;
-      context.clearRect(0, 0, canvas.width, canvas.height);
-
-      for (let i=0; i < colSize; i++){
-        let rowIdx = rowInterval[0] + i;
-        let backgroundColor;
-        let fontColor='#000000';
-        if(firstcol || i==0){
-          backgroundColor=first_dark;
-          fontColor='#ffffff';
-        }else{
-          let normal = (selected ? selected_light : (hovered ? normal_hovered : normal_light));
-          let darker = (selected ? selected_darker : (hovered ? normal_hovered : normal_darker));
-          backgroundColor = (i%2==0 ? darker : normal);
-        }
-        context.fillStyle = backgroundColor;
-        context.fillRect(0, i*fontSize, canvas.width, fontSize);
-        
-        let data = csv[colInterval[0]+colId];
-        let text = '';
-        if(firstcol){
-          text = ((i==0) ? '' : rowIdx)+'';
-        } else if(data && i < data.length) {
-          text = ((i==0) ? data[0] : data[rowIdx])+'';
-        }
-        text = text.substring(0, MAX_CHAR) + (text.length > MAX_CHAR ? "..." : "");
-        context.fillStyle = fontColor;
-        context.fillText(text, 0, i*fontSize, canvas.width);
+    }else{
+      let newSelectedCells = selectedCells.slice();
+      let elementToFind = [colIdx, cellIdx];
+      let idx = selectedCells.findIndex(element => element[0] == elementToFind[0] && element[1] == elementToFind[1]);
+      if(idx!=-1){
+        newSelectedCells.splice(idx, 1);
+      } else {
+        newSelectedCells.push(elementToFind);
       }
-
-      var texture = new CanvasTexture(canvas);
-      // because our canvas is likely not a power of 2
-      // in both dimensions set the filtering appropriately.
-      texture.minFilter = LinearFilter;
-      texture.wrapS = RepeatWrapping;
-      texture.wrapT = RepeatWrapping;
-      const labelMaterial = new MeshBasicMaterial({
-          map: texture,
-          side: FrontSide,
-          transparent: false,
-        });
-
-      return labelMaterial;
-
-    }, [csv, selected, hovered, rowInterval, colInterval, colId]);
-
-    const backgroundGeometry = new PlaneBufferGeometry(1, 1);
-  
-    return (
-      <Interactive onSelectStart={selectCol} onHover={hoverCol} onBlur={blurCol} >
-        <mesh rotation={rotation} scale={scale} position={position} geometry={backgroundGeometry} material={labelMaterial} />
-      </Interactive>
-    )
+      setSelectedCells(newSelectedCells);
+    }
   }
 
-  function SpreadSheet({ position }){
-    const { gridSize } = useRContext();
+  function hoverCell() {
+    setHovered(true);
+  }
+
+  function blurCell() {
+    setHovered(false);
+  }
+
+  return (
+    <>
+      {(cellSelectionMode && cellId!=0) || (colSelectionMode && cellId==0)? 
+        <Interactive onSelectStart={select} onHover={hoverCell} onBlur={blurCell} >
+          {(!selected && !hovered) || cellId==0 ?
+            <mesh rotation={rotation} scale={scale} position={position} geometry={backgroundGeometry} material={normalMaterial} />
+          :
+            null
+          }
+
+          {selected && cellId!=0 ? 
+            <mesh rotation={rotation} scale={scale} position={position} geometry={backgroundGeometry} material={selectedMaterial} />
+          :
+            null
+          }
+
+          {hovered ?
+            cellId==0 ?
+              <mesh rotation={rotation} scale={scale} position={position} geometry={backgroundGeometry} material={hoveredFirstMaterial} />
+            :
+              <mesh rotation={rotation} scale={scale} position={position} geometry={backgroundGeometry} material={hoveredMaterial} />
+          :
+            null
+          }
+        </Interactive>
+        :
+          selected && cellId!=0 ? 
+            <mesh rotation={rotation} scale={scale} position={position} geometry={backgroundGeometry} material={selectedMaterial} />
+          :
+            null
+      }
+    </>
+  )
+}
+
+/**
+ * Interaction des données
+ * @param {} colId - Id colonne
+ * @param {} position - Position
+ * @param {} rotation - Rotation
+ * @param {} scale - Echelle
+ * @returns {} - Récupérer les valeurs des cellules
+ */
+function DataCol({colId, position, rotation, scale}){
+  const { csv, sessionCodeId, gridSize, colInterval, rowInterval } = useRContext();
+  const fontSize = 45;
+
+  const canvas = useMemo(() => {
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    canvas.width = scale[0]*100;
+    canvas.height =  gridSize[1]*fontSize;
+    context.textBaseline = 'top';
+    context.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial, sans-serif`;
+
+    return canvas;
+  }, [scale, gridSize]);
+
+  const data = useMemo(() => {
+    return csv[colInterval[0]+colId];
+  }, [csv, sessionCodeId, colInterval, colId]);
+
+  const dataMaterial = useMemo(() => {
+    const context = canvas.getContext('2d');
     
-    const generateGrid = () => {
-      const rows = [];
+    const colSize = gridSize[1];
+    const maxChar = canvas.width/fontSize;
 
-      let maxRows = gridSize[0];
-      let pi_coeff = Math.PI/maxRows;
-      let circle_ray = 30;
-      let size, pos, rotation;
-      
-      let posX0 = (circle_ray*Math.cos(-1*(maxRows-1)*pi_coeff));
-      let posZ0 = (circle_ray*Math.sin(-1*(maxRows-1)*pi_coeff));
+    context.lineWidth = 0;
+    context.clearRect(0, 0, canvas.width, canvas.height);
 
-      let posX1 = (circle_ray*Math.cos(-1*(maxRows)*pi_coeff));
-      let posZ1 = (circle_ray*Math.sin(-1*(maxRows)*pi_coeff));
-
-      size=[ Math.sqrt(((posX1-posX0)**2)+((posZ1-posZ0)**2)), maxRows, 1 ];
-
-      for (let i=0; i < maxRows; i++){
-        posX1 = (circle_ray*Math.cos(-1*(maxRows-i)*pi_coeff));
-        posZ1 = (circle_ray*Math.sin(-1*(maxRows-i)*pi_coeff));
-        
-        rotation = [0, -((Math.PI/(maxRows))*i) + (Math.PI/2), 0];
-
-        pos = [posX1, position[1], posZ1];
-
-        posX0 = posX1;
-        posZ0 = posZ1;
-
-        rows.push(
-          <DataCol
-            key={'Col'+i}
-            position={pos} 
-            rotation={rotation}
-            scale={size}
-            colId={i} 
-            firstcol={false}  
-          />
-        );
+    for (let i=0; i < colSize; i++){
+      let rowIdx = rowInterval[0] + i;
+      let backgroundColor=normal_light;
+      let fontColor='#000000';
+      if(i==0){
+        backgroundColor='#080505';
+        fontColor='#ffffff';
+      }else if (i%2!=0){
+        backgroundColor = normal_darker;
       }
-      return rows;
+      context.fillStyle = backgroundColor;
+      context.fillRect(0, i*fontSize, canvas.width, fontSize);
+      
+      let text = '';
+      if(data && i < data.length) {
+        text = ((i==0) ? data[0] : data[rowIdx])+'';
+      }
+      text = text.substring(0, maxChar) + (text.length > maxChar ? "..." : "");
+      context.fillStyle = fontColor;
+      context.fillText(text, 0, i*fontSize, canvas.width);
     }
-  
-    return (
-        <>
-          {generateGrid()}
-        </>
-    )
+
+    const texture = new CanvasTexture(canvas);
+    // because our canvas is likely not a power of 2
+    // in both dimensions set the filtering appropriately.
+    texture.minFilter = LinearFilter;
+    texture.wrapS = RepeatWrapping;
+    texture.wrapT = RepeatWrapping;
+    const material = new MeshBasicMaterial({
+        map: texture,
+        side: DoubleSide,
+        transparent: false,
+      });
+
+    return material;
+
+  }, [data, rowInterval, canvas]);
+
+  const generateInteractiveCol = () => {
+    const cells = [];
+
+    let maxRows = gridSize[1];
+    let cellScale = [scale[0], scale[1]/maxRows, scale[2]+0.1];
+    let pos = [position[0], position[1]+cellScale[1]*maxRows/2-cellScale[1]/2, position[2]+0.2];
+    for (let i=0; i < maxRows; i++){
+      cells.push(
+        <InteractiveCell
+          key={'IntCell'+colId+i}
+          position={pos} 
+          rotation={rotation}
+          scale={cellScale}
+          cellId={i}
+          colId={colId}
+        />
+      );
+      pos=[pos[0], pos[1]-cellScale[1], pos[2]];
+    }
+    return cells;
   }
+
+  return (
+    <>
+      <mesh rotation={rotation} scale={scale} position={position} geometry={backgroundGeometry} material={dataMaterial} />
+      {generateInteractiveCol()}
+    </>
+  )
+}
+
+/**
+ * Tableau 3D qui affichent une partie des données du CSV issu du serveur
+ * @param {} position - Position
+ * @returns {} - Afficher un tableau de données en 180° et 360°
+ */
+function SpreadSheet({ position }){
+  const { csv, gridSize, displayAngles } = useRContext();
+  
+  const generateGrid = () => {
+    const cols = [];
+
+    let disAnge = parseInt(displayAngles[0]);
+    let maxCols = gridSize[0];
+    let filledCols = csv.length;
+    let pi_coeff = (disAnge*(Math.PI/180.))/maxCols;
+    let circle_ray = 30;
+    let size, pos, rotation;
+    
+    let posX0 = (circle_ray*Math.cos(-1*(maxCols-1)*pi_coeff));
+    let posZ0 = (circle_ray*Math.sin(-1*(maxCols-1)*pi_coeff));
+
+    let posX1 = (circle_ray*Math.cos(-1*(maxCols)*pi_coeff));
+    let posZ1 = (circle_ray*Math.sin(-1*(maxCols)*pi_coeff));
+
+    size=[Math.sqrt(((posX1-posX0)**2)+((posZ1-posZ0)**2)), gridSize[1]*1.5, 1];
+
+    for (let i=0; i < maxCols; i++){
+      posX1 = (circle_ray*Math.cos(-1*(maxCols-i)*pi_coeff));
+      posZ1 = (circle_ray*Math.sin(-1*(maxCols-i)*pi_coeff));
+      
+      rotation = [0, -(pi_coeff*i) + (disAnge==360 ? -Math.PI/2 : +Math.PI/2), 0];
+
+      pos = [posX1, position[1], posZ1];
+
+      posX0 = posX1;
+      posZ0 = posZ1;
+      
+      let colid = (filledCols < maxCols ? 0-Math.round((maxCols-filledCols)/2)+i : i);
+
+      cols.push(
+        <DataCol
+          key={'Col'+i}
+          position={pos} 
+          rotation={rotation}
+          scale={size}
+          colId={colid} 
+        />
+      );
+    }
+    return cols;
+  }
+
+  return (
+      <>
+        {generateGrid()}
+      </>
+  )
+}
 
 export default SpreadSheet;

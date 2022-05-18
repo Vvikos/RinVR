@@ -1,3 +1,7 @@
+/**
+ * @module Controller
+ */
+
 import { useState, useEffect, useRef } from 'react'
 import { useXREvent, useController, DefaultXRControllers } from '@react-three/xr'
 import { useFrame } from "@react-three/fiber";
@@ -5,10 +9,17 @@ import { Billboard, Text } from "@react-three/drei";
 import { useRContext } from '../RContextProvider'
 import DropDown from './DropDown'
 import Box from './Box'
+import UserPreferences from './UserPreferences'
+import QueryBuilder from './QueryBuilder'
 
+/**
+ * Gerer les interactions avec les manettes (cliquer sur les boutons, pointer les objets)
+ * @returns {} - Mesh qui contient un bouton avec son texte
+ */
 function Controllers() {
     const { csvFiles, setCsvFiles, incrementRowInterval, decrementRowInterval, incrementColInterval, decrementColInterval, gridSize } = useRContext();
     const leftController = useController('left');
+    const rightController = useController('right');
     const ref = useRef();
     const [wristlePanel, setWristlePanel] = useState(false);
     const [swipeColMode, setSwipeColMode] = useState(false);
@@ -38,13 +49,13 @@ function Controllers() {
             if(joystickDirections.indexOf('center')){
                 joystickDirections.forEach(element => {
                     if(element == 'left')
-                        setColInterval(prevstate => ((prevstate[0]==0) ? prevstate : [prevstate[0]-1, prevstate[1]]));
+                        decrementColInterval();
                     else if(element == 'right')
-                        setColInterval(prevstate => ((prevstate[0]+prevstate[1]>=csv[0].length-2) ? prevstate : [prevstate[0]+1, prevstate[1]]));
+                        incrementColInterval();
                     else if(element == 'top')
-                        setRowInterval(prevstate => ((prevstate[0]==0) ? prevstate : [prevstate[0]-1, prevstate[1]]));
+                        decrementRowInterval();
                     else if(element == 'bottom')
-                        setRowInterval(prevstate => ((prevstate[0]+prevstate[1]>=csv.length-2) ? prevstate : [prevstate[0]+1, prevstate[1]]));
+                        incrementRowInterval();
                     
                     setJoystickDirections(['center']);
                 });
@@ -52,7 +63,23 @@ function Controllers() {
         }
     }, [joystickDirections]);
 
-    /*useEffect(() => {
+    const onDropDownChange = (file) => {
+        let newCsvFiles = csvFiles.slice();
+        let idx = newCsvFiles.indexOf(file);
+        //swap selected file to first file
+        [newCsvFiles[0], newCsvFiles[idx]] = [newCsvFiles[idx], newCsvFiles[0]];
+        setCsvFiles(newCsvFiles);
+        console.log('new csv files', newCsvFiles);
+    }
+
+    useFrame(() => {
+        let currentSize = ref.current.scale;
+        if (leftController && leftController.grip && leftController.grip.position) {
+            ref.current.position.x = leftController.grip.position.x-leftController.grip.scale.x;
+            ref.current.position.y = leftController.grip.position.y+4*currentSize.y/5;
+            ref.current.position.z = leftController.grip.position.z-(currentSize.x+currentSize.y);
+        }
+
         if (rightController) {
             if (rightController.inputSource && rightController.inputSource.gamepad && leftController.inputSource.gamepad.axes) {
                 let joystickX = leftController.inputSource.gamepad.axes[2];
@@ -72,27 +99,6 @@ function Controllers() {
                 }
                 setJoystickDirections(newJoystickDirections);
             }
-        }
-    }, [rightController]);*/
-
-    const onDropDownChange = (file) => {
-        let newCsvFiles = csvFiles.slice();
-        let idx = newCsvFiles.indexOf(file);
-        //swap selected file to first file
-        [newCsvFiles[0], newCsvFiles[idx]] = [newCsvFiles[idx], newCsvFiles[0]];
-        setCsvFiles(newCsvFiles);
-    }
-
-    const onClickRefresh = () => {
-        setRowInterval(rowInterval);
-    }
-
-    useFrame(() => {
-        let currentSize = ref.current.scale;
-        if (leftController && leftController.grip && leftController.grip.position) {
-            ref.current.position.x = leftController.grip.position.x-leftController.grip.scale.x;
-            ref.current.position.y = leftController.grip.position.y+4*currentSize.y/5;
-            ref.current.position.z = leftController.grip.position.z-(currentSize.x+currentSize.y)/2.;
         }
             
         if (leftController && inAnimation) {
@@ -139,13 +145,17 @@ function Controllers() {
                 lockY={false}
                 lockZ={true} // Lock the rotation on the z axis (default=false)
             >
-                <DropDown scale={[1, 1.5, 1]} color={0xffffff} onChangeValue={onDropDownChange} dropDownValue={csvFiles} position={[0, ref?.current?.scale?.y/8, 0]}/>
-                <Box position={[0, 0, -ref?.current?.scale?.y/2]}></Box>
+                <DropDown scale={[1, 0.1, 0.1]} color={0xffffff} onChangeValue={onDropDownChange} dropDownValue={csvFiles} position={[0, ref?.current?.scale?.y/8, 3]} fontSize={0.04} />
+                
+                <QueryBuilder position={[0, -0.01, -ref?.current?.scale?.y/2]} scale={[1, 1, 0.1]} />
+
+                <Box position={[0.8, 0, -ref?.current?.scale?.y/2]} scale={[0.5, 1, 0.1]} color={"grey"}>
+                    <UserPreferences/>
+                </Box>
+
             </Billboard>
         </>
     )
 }
-
-//<RoundedButton color={wristleColor} fontColor={0xffffff} fontSize={0.015} size={[0.05, 0.05, 0.001]} position={wristlePosition} rotation={wristleRotation}>WRISTLE</RoundedButton>
 
 export default Controllers;

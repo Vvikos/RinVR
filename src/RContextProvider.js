@@ -1,3 +1,6 @@
+/**
+ * @module RContextProviders
+ */
 import { createContext, useContext, useState, useEffect } from 'react';
 import Papa from 'papaparse';
 
@@ -11,6 +14,8 @@ const RContext = createContext({
     setCsv: () => { },
     selectedCols: [],
     setSelectedCols: () => { },
+    selectedCells: [],
+    setSelectedCells: () => { },
     rowInterval: [],
     incrementRowInterval: () => { },
     decrementRowInterval: () => { },
@@ -21,27 +26,67 @@ const RContext = createContext({
     fetchInterval: [],
     setFetchInterval: () => { },
     gridSize: [],
-    setGridSize: () => { }
+    setGridSize: () => { },
+    incrementColGrid: () => { },
+    decrementColGrid: () => { },
+    incrementRowGrid: () => { },
+    decrementRowGrid: () => { },
+    displayAngles: [],
+    setDisplayAngles: () =>{ },
+    clearColSelection: () =>{ },
+    colSelectionMode: false,
+    setColSelectionMode: () => { },
+    clearCellSelection: () => { },
+    cellSelectionMode: false,
+    setCellSelectionMode: () => { },
+    sendSelectRequest: () => { },
+    sessionCodeId: null,
+    setSessionCodeId: () => { },
+    setSessionState: () => { }
+
 });
 
+/**
+ * Wrapper du provider
+ * @returns {} - Context de fonctions et variables R
+ */
 function useRContext() {
     return useContext(RContext);
 }
 
+/**
+ * Provider R
+ * @param {} - Elements enfants du contexte
+ * @returns {} - Provider pour le R contexte
+ */
 function RContextProvider({ children }) {
-    const [gridSize, setGridSize] = useState([20, 40]);
+    const [gridSize, setGridSize] = useState([5, 5]);
     const [csv, setCsv] = useState([]);
     const [selectedCols, setSelectedCols] = useState([]);
+    const [selectedCells, setSelectedCells] = useState([]);
     const [csvFiles, setCsvFiles] = useState(['']);
     const [fetchInterval, setFetchInterval] = useState([0, 0]);
     const [rowInterval, setRowInterval] = useState([0, 9]);
     const [colInterval, setColInterval] = useState([0, 9]);
+    const [displayAngles, setDisplayAngles] = useState(["180","360"]);
+    const [cellSelectionMode, setCellSelectionMode] = useState(false);
+    const [colSelectionMode, setColSelectionMode] = useState(false);
+    const [selectQueryPool, setSelectQueryPool] = useState({});
+    const [sessionCodeId, setSessionCodeId] = useState(null);
+    const [sessionState, setSessionState] = useState('DISCONNECTED');
 
-    const FETCH_SIZE = 40;
+    const FETCH_SIZE = 20;
+
+    useEffect(() => {
+        createSessionCodeId();
+        if(sessionState!='DISCONNECTED'){
+            connectSessionCodeId(sessionState);
+        }
+    }, [sessionState]);
 
     useEffect(() => {
         RService.getCsvFiles()
-            .then(function (response) { let res = response.slice(); res.splice(res.indexOf('email.csv'), 1); console.log(res); setCsvFiles(res); })
+            .then((res) => setCsvFiles(res))
             .catch(error => console.log('ERROR', error));
     }, []);
 
@@ -62,17 +107,51 @@ function RContextProvider({ children }) {
             return;
         }
 
-        RService.getCsv(csvFiles[0], fetchInterval)
+        if (!sessionCodeId) {
+            console.log('INFO', 'SESSION ID NOT SET');
+            return;
+        }
+
+        RService.getCsv(sessionCodeId, csvFiles[0], fetchInterval)
             .then(response => setCsv(response))
-            .catch(error => console.log('ERROR', error));
-    }, [fetchInterval]);
+            .catch(error => { setSessionCodeId("#00001"); console.log('ERROR', error)});
+    }, [fetchInterval, sessionCodeId]);
 
     useEffect(() => {
-        if (csv && csv.length > 0 && csv[1].length > 0 && csv[1][0].length > 0) {
-            setRowInterval([0, ((csv[1][0].length < gridSize[1] - 1) ? csv[1][0].length : gridSize[1] - 1)]);
-            setColInterval([0, ((csv[1].length < gridSize[0] - 1) ? csv[1].length : gridSize[0] - 1)]);
+        if (csvFiles[0] == '') {
+            console.log('INFO', 'NO FILE FETCHED BECAUSE NO FILE SELECTED');
+            return;
+        }
+
+        RService.getCsvWithSelect(sessionCodeId, csvFiles[0], fetchInterval, selectQueryPool)
+            .then(response => setCsv(response))
+            .catch(error => console.log('ERROR', error));
+    }, [selectQueryPool]);
+
+    useEffect(() => {
+        if (csv && csv.length > 0 && csv[0].length > 0) {
+            setRowInterval([0, ((csv[0].length < gridSize[1] - 1) ? csv[0].length : gridSize[1] - 1)]);
+            setColInterval([0, ((csv.length < gridSize[0] - 1) ? csv.length : gridSize[0] - 1)]);
         }
     }, [csv]);
+
+    function createSessionCodeId(){
+        RService.createSessionCodeId()
+            .then(code => setSessionCodeId(code))
+            .catch(error => console.log('ERROR', error));
+    }
+
+    function connectSessionCodeId(code){
+        RService.connectSessionCodeId(code)
+            .then(function(response) {
+                if (!response.ok) {
+                    setSessionCodeId("#00001");
+                } else {
+                    setSessionCodeId(code);
+                }
+            })
+            .catch(error => setSessionCodeId("#00001"));
+    }
 
     function incrementColInterval() {
         if(colInterval[1] < csv.length)
@@ -94,6 +173,42 @@ function RContextProvider({ children }) {
             setRowInterval([rowInterval[0]-1, rowInterval[1]-1]);
     }
 
+    function incrementColGrid() {
+        if(gridSize[0] < 30)
+            setGridSize([gridSize[0]+1, gridSize[1]]);
+    }
+
+    function decrementColGrid() {
+        if(gridSize[0] > 3)
+            setGridSize([gridSize[0]-1, gridSize[1]]);
+    }
+
+    function incrementRowGrid() {
+        if(gridSize[1] < 50)
+            setGridSize([gridSize[0], gridSize[1]+1]);
+    }
+
+    function decrementRowGrid() {
+        if(gridSize[1] > 10)
+            setGridSize([gridSize[0], gridSize[1]-1]);
+    }
+
+    function setFirstDisplayAngles(selectedAngle) {
+        let newDisplayAngles = displayAngles.slice();
+        let idx = displayAngles.indexOf(selectedAngle);
+        //swap selected file to first file
+        [newDisplayAngles[0], newDisplayAngles[idx]] = [newDisplayAngles[idx], newDisplayAngles[0]];
+        setDisplayAngles(newDisplayAngles);
+    }
+
+    function clearColSelection() {
+        setSelectedCols([]);
+    }
+
+    function clearCellSelection() {
+        setSelectedCells([]);
+    }
+
     return (
         <RContext.Provider value={{
             csvFiles: csvFiles,
@@ -102,6 +217,8 @@ function RContextProvider({ children }) {
             setCsv: setCsv,
             selectedCols: selectedCols,
             setSelectedCols: setSelectedCols,
+            selectedCells: selectedCells,
+            setSelectedCells: setSelectedCells,
             rowInterval: rowInterval,
             incrementRowInterval: incrementRowInterval,
             decrementRowInterval: decrementRowInterval,
@@ -111,13 +228,32 @@ function RContextProvider({ children }) {
             fetchInterval: fetchInterval,
             setFetchInterval: setFetchInterval,
             gridSize: gridSize,
-            setGridSize: setGridSize
+            setGridSize: setGridSize,
+            incrementColGrid: incrementColGrid,
+            decrementColGrid: decrementColGrid,
+            incrementRowGrid: incrementRowGrid,
+            decrementRowGrid: decrementRowGrid,
+            displayAngles: displayAngles,
+            setDisplayAngles: setFirstDisplayAngles,
+            clearColSelection: clearColSelection,
+            colSelectionMode: colSelectionMode,
+            setColSelectionMode: setColSelectionMode,
+            clearCellSelection: clearCellSelection,
+            cellSelectionMode: cellSelectionMode,
+            setCellSelectionMode: setCellSelectionMode,
+            sendSelectRequest: setSelectQueryPool,
+            sessionCodeId: sessionCodeId,
+            setSessionCodeId: setSessionCodeId,
+            setSessionState: setSessionState
         }}>
             {children}
         </RContext.Provider>
     )
 }
 
+/**
+ * Classe service permettant de lancer des requetes avec le serveur
+ */
 class RService {
     static async getCsvFiles() {
         return fetch(API_R + "/csv_names", { mode: 'cors' })
@@ -139,8 +275,14 @@ class RService {
             });
     }
 
-    static async getCsv(csvName, fetchInterval) {
-        return fetch(API_R + "/csv?name=" + csvName + "&offset=" + fetchInterval[0] + "&limit=" + fetchInterval[1], { mode: 'cors' })
+    static async getCsv(sessionCodeId, csvName, fetchInterval) {
+        const requestOptions = {
+            method: 'POST',
+            mode: 'cors',
+            headers: { 'Content-Type': 'application/json'}
+        };
+
+        return fetch(API_R + "/csv?session_code="+sessionCodeId+"&name="+csvName+"&offset="+fetchInterval[0]+"&limit="+fetchInterval[1], requestOptions)
             .then(res => {
                 const reader = res.body.getReader();
                 return reader.read();
@@ -158,6 +300,67 @@ class RService {
                 console.log(e);
                 return e;
             });
+    }
+
+    static async getCsvWithSelect(sessionCodeId, csvName, fetchInterval, selectQuery) {
+        const requestOptions = {
+            method: 'POST',
+            mode: 'cors',
+            headers: { 'Content-Type': 'application/json'},
+            body: JSON.stringify(selectQuery)
+        };
+
+        return fetch(API_R + "/csv?session_code="+sessionCodeId+"&name="+csvName+"&offset="+fetchInterval[0]+"&limit="+fetchInterval[1], requestOptions)
+            .then(res => {
+                const reader = res.body.getReader();
+                return reader.read();
+            })
+            .then(result => {
+                const decoder = new TextDecoder('utf-8');
+                return decoder.decode(result.value);
+            })
+            .then(csvStr => {
+                const csv_data = Papa.parse(csvStr).data;
+                const csv_flip = csv_data[0].map((col, i) => csv_data.map(row => row[i]));
+                return csv_flip;
+            })
+            .catch(e => {
+                console.log(e);
+                return e;
+            });
+    }
+
+    static async createSessionCodeId() {
+        const requestOptions = {
+            method: 'POST',
+            mode: 'cors'
+        };
+
+        return fetch(API_R + "/session", requestOptions)
+            .then(res => {
+                const reader = res.body.getReader();
+                return reader.read();
+            })
+            .then(result => {
+                const decoder = new TextDecoder('utf-8');
+                return decoder.decode(result.value);
+            })
+            .then(body => {
+                return JSON.parse(body).session_code;
+            })
+            .catch(e => {
+                console.log(e);
+                return e;
+            });
+    }
+
+    static async connectSessionCodeId(code) {
+        const requestOptions = {
+            method: 'GET',
+            mode: 'cors'
+        };
+
+        return fetch(API_R + "/session?session_code="+code, requestOptions);
     }
 }
 
