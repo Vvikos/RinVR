@@ -106,8 +106,8 @@ function RContextProvider({ children }) {
 
         RService.getCsv(sessionCodeId, csvFiles[0], fetchInterval)
             .then(response => setCsv(response))
-            .catch(error => console.log('ERROR', error));
-    }, [fetchInterval, sessionCodeId]);
+            .catch(error => { setSessionCodeId("#00001"); console.log('ERROR', error)});
+    }, [fetchInterval]);
 
     useEffect(() => {
         if (csvFiles[0] == '') {
@@ -133,17 +133,16 @@ function RContextProvider({ children }) {
             .then(code => setSessionCodeId(code))
             .catch(error => console.log('ERROR', error));
     }
-
     function connectSessionCodeId(code){
         RService.connectSessionCodeId(code)
             .then(function(response) {
                 if (!response.ok) {
-                    setSessionCodeId(null);
+                    setSessionCodeId("#00001");
                 } else {
                     setSessionCodeId(code);
                 }
             })
-            .catch(error => console.log('ERROR', error));
+            .catch(error => setSessionCodeId("#00001"));
     }
 
     function incrementColInterval() {
