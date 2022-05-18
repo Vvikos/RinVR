@@ -90,7 +90,7 @@ function InteractiveCell({colId, cellId, position, rotation, scale}){
 }
 
 function DataCol({colId, position, rotation, scale}){
-  const { csv, gridSize, colInterval, rowInterval } = useRContext();
+  const { csv, sessionCodeId, gridSize, colInterval, rowInterval } = useRContext();
   const fontSize = 45;
 
   const canvas = useMemo(() => {
@@ -104,6 +104,11 @@ function DataCol({colId, position, rotation, scale}){
     return canvas;
   }, [scale, gridSize]);
 
+  const data = useMemo(() => {
+    console.log('DATAROW', csv, sessionCodeId);
+    return csv[colInterval[0]+colId];
+  }, [csv, sessionCodeId, colInterval, colId]);
+
   const dataMaterial = useMemo(() => {
     const context = canvas.getContext('2d');
     
@@ -112,8 +117,6 @@ function DataCol({colId, position, rotation, scale}){
 
     context.lineWidth = 0;
     context.clearRect(0, 0, canvas.width, canvas.height);
-
-    let data = csv[colInterval[0]+colId];
 
     for (let i=0; i < colSize; i++){
       let rowIdx = rowInterval[0] + i;
@@ -151,7 +154,7 @@ function DataCol({colId, position, rotation, scale}){
 
     return material;
 
-  }, [csv, colInterval, rowInterval, canvas]);
+  }, [data, rowInterval, canvas]);
 
   const generateInteractiveCol = () => {
     const cells = [];

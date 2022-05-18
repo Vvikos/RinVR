@@ -6,6 +6,7 @@ import { Alert } from '@material-ui/lab';
 function SessionCodeIdManager() {
     const { sessionCodeId, setSessionState } = useRContext();
     const [session, setSession] = React.useState(null);
+    const [panelDiplayed, setPanelDiplayed] = React.useState(true);
 
     const [error, setError] = React.useState("");
     
@@ -34,6 +35,7 @@ function SessionCodeIdManager() {
       if(inputSessionId && inputSessionId.length == 6 && isnum){
         setSessionState(inputSessionId);
         setSession(sessionCodeId);
+        setPanelDiplayed(false);
       }
 
       if(inputSessionId.length == 0){
@@ -43,14 +45,12 @@ function SessionCodeIdManager() {
     }
   
     function createSession() {
-      setSessionState('INIT');
+      setPanelDiplayed(false);
     }
   
     return (
     <>
-      {sessionCodeId && sessionCodeId != "#00001" ?
-        null
-      :
+      {panelDiplayed ?
         <div className="sessionCodeId">
             <div>
                 <div>
@@ -70,11 +70,12 @@ function SessionCodeIdManager() {
                     </div>
                     <div>
                         <input type='button' value='Create Session' onClick={createSession} />
-                        <p color='red'>{}</p>
                     </div>
                 </div>
             </div>
         </div>
+      :
+        null
       }
     </>
     )

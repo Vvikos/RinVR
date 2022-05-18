@@ -61,18 +61,14 @@ function RContextProvider({ children }) {
     const [colSelectionMode, setColSelectionMode] = useState(false);
     const [selectQueryPool, setSelectQueryPool] = useState({});
     const [sessionCodeId, setSessionCodeId] = useState(null);
-    const [sessionState, setSessionState] = useState('INIT');
+    const [sessionState, setSessionState] = useState('DISCONNECTED');
 
     const FETCH_SIZE = 20;
 
     useEffect(() => {
-        if(sessionState=='INIT'){
-            createSessionCodeId();
-        }else if(sessionState!='DISCONNECTED'){
-            console.log('SESSIONSTATE', sessionState);
+        createSessionCodeId();
+        if(sessionState!='DISCONNECTED'){
             connectSessionCodeId(sessionState);
-        }else {
-            console.log('TAMERE', sessionState)
         }
     }, [sessionState]);
 
@@ -107,7 +103,7 @@ function RContextProvider({ children }) {
         RService.getCsv(sessionCodeId, csvFiles[0], fetchInterval)
             .then(response => setCsv(response))
             .catch(error => { setSessionCodeId("#00001"); console.log('ERROR', error)});
-    }, [fetchInterval]);
+    }, [fetchInterval, sessionCodeId]);
 
     useEffect(() => {
         if (csvFiles[0] == '') {
@@ -133,6 +129,7 @@ function RContextProvider({ children }) {
             .then(code => setSessionCodeId(code))
             .catch(error => console.log('ERROR', error));
     }
+
     function connectSessionCodeId(code){
         RService.connectSessionCodeId(code)
             .then(function(response) {

@@ -69,7 +69,7 @@ function Controllers() {
         if (leftController && leftController.grip && leftController.grip.position) {
             ref.current.position.x = leftController.grip.position.x-leftController.grip.scale.x;
             ref.current.position.y = leftController.grip.position.y+4*currentSize.y/5;
-            ref.current.position.z = leftController.grip.position.z-(currentSize.x+currentSize.y)/2.;
+            ref.current.position.z = leftController.grip.position.z-(currentSize.x+currentSize.y);
         }
 
         if (rightController) {

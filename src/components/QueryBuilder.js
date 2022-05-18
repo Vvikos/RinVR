@@ -545,8 +545,8 @@ function QueryBuilder({ position, scale }) {
             :
                 null
             }
-            <Submit position={[0.6,-scale[1]-scale[1]/8,1]} scale={[scale[0], scale[1]/8, scale[2]]} onSubmitSend={submitRequest}/>
-            <Reset position={[0.6-scale[0]/2,-scale[1]-scale[1]/8,1]} scale={[scale[0], scale[1]/8, scale[2]]} onReset={resetRequest}/>
+            <Submit position={[0.6,-scale[1]-scale[1]/16,1]} scale={[scale[0], scale[1]/8, scale[2]]} onSubmitSend={submitRequest}/>
+            <Reset position={[0.6-scale[0]/2,-scale[1]-scale[1]/16 ,1]} scale={[scale[0], scale[1]/8, scale[2]]} onReset={resetRequest}/>
         </>
     )
 }
