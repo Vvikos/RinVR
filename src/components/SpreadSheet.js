@@ -184,13 +184,14 @@ function DataCol({colId, position, rotation, scale}){
 }
 
 function SpreadSheet({ position }){
-  const { gridSize, displayAngles } = useRContext();
+  const { csv, gridSize, displayAngles } = useRContext();
   
   const generateGrid = () => {
     const cols = [];
 
     let disAnge = parseInt(displayAngles[0]);
     let maxCols = gridSize[0];
+    let filledCols = csv.length;
     let pi_coeff = (disAnge*(Math.PI/180.))/maxCols;
     let circle_ray = 30;
     let size, pos, rotation;
@@ -213,6 +214,9 @@ function SpreadSheet({ position }){
 
       posX0 = posX1;
       posZ0 = posZ1;
+      
+      let colid = (filledCols < maxCols ? 0-Math.round((maxCols-filledCols)/2)+i : i);
+      console.log('STARTIDX', Math.round((maxCols-filledCols)/2),'IDX', i,'COL', colid);
 
       cols.push(
         <DataCol
@@ -220,7 +224,7 @@ function SpreadSheet({ position }){
           position={pos} 
           rotation={rotation}
           scale={size}
-          colId={i} 
+          colId={colid} 
         />
       );
     }

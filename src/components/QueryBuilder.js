@@ -475,7 +475,7 @@ function Reset({ position, scale, onReset }){
 function QueryBuilder({ position, scale }) {
     const { sendSelectRequest } = useRContext();
 
-    const [operatorFilter, setOperatorFilter] = useState(['==', '!=']);
+    const [operatorFilter, setOperatorFilter] = useState(["==", "!="]);
     const [selectedColFilter, setSelectedColFilter] = useState('');
     const [selectedCellFilter, setSelectedCellFilter] = useState('');
 
