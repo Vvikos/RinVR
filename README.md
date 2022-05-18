@@ -22,8 +22,8 @@ Ce projet vise à utiliser la réalité virtuelle pour visualiser des tableaux c
 <img src="img/tableau.png" width="450" height="350"/>
 <img src="img/grid.png" width="450" height="350"/>
 <img src="img/select.png" width="450" height="350"/>
-<img src="img/180.jpg" width="400" height="175"/>
-<img src="img/360.jpg" width="400" height="175"/>
+<img src="img/180.JPG" width="400" height="175"/>
+<img src="img/360.JPG" width="400" height="175"/>
 
 ## Fonctionnalités
 
