@@ -1,3 +1,6 @@
+/**
+ * @module RContextProviders
+ */
 import { createContext, useContext, useState, useEffect } from 'react';
 import Papa from 'papaparse';
 
@@ -43,10 +46,19 @@ const RContext = createContext({
 
 });
 
+/**
+ * Wrapper du provider
+ * @returns {} - Context de fonctions et variables R
+ */
 function useRContext() {
     return useContext(RContext);
 }
 
+/**
+ * Provider R
+ * @param {} - Elements enfants du contexte
+ * @returns {} - Provider pour le R contexte
+ */
 function RContextProvider({ children }) {
     const [gridSize, setGridSize] = useState([5, 5]);
     const [csv, setCsv] = useState([]);
@@ -240,6 +252,9 @@ function RContextProvider({ children }) {
     )
 }
 
+/**
+ * Classe service permettant de lancer des requetes avec le serveur
+ */
 class RService {
     static async getCsvFiles() {
         return fetch(API_R + "/csv_names", { mode: 'cors' })

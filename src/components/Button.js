@@ -1,9 +1,21 @@
-
+/**
+ * @module Button
+ */
 import { Text } from '@react-three/drei'
 import { BoxGeometry } from "three";
 
 const box = new BoxGeometry();
 
+/**
+ * Créer un bouton en 3D
+ * @param {} children - Fils qui hérite
+ * @param {} scale - Echelle
+ * @param {} color - Couleur
+ * @param {} fontSize - Taille de la police
+ * @param {} fontColor - Couleur de la police
+ * @param {} position - Position
+ * @returns {} - Mesh qui contient un bouton avec son texte
+ */
 function Button({ children, scale, color, fontSize, fontColor, position }) {
   return (
     <>

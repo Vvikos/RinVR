@@ -1,3 +1,7 @@
+/**
+ * @module Controller
+ */
+
 import { useState, useEffect, useRef } from 'react'
 import { useXREvent, useController, DefaultXRControllers } from '@react-three/xr'
 import { useFrame } from "@react-three/fiber";
@@ -8,6 +12,10 @@ import Box from './Box'
 import UserPreferences from './UserPreferences'
 import QueryBuilder from './QueryBuilder'
 
+/**
+ * Gerer les interactions avec les manettes (cliquer sur les boutons, pointer les objets)
+ * @returns {} - Mesh qui contient un bouton avec son texte
+ */
 function Controllers() {
     const { csvFiles, setCsvFiles, incrementRowInterval, decrementRowInterval, incrementColInterval, decrementColInterval, gridSize } = useRContext();
     const leftController = useController('left');

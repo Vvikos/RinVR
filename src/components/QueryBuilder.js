@@ -1,3 +1,6 @@
+/**
+ * @module QueryBuilder
+ */
 import { useMemo, useState, useEffect } from 'react';
 import { MeshBasicMaterial, DoubleSide, PlaneBufferGeometry, CanvasTexture, LinearFilter, RepeatWrapping } from 'three';
 import { Interactive } from '@react-three/xr';
@@ -8,6 +11,16 @@ import { normal_darker, selected_light, normal_hovered, disabled_button, darker_
 
 const backgroundGeometry = new PlaneBufferGeometry(1, 1);
 
+/**
+ * Récuperer des noms de colonne 
+ * @param {} position - Position
+ * @param {} rotation - Rotation
+ * @param {} scale - Echelle
+ * @param {} maxLines - Nombre maximum de ligne
+ * @param {} selectedColsValue - Colonnes selectionnées
+ * @param {} onColSelection - Fonction qui met à jour les données
+ * @returns {} - Renvoie les différents noms de colonnes
+ */
 function ColumnsField({ position, rotation, scale, maxLines, selectedColsValue, onColSelection }) {
     const { csv, selectedCols, setSelectedCols, colSelectionMode, cellSelectionMode, setColSelectionMode } = useRContext();
     const [inSelection, setInSelection] = useState(false);
@@ -109,6 +122,15 @@ function ColumnsField({ position, rotation, scale, maxLines, selectedColsValue, 
   )
 }
 
+/**
+ * Récuperer un nom de colonne 
+ * @param {} position - Position
+ * @param {} rotation - Rotation
+ * @param {} scale - Echelle
+ * @param {} selectedColValue - Colonne selectionnée
+ * @param {} onColSelection - Fonction qui met à jour les données
+ * @returns {} - Renvoie une colonne
+ */
 function ColumnField({ position, rotation, scale, selectedColValue, onColSelection }) {
     const { csv, selectedCols, setSelectedCols, colSelectionMode, cellSelectionMode, setColSelectionMode } = useRContext();
     const [inSelection, setInSelection] = useState(false);
@@ -201,6 +223,15 @@ function ColumnField({ position, rotation, scale, selectedColValue, onColSelecti
   )
 }
 
+/**
+ * Récuperer une cellule 
+ * @param {} position - Position
+ * @param {} rotation - Rotation
+ * @param {} scale - Echelle
+ * @param {} selectedCellValue - Cellule selectionnée
+ * @param {} onCellSelection - Fonction qui met à jour les données
+ * @returns {} - Renvoie une cellule
+ */
 function CellField({ position, rotation, scale, selectedCellValue, onCellSelection }) {
     const { csv, selectedCells, setSelectedCells, colSelectionMode, cellSelectionMode, setCellSelectionMode } = useRContext();
     const [inSelection, setInSelection] = useState(false);
@@ -295,6 +326,15 @@ function CellField({ position, rotation, scale, selectedCellValue, onCellSelecti
   )
 }
 
+/**
+ * Créer un bouton sous forme de canva
+ * @param {} text - Texte
+ * @param {} position - Position
+ * @param {} scale - Echelle
+ * @param {} textColor - Couleur du texte
+ * @param {} backColor - Couleur de l'arrière plan
+ * @returns {} - Renvoie un mesh contient un bouton
+ */
 function ButtonQuery({text, position, scale, textColor='#000000', backColor='#ffffff'})
 {
     const fontSize = 35;
@@ -340,6 +380,14 @@ function ButtonQuery({text, position, scale, textColor='#000000', backColor='#ff
     );
 }
 
+/**
+ * Gérer le "select"
+ * @param {} position - Position
+ * @param {} scale - Echelle
+ * @param {} selectedCols - Colonnes selectionnées
+ * @param {} onColSelection - Fonction qui met à jour les données
+ * @returns {} - Renvoie un ensemble de composants
+ */
 function SelectBuilder({ position, scale, selectedCols, onColSelection }) {
     return (
         <Box position={position} scale={scale} color={darker_panel}>
@@ -349,6 +397,18 @@ function SelectBuilder({ position, scale, selectedCols, onColSelection }) {
     )
 }
 
+/**
+ * Gérer le "filter"
+ * @param {} position - Position
+ * @param {} scale - Echelle
+ * @param {} operatorFilter - Opérateurs (==, !=)
+ * @param {} setOperatorFilter - Fonction qui met à jour les données
+ * @param {} selectedColFilter - Colonnes selectionnées
+ * @param {} setSelectedColFilter - Fonction qui met à jour les données
+ * @param {} selectedCellFilter - Cellules selectionnées
+ * @param {} setSelectedCellFilter - Fonction qui met à jour les données
+ * @returns {} - Renvoie un ensemble de composants
+ */
 function FilterBuilder({ position, scale, operatorFilter, setOperatorFilter, selectedColFilter, setSelectedColFilter, selectedCellFilter, setSelectedCellFilter={setSelectedCellFilter} }) {
     const [hovered, setHovered] = useState(false);
     const [activated, setActivated] = useState(false);
@@ -385,6 +445,14 @@ function FilterBuilder({ position, scale, operatorFilter, setOperatorFilter, sel
     )
 }
 
+/**
+ * Gérer le "group by"
+ * @param {} position - Position
+ * @param {} scale - Echelle
+ * @param {} groupbyCols - Colonnes selectionées
+ * @param {} onGroupByChange - Fonction qui met à jour les données
+ * @returns {} - Renvoie un ensemble de composants
+ */
 function GroupByBuilder({ position, scale, groupbyCols, onGroupByChange }) {
     const [hovered, setHovered] = useState(false);
     const [activated, setActivated] = useState(false);
@@ -417,6 +485,16 @@ function GroupByBuilder({ position, scale, groupbyCols, onGroupByChange }) {
     )
 }
 
+/**
+ * Gérer le "summerize"
+ * @param {} position - Position
+ * @param {} scale - Echelle
+ * @param {} summariseOperatorValue - Opérateurs (mean, min, max, sum)
+ * @param {} onSummariseOperatorChange - Fonction qui met à jour les données
+ * @param {} summariseColValue - Valeurs
+ * @param {} onSummariseColChange - Fonction qui met à jour les données
+ * @returns {} - Renvoie un ensemble de composants
+ */
 function SummarizeBuilder({ position, scale, summariseOperatorValue, onSummariseOperatorChange, summariseColValue, onSummariseColChange }){
 
     const onDropDownChange = (op) => {
@@ -436,6 +514,13 @@ function SummarizeBuilder({ position, scale, summariseOperatorValue, onSummarise
       )
 }
 
+/**
+ * Gérer l'envoi de la requête'
+ * @param {} position - Position
+ * @param {} scale - Echelle
+ * @param {} onSubmitSend - Fonction qui met à jour les données
+ * @returns {} - Renvoie un ensemble de composants
+ */
 function Submit({ position, scale, onSubmitSend }){
     const [hovered, setHovered] = useState(false);
 
@@ -454,6 +539,13 @@ function Submit({ position, scale, onSubmitSend }){
       )
 }
 
+/**
+ * Gérer la reinitialisation de l'affichage/requête
+ * @param {} position - Position
+ * @param {} scale - Echelle
+ * @param {} onReset - Fonction qui met à jour les données
+ * @returns {} - Renvoie un ensemble de composants
+ */
 function Reset({ position, scale, onReset }){
     const [hovered, setHovered] = useState(false);
 
@@ -472,6 +564,12 @@ function Reset({ position, scale, onReset }){
       )
 }
 
+/**
+ * Gérer la construction de la requête
+ * @param {} position - Position
+ * @param {} scale - Echelle
+ * @returns {} - Reqûete
+ */
 function QueryBuilder({ position, scale }) {
     const { sendSelectRequest } = useRContext();
 

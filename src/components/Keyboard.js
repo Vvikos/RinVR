@@ -1,3 +1,6 @@
+/**
+ * @module Keyboard
+ */
 import { useMemo, useState } from 'react';
 import { Interactive } from '@react-three/xr';
 import { MeshBasicMaterial, FrontSide, PlaneBufferGeometry, CanvasTexture, LinearFilter, RepeatWrapping } from 'three';
@@ -6,6 +9,12 @@ const colorHovered = '#B0E2FF';
 const colorLight = '#ffffff';
 const fontColor = '#000000'
 
+/**
+ * Créer une touche pour le clavier virtuel
+ * @param {} letter - Lettre
+ * @param {} position - Position
+ * @returns {} - Renvoie une mesh qui contient une touche
+ */
 function Key({letter, position}){
 
     const [hovered, setHovered] = useState(false);
@@ -104,6 +113,11 @@ function Key({letter, position}){
       )
 }
 
+/**
+ * Créer le clavier virtuel entier 
+ * @param {} position - Position
+ * @returns {} - Renvoie toutes les touches (composant Key) pour former le clavier virtuel
+ */
 function Keyboard({position})
 {
     const generateKeyboard = () => {

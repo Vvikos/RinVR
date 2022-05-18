@@ -1,7 +1,20 @@
+/**
+ * @module DropDown
+ */
 import { useState, useEffect } from 'react';
 import { Interactive } from '@react-three/xr';
 import Button from './Button';
 
+/**
+ * Créer un menu déroulant en 3D
+ * @param {} scale - Echelle
+ * @param {} position - Position
+ * @param {} dropDownValue - Listes de valeurs
+ * @param {} onChangeValue - Fonction qui est appelée à chaque changement
+ * @param {} fontSize - Taille de la police
+ * @param {} backgroundColor - Couleur du fond
+ * @returns {} - Renvoie une liste déroulante pour seléctionner une valeur contenue dans une liste
+ */
 function DropDown({ scale, position, dropDownValue, onChangeValue, fontSize, backgroundColor}) {
   const [visible, setVisible] = useState(false);
   const [currentHovered, setCurrentHovered] = useState('');
