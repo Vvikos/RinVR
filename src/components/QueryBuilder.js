@@ -178,7 +178,7 @@ function ColumnField({ position, rotation, scale, selectedColValue, onColSelecti
     const canvas = useMemo(() => {
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
-        canvas.width = scale[0]*100;
+        canvas.width = scale[0]*500;
         canvas.height = fontSize;
         context.textBaseline = 'top';
         context.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial, sans-serif`;
@@ -197,7 +197,7 @@ function ColumnField({ position, rotation, scale, selectedColValue, onColSelecti
         context.fillStyle = backgroundColor;
         context.fillRect(0, 0, canvas.width, fontSize);
 
-        let text = selectedColValue;
+        let text = selectedColValue.slice(0,20);
         context.fillStyle = '#000000';
         context.fillText(text, 0, 0, canvas.width);
 
@@ -281,7 +281,7 @@ function CellField({ position, rotation, scale, selectedCellValue, onCellSelecti
     const canvas = useMemo(() => {
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
-        canvas.width = scale[0]*100;
+        canvas.width = scale[0]*500;
         canvas.height = fontSize;
         context.textBaseline = 'top';
         context.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial, sans-serif`;
@@ -300,7 +300,7 @@ function CellField({ position, rotation, scale, selectedCellValue, onCellSelecti
         context.fillStyle = backgroundColor;
         context.fillRect(0, 0, canvas.width, fontSize);
 
-        let text = selectedCellValue;
+        let text = selectedCellValue.slice(0,20);
         context.fillStyle = '#000000';
         context.fillText(text, 0, 0, canvas.width);
 

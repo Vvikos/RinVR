@@ -145,7 +145,7 @@ function Controllers() {
                 lockY={false}
                 lockZ={true} // Lock the rotation on the z axis (default=false)
             >
-                <DropDown scale={[1, 0.1, 0.1]} color={0xffffff} onChangeValue={onDropDownChange} dropDownValue={csvFiles} position={[0, ref?.current?.scale?.y/8, 0.2]} fontSize={0.04} />
+                <DropDown scale={[1, 0.1, 0.1]} color={0xffffff} onChangeValue={onDropDownChange} dropDownValue={csvFiles} position={[0, ref?.current?.scale?.y/8, 3]} fontSize={0.04} />
                 
                 <QueryBuilder position={[0, -0.01, -ref?.current?.scale?.y/2]} scale={[1, 1, 0.1]} />
 

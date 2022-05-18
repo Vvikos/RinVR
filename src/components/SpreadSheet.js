@@ -125,7 +125,6 @@ function DataCol({colId, position, rotation, scale}){
   }, [scale, gridSize]);
 
   const data = useMemo(() => {
-    console.log('DATAROW', csv, sessionCodeId);
     return csv[colInterval[0]+colId];
   }, [csv, sessionCodeId, colInterval, colId]);
 
