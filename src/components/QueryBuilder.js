@@ -594,14 +594,14 @@ function QueryBuilder({ position, scale }) {
         if(filter!='')
             query.filter = filter;
         
-        if(groupbyCols.legnth>0)
+        if(groupbyCols.length>0)
             query.group_by = groupbyCols;
 
         let summarize = '';
         if(summarizeCol!='')
             summarize = [{"operation": summarizeOperator[0], "column":summarizeCol}];
 
-        if(groupbyCols.legnth>0 && summarize!='')
+        if(groupbyCols.length>0 && summarize!='')
             query.summarize = summarize;
 
         if(query != {})
