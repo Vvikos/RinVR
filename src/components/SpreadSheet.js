@@ -216,7 +216,6 @@ function SpreadSheet({ position }){
       posZ0 = posZ1;
       
       let colid = (filledCols < maxCols ? 0-Math.round((maxCols-filledCols)/2)+i : i);
-      console.log('STARTIDX', Math.round((maxCols-filledCols)/2),'IDX', i,'COL', colid);
 
       cols.push(
         <DataCol

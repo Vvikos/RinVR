@@ -7,16 +7,38 @@ import { RContextProvider, useRContext } from './RContextProvider'
 import '@react-three/fiber'
 import './styles.css'
 
-function SessionCodeId() {
-  const { sessionCodeId } = useRContext();
+function SessionCodeIdManager() {
+  const { sessionCodeId, setSessionState } = useRContext();
+
+  function connectToSession() {
+    let inputSessionId = document.getElementById("sessionId").value;
+    let isnum = /^\d+$/.test(inputSessionId);
+    if(inputSessionId && inputSessionId.length == 6 && isnum)
+      setSessionState(inputSessionId);
+  }
+
+  function createSession() {
+    setSessionState('INIT');
+  }
+
   return (
-    <div className="sessionCodeId" style={{ display: "block" }}>
-      { sessionCodeId ? 
-          'Session Code Id : #'+sessionCodeId
-        :
-          'Session not created'
-      }
-    </div>
+  <>
+    {sessionCodeId ?
+      null
+    :
+      <div 
+        className="sessionCodeId" 
+        style={{ display: "block", height: '98%', width: '99%', backgroundColor: '#000000', flex: 1, flexDirection: 'column', justifyContent: 'center', alignContent: 'center' }}
+      >
+        <label>Existing Session ID (6 numbers):</label>
+        <input type="text" id="sessionId" required minLength="6" maxLength="6" size="10" />
+        <input type='button' value='Connect' onClick={connectToSession}/>
+        OR
+        <input type='button' value='Create Session' onClick={createSession} />
+        <p color='red'>{}</p>
+      </div>
+    }
+  </>
   )
 }
 
@@ -33,7 +55,7 @@ function App() {
         </RContextProvider>
       </VRCanvas>
       <RContextProvider>
-          <SessionCodeId />
+          <SessionCodeIdManager />
       </RContextProvider>
     </>
   )

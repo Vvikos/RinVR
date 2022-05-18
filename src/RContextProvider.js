@@ -37,7 +37,9 @@ const RContext = createContext({
     cellSelectionMode: false,
     setCellSelectionMode: () => { },
     sendSelectRequest: () => { },
-    sessionCodeId: null
+    sessionCodeId: null,
+    setSessionCodeId: () => { },
+    setSessionState: () => { }
 
 });
 
@@ -59,16 +61,23 @@ function RContextProvider({ children }) {
     const [colSelectionMode, setColSelectionMode] = useState(false);
     const [selectQueryPool, setSelectQueryPool] = useState({});
     const [sessionCodeId, setSessionCodeId] = useState(null);
+    const [sessionState, setSessionState] = useState('DISCONNECTED');
 
     const FETCH_SIZE = 40;
+
+    useEffect(() => {
+        if(sessionState=='INIT'){
+            createSessionCodeId();
+        }else if(sessionState!='DISCONNECTED'){
+            connectSessionCodeId(sessionState);
+        }
+    }, [sessionState]);
 
     useEffect(() => {
         if(sessionCodeId){
             RService.getCsvFiles()
                 .then((res) => setCsvFiles(['sample.csv']))
                 .catch(error => console.log('ERROR', error));
-        }else{
-            getSessionCodeId();
         }
     }, [sessionCodeId]);
 
@@ -91,7 +100,7 @@ function RContextProvider({ children }) {
 
         RService.getCsv(sessionCodeId, csvFiles[0], fetchInterval)
             .then(response => setCsv(response))
-            .catch(error => console.log('ERROR', error));
+            .catch(error => { setSessionCodeId(null); console.log('ERROR', error)});
     }, [fetchInterval]);
 
     useEffect(() => {
@@ -113,10 +122,22 @@ function RContextProvider({ children }) {
         }
     }, [csv]);
 
-    function getSessionCodeId(){
-        RService.getSessionCodeId()
+    function createSessionCodeId(){
+        RService.createSessionCodeId()
             .then(code => setSessionCodeId(code))
             .catch(error => console.log('ERROR', error));
+    }
+
+    function connectSessionCodeId(code){
+        RService.connectSessionCodeId(code)
+            .then(function(response) {
+                if (!response.ok) {
+                    setSessionCodeId(null);
+                } else {
+                    setSessionCodeId(code);
+                }
+            })
+            .catch(error => setSessionCodeId(null));
     }
 
     function incrementColInterval() {
@@ -208,7 +229,9 @@ function RContextProvider({ children }) {
             cellSelectionMode: cellSelectionMode,
             setCellSelectionMode: setCellSelectionMode,
             sendSelectRequest: setSelectQueryPool,
-            sessionCodeId: sessionCodeId
+            sessionCodeId: sessionCodeId,
+            setSessionCodeId: setSessionCodeId,
+            setSessionState: setSessionState
         }}>
             {children}
         </RContext.Provider>
@@ -293,7 +316,7 @@ class RService {
             });
     }
 
-    static async getSessionCodeId() {
+    static async createSessionCodeId() {
         const requestOptions = {
             method: 'POST',
             mode: 'cors'
@@ -315,6 +338,15 @@ class RService {
                 console.log(e);
                 return e;
             });
+    }
+
+    static async connectSessionCodeId(code) {
+        const requestOptions = {
+            method: 'GET',
+            mode: 'cors'
+        };
+
+        return fetch(API_R + "/session?session_code="+code, requestOptions);
     }
 }
 

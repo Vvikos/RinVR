@@ -19,7 +19,6 @@ function Key({letter, position}){
     }
 
     function selectLetter(){
-      console.log("test");
     }
 
     const normalMaterial = useMemo(() => {
