@@ -1,0 +1,23 @@
+version: '3.3'
+
+services:
+  r-in-vr-react-xr:
+    image: r-in-vr-react-xr
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+       - "3000:80"
+    networks:
+       - web
+    labels: # for traefik, delete this if not needed
+       - "traefik.enable=true" # Auto-search deactivated so we need to specify the service enable
+       - "traefik.docker.network=web" # On the network web
+       - "traefik.http.routers.vr.rule=Host(vr.achencraft.fr)"
+       - "traefik.http.routers.vr.tls=true" # Routeur https activé
+       - "traefik.http.routers.vr.tls.certresolver=default" # Cert resolver
+       - "traefik.http.services.vr.loadbalancer.server.port=3000"
+networks:
+    web:
+      external:
+        name: web
