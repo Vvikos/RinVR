@@ -1,3 +1,6 @@
+/**
+ * @module UserPreferences
+ */
 import { useMemo, useState } from 'react';
 import { Interactive } from '@react-three/xr';
 import { MeshBasicMaterial, FrontSide, PlaneBufferGeometry, CanvasTexture, LinearFilter, RepeatWrapping } from 'three';
@@ -7,6 +10,17 @@ import Button from './Button';
 import DropDown from './DropDown';
 import { darker_panel, blue_button } from '../helpers/colors';
 
+
+/**
+ * Insérer du texte avec un canva
+ * @param {} position - Position
+ * @param {} backgroundColor - Couleur de l'arrière plan
+ * @param {} textColor - Couleur du texte
+ * @param {} fontSize - Taille du texte
+ * @param {} width - Largeur du canva
+ * @param {} meshScale - Echelle du canva
+ * @returns {} - Texte
+ */
 function InsertText({position, backgroundColor, textColor, fontSize, text, width, meshScale})
 {
     const normalMaterial = useMemo(() => {
@@ -52,6 +66,11 @@ function InsertText({position, backgroundColor, textColor, fontSize, text, width
       )
 }
 
+/**
+ * Panneau d'affichage pour modifier les dimensions du tableau
+ * @param {} position - Position
+ * @returns {} - Modifie le tableau courant
+ */
 function ChangeGrid({position})
 {
     const { gridSize, incrementColGrid, incrementRowGrid, decrementColGrid, decrementRowGrid, displayAngles, setDisplayAngles, sessionCodeId } = useRContext();
@@ -95,6 +114,7 @@ function ChangeGrid({position})
         </>
     );
 }
+
 
 function UserPreferences({position})
 {

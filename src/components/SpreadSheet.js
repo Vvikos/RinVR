@@ -1,3 +1,6 @@
+/**
+ * @module SpreadSheet
+ */
 import { useMemo, useState, useEffect } from 'react';
 import { MeshBasicMaterial, DoubleSide, PlaneBufferGeometry, CanvasTexture, LinearFilter, RepeatWrapping } from 'three';
 import { Interactive } from '@react-three/xr';
@@ -6,6 +9,15 @@ import { normal_light, normal_darker, normalMaterial, hoveredMaterial, hoveredFi
 
 const backgroundGeometry = new PlaneBufferGeometry(1, 1);
 
+/**
+ * Interaction des cellules
+ * @param {} colId - Id colonne
+ * @param {} cellId - Id Cellule
+ * @param {} position - Position
+ * @param {} rotation - Rotation
+ * @param {} scale - Echelle
+ * @returns {} - Cellule interactive
+ */
 function InteractiveCell({colId, cellId, position, rotation, scale}){
   const { rowInterval, colInterval, selectedCols, setSelectedCols, selectedCells, setSelectedCells, cellSelectionMode, colSelectionMode } = useRContext();
   const [selected, setSelected] = useState(false);
@@ -89,6 +101,14 @@ function InteractiveCell({colId, cellId, position, rotation, scale}){
   )
 }
 
+/**
+ * Interaction des données
+ * @param {} colId - Id colonne
+ * @param {} position - Position
+ * @param {} rotation - Rotation
+ * @param {} scale - Echelle
+ * @returns {} - Récupérer les valeurs des cellules
+ */
 function DataCol({colId, position, rotation, scale}){
   const { csv, gridSize, colInterval, rowInterval } = useRContext();
   const fontSize = 45;
@@ -183,6 +203,11 @@ function DataCol({colId, position, rotation, scale}){
   )
 }
 
+/**
+ * Tableau 3D qui affichent une partie des données du CSV issu du serveur
+ * @param {} position - Position
+ * @returns {} - Afficher un tableau de données en 180° et 360°
+ */
 function SpreadSheet({ position }){
   const { csv, gridSize, displayAngles } = useRContext();
   

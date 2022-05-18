@@ -52,6 +52,15 @@ https://r-vr.pages.unistra.fr/r-in-vr-react-xr
   <img src="img/controller.jpg" width="600"><br>
 </p>
 
+## Documentation 
+
+Pour générer la documentation depuis la racine du projet :
+
+```sh
+$ jsdoc src -r -d docs
+```
+Puis ouvrez le fichier **index.html** dans le dossier **docs**.
+
 ## Licences
 
 Université de Strasbourg - Master 2 Sciences et Ingénierie du Logiciel - Projet Master - 2021/2022
