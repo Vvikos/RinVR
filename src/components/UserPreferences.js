@@ -115,7 +115,11 @@ function ChangeGrid({position})
     );
 }
 
-
+/**
+ * Parametrage de l'utilisateur
+ * @param {} position - Position
+ * @returns {} - Panneau d'affichage pour modifier les dimensions du tableau
+ */
 function UserPreferences({position})
 {
     return (

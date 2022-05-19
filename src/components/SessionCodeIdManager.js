@@ -1,8 +1,15 @@
+/**
+ * @module SessionCodeIdManager
+ */
 import '../styles.css'
 import { useRContext } from '../RContextProvider'
 import React from 'react';
 import { Alert } from '@material-ui/lab';
 
+/**
+ * Gestion de la creation de session / connexion à une session existante
+ * @returns {} - Page de connexion 
+ */
 function SessionCodeIdManager() {
     const { sessionCodeId, setSessionState } = useRContext();
     const [session, setSession] = React.useState(null);
