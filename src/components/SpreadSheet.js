@@ -30,7 +30,6 @@ function InteractiveCell({colId, cellId, position, rotation, scale}){
     let selectedCell = (selectedCells.findIndex(element => element[0] == elementToFind[0] && element[1] == elementToFind[1])>=0 ? true : false);
     let selectedCol = (selectedCols.findIndex(element => element == colIdx)>=0 ? true : false);
     setSelected(selectedCell || selectedCol);
-    //setSelected(true);
   }, [selectedCols, selectedCells, colInterval, rowInterval]);
 
   function select() {

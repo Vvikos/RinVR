@@ -573,7 +573,7 @@ function Reset({ position, scale, onReset }){
 function QueryBuilder({ position, scale }) {
     const { sendSelectRequest } = useRContext();
 
-    const [operatorFilter, setOperatorFilter] = useState(["==", "!="]);
+    const [operatorFilter, setOperatorFilter] = useState(["=", "<>", "<", "<=", ">", ">="]);
     const [selectedColFilter, setSelectedColFilter] = useState('');
     const [selectedCellFilter, setSelectedCellFilter] = useState('');
 
@@ -588,8 +588,13 @@ function QueryBuilder({ position, scale }) {
             query.select = selectCols;
         
         let filter = '';
+        let operator = operatorFilter[0];
+        if(operator=='=')
+            operator='=='
+        else if(operator=='<>')
+            operator='!='
         if(selectedColFilter!='' && selectedCellFilter!='')
-            filter = selectedColFilter+' '+operatorFilter[0]+' \''+selectedCellFilter+'\'';
+            filter = selectedColFilter+' '+operator+' \''+selectedCellFilter+'\'';
         
         if(filter!='')
             query.filter = filter;

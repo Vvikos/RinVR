@@ -321,12 +321,12 @@ class RService {
 
         return fetch(API_R + "/csv?session_code="+sessionCodeId+"&name="+csvName+"&offset="+fetchInterval[0]+"&limit="+fetchInterval[1], requestOptions)
             .then(res => {
-                if(res.status==200 || res.status==201){
+                if(res.ok || res.status==200 || res.status==201){
                     const reader = res.body.getReader();
                     return reader.read();
                 }else{
-
-                    throw 'Server Error';
+                    const error = (data && data.message) || res.status;
+                    return Promise.reject(error);
                 }
             })
             .then(result => {
