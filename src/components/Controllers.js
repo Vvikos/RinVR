@@ -69,7 +69,7 @@ function Controllers() {
         //swap selected file to first file
         [newCsvFiles[0], newCsvFiles[idx]] = [newCsvFiles[idx], newCsvFiles[0]];
         setCsvFiles(newCsvFiles);
-        console.log('new csv files', newCsvFiles);
+        console.log('CSV FILES LIST', newCsvFiles);
     }
 
     useFrame(() => {

@@ -45,7 +45,7 @@ $ npm start
 Pour exécuter en ligne :
 
 ```html
-https://r-vr.pages.unistra.fr/r-in-vr-react-xr
+http://vr2.achencraft.fr:3000
 ```
 
 ## Utilisation

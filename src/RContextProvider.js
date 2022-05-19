@@ -60,7 +60,7 @@ function useRContext() {
  * @returns {} - Provider pour le R contexte
  */
 function RContextProvider({ children }) {
-    const [gridSize, setGridSize] = useState([5, 5]);
+    const [gridSize, setGridSize] = useState([10, 12]);
     const [csv, setCsv] = useState([]);
     const [selectedCols, setSelectedCols] = useState([]);
     const [selectedCells, setSelectedCells] = useState([]);
@@ -183,7 +183,7 @@ function RContextProvider({ children }) {
     }
 
     function incrementColGrid() {
-        if(gridSize[0] < 30)
+        if(gridSize[0] < 20)
             setGridSize([gridSize[0]+1, gridSize[1]]);
     }
 
@@ -193,7 +193,7 @@ function RContextProvider({ children }) {
     }
 
     function incrementRowGrid() {
-        if(gridSize[1] < 50)
+        if(gridSize[1] < 25)
             setGridSize([gridSize[0], gridSize[1]+1]);
     }
 
