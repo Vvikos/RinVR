@@ -508,7 +508,7 @@ function SummarizeBuilder({ position, scale, summariseOperatorValue, onSummarise
     return (
         <Box position={position} scale={scale} color={darker_panel}>
             <ButtonQuery position={[0,0,position[2]+0.1]} scale={[0.5, 0.15, scale[2]]} textColor={'#ffffff'} backColor={blue_button} text={"SUMMARIZE"}/>
-            <DropDown position={[-0.3,-0.25,position[2]+0.1]} scale={[0.3, 0.2, scale[2]]} color={0xffffff} dropDownValue={summariseOperatorValue} onChangeValue={onDropDownChange} fontSize={0.08} />
+            <DropDown position={[-0.3,-0.25,position[2]+0.1]} scale={[0.35, 0.2, scale[2]]} color={0xffffff} dropDownValue={summariseOperatorValue} onChangeValue={onDropDownChange} fontSize={0.06} />
             <ColumnField position={[0.15, -0.25,position[2]+0.1]} scale={[0.5, 0.2, scale[2]]} selectedColValue={summariseColValue} onColSelection={onSummariseColChange} />
         </Box>
       )
