@@ -11,17 +11,17 @@ function SessionCodeIdManager() {
     const [error, setError] = React.useState("");
     
     React.useEffect(() => {
-      if(sessionCodeId == "#00001"){
+      if(!session || session=="#00001" || sessionCodeId=="#00001"){
         setError("Session ID does not exist !");
+        setSession("#00001");
+        setPanelDiplayed(true);
+      }else{
         setSession(sessionCodeId);
-      } 
-  }, [sessionCodeId]);
+        setPanelDiplayed(false);
+      }
 
-  React.useEffect(() => {
-    if(session == "#00001"){
-      setError("Session ID does not exist !");
-    } 
-}, [session]);
+      console.log(session, sessionCodeId);
+    }, [sessionCodeId, session]);
 
     function connectToSession() {
       let inputSessionId = document.getElementById("sessionId").value;
@@ -35,7 +35,6 @@ function SessionCodeIdManager() {
       if(inputSessionId && inputSessionId.length == 6 && isnum){
         setSessionState(inputSessionId);
         setSession(sessionCodeId);
-        setPanelDiplayed(false);
       }
 
       if(inputSessionId.length == 0){

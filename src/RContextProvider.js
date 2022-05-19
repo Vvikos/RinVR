@@ -112,7 +112,7 @@ function RContextProvider({ children }) {
             return;
         }
 
-        RService.getCsv(sessionCodeId, csvFiles[0], fetchInterval)
+        RService.getCsvWithSelect(sessionCodeId, csvFiles[0], fetchInterval, selectQueryPool)
             .then(response => setCsv(response))
             .catch(error => { setSessionCodeId("#00001"); console.log('ERROR', error)});
     }, [fetchInterval, sessionCodeId]);
