@@ -30,6 +30,7 @@ function InteractiveCell({colId, cellId, position, rotation, scale}){
     let selectedCell = (selectedCells.findIndex(element => element[0] == elementToFind[0] && element[1] == elementToFind[1])>=0 ? true : false);
     let selectedCol = (selectedCols.findIndex(element => element == colIdx)>=0 ? true : false);
     setSelected(selectedCell || selectedCol);
+    //setSelected(true);
   }, [selectedCols, selectedCells, colInterval, rowInterval]);
 
   function select() {
@@ -109,7 +110,7 @@ function InteractiveCell({colId, cellId, position, rotation, scale}){
  * @param {} scale - Echelle
  * @returns {} - Récupérer les valeurs des cellules
  */
-function DataCol({colId, position, rotation, scale}){
+function DataCol({colId, position, positionInteractiveCell, rotation, scale, scaleInteractiveCell}){
   const { csv, sessionCodeId, gridSize, colInterval, rowInterval } = useRContext();
   const fontSize = 45;
 
@@ -179,8 +180,8 @@ function DataCol({colId, position, rotation, scale}){
     const cells = [];
 
     let maxRows = gridSize[1];
-    let cellScale = [scale[0], scale[1]/maxRows, scale[2]+0.1];
-    let pos = [position[0], position[1]+cellScale[1]*maxRows/2-cellScale[1]/2, position[2]+0.2];
+    let cellScale = [scaleInteractiveCell[0], scaleInteractiveCell[1]/maxRows, scaleInteractiveCell[2]];
+    let pos = [positionInteractiveCell[0], positionInteractiveCell[1]+cellScale[1]*maxRows/2-cellScale[1]/2, positionInteractiveCell[2]];
     for (let i=0; i < maxRows; i++){
       cells.push(
         <InteractiveCell
@@ -221,8 +222,10 @@ function SpreadSheet({ position }){
     let filledCols = csv.length;
     let pi_coeff = (disAnge*(Math.PI/180.))/maxCols;
     let circle_ray = 30;
+    let circle_ray_ic = 29.5;
     let size, pos, rotation;
-    
+    let size_i, pos_i, rotation_i;
+
     let posX0 = (circle_ray*Math.cos(-1*(maxCols-1)*pi_coeff));
     let posZ0 = (circle_ray*Math.sin(-1*(maxCols-1)*pi_coeff));
 
@@ -231,25 +234,43 @@ function SpreadSheet({ position }){
 
     size=[Math.sqrt(((posX1-posX0)**2)+((posZ1-posZ0)**2)), gridSize[1]*1.5, 1];
 
+    let posX0_i = (circle_ray_ic*Math.cos(-1*(maxCols-1)*pi_coeff));
+    let posZ0_i = (circle_ray_ic*Math.sin(-1*(maxCols-1)*pi_coeff));
+
+    let posX1_i = (circle_ray_ic*Math.cos(-1*(maxCols)*pi_coeff));
+    let posZ1_i = (circle_ray_ic*Math.sin(-1*(maxCols)*pi_coeff));
+
+    size_i=[Math.sqrt(((posX1_i-posX0_i)**2)+((posZ1_i-posZ0_i)**2)), gridSize[1]*1.5, 1];
+
     for (let i=0; i < maxCols; i++){
       posX1 = (circle_ray*Math.cos(-1*(maxCols-i)*pi_coeff));
       posZ1 = (circle_ray*Math.sin(-1*(maxCols-i)*pi_coeff));
       
+      posX1_i = (circle_ray_ic*Math.cos(-1*(maxCols-i)*pi_coeff));
+      posZ1_i = (circle_ray_ic*Math.sin(-1*(maxCols-i)*pi_coeff));
+
       rotation = [0, -(pi_coeff*i) + (disAnge==360 ? -Math.PI/2 : +Math.PI/2), 0];
 
       pos = [posX1, position[1], posZ1];
 
+      pos_i = [posX1_i, position[1], posZ1_i];
+
       posX0 = posX1;
       posZ0 = posZ1;
       
+      posX0_i = posX1_i;
+      posZ0_i = posZ1_i;
+
       let colid = (filledCols < maxCols ? 0-Math.round((maxCols-filledCols)/2)+i : i);
 
       cols.push(
         <DataCol
           key={'Col'+i}
           position={pos} 
+          positionInteractiveCell={pos_i}
           rotation={rotation}
           scale={size}
+          scaleInteractiveCell={size_i}
           colId={colid} 
         />
       );
