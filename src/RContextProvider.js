@@ -69,7 +69,7 @@ function RContextProvider({ children }) {
     const [rowInterval, setRowInterval] = useState([0, 9]);
     const [colInterval, setColInterval] = useState([0, 9]);
     const [displayAngles, setDisplayAngles] = useState(["180","360"]);
-    const [cellSelectionMode, setCellSelectionMode] = useState(false);
+    const [cellSelectionMode, setCellSelectionMode] = useState(null);
     const [colSelectionMode, setColSelectionMode] = useState(false);
     const [selectQueryPool, setSelectQueryPool] = useState({});
     const [sessionCodeId, setSessionCodeId] = useState(null);

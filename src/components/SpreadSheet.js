@@ -68,7 +68,7 @@ function InteractiveCell({colId, cellId, position, rotation, scale}){
 
   return (
     <>
-      {(cellSelectionMode && cellId!=0) || (colSelectionMode && cellId==0)? 
+      {(cellSelectionMode==colId && cellId!=0) || (colSelectionMode && cellId==0)? 
         <Interactive onSelectStart={select} onHover={hoverCell} onBlur={blurCell} >
           {(!selected && !hovered) || cellId==0 ?
             <mesh rotation={rotation} scale={scale} position={position} geometry={backgroundGeometry} material={normalMaterial} />

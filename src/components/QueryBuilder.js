@@ -232,7 +232,7 @@ function ColumnField({ position, rotation, scale, selectedColValue, onColSelecti
  * @param {} onCellSelection - Fonction qui met à jour les données
  * @returns {} - Renvoie une cellule
  */
-function CellField({ position, rotation, scale, selectedCellValue, onCellSelection }) {
+function CellField({ position, rotation, scale, selectedCellValue, onCellSelection, selectedColIdFilter }) {
     const { csv, selectedCells, setSelectedCells, colSelectionMode, cellSelectionMode, setCellSelectionMode } = useRContext();
     const [inSelection, setInSelection] = useState(false);
     const [hovered, setHovered] = useState(false);
@@ -250,11 +250,11 @@ function CellField({ position, rotation, scale, selectedCellValue, onCellSelecti
     function changeSelectionMode() {
         if(!inSelection && !colSelectionMode && !cellSelectionMode){
             setInSelection(true);
-            setCellSelectionMode(true);
+            setCellSelectionMode(selectedColIdFilter);
         }
         if(inSelection && cellSelectionMode){
             setInSelection(false);
-            setCellSelectionMode(false);
+            setCellSelectionMode(null);
             setSelectedCells([]);
         }
     }
@@ -273,7 +273,7 @@ function CellField({ position, rotation, scale, selectedCellValue, onCellSelecti
                 onCellSelection(selection);
             }
             setInSelection(false);
-            setCellSelectionMode(false);
+            setCellSelectionMode(null);
             setSelectedCells([]);
         }
     }, [selectedCells])
@@ -409,7 +409,7 @@ function SelectBuilder({ position, scale, selectedCols, onColSelection }) {
  * @param {} setSelectedCellFilter - Fonction qui met à jour les données
  * @returns {} - Renvoie un ensemble de composants
  */
-function FilterBuilder({ position, scale, operatorFilter, setOperatorFilter, selectedColFilter, setSelectedColFilter, selectedCellFilter, setSelectedCellFilter={setSelectedCellFilter} }) {
+function FilterBuilder({ position, scale, operatorFilter, setOperatorFilter, selectedColFilter, setSelectedColFilter, selectedCellFilter, setSelectedCellFilter, selectedColIdFilter }) {
     const [hovered, setHovered] = useState(false);
     const [activated, setActivated] = useState(false);
 
@@ -419,6 +419,14 @@ function FilterBuilder({ position, scale, operatorFilter, setOperatorFilter, sel
 
     function blurCell() {
         setHovered(false);
+    }
+
+    const onDropDownFilterChange = (value) => {
+        let newFilters = operatorFilter.slice();
+        let idx = newFilters.indexOf(value);
+        //swap selected file to first file
+        [newFilters[0], newFilters[idx]] = [newFilters[idx], newFilters[0]];
+        setOperatorFilter(newFilters);
     }
 
     return (
@@ -435,8 +443,12 @@ function FilterBuilder({ position, scale, operatorFilter, setOperatorFilter, sel
             {activated ?
             <>
                 <ColumnField position={[position[0]-scale[0]/16,-0.4,position[2]]} scale={[scale[0]/4, 0.8, scale[2]]}  selectedColValue={selectedColFilter} onColSelection={setSelectedColFilter} />
-                <DropDown position={[position[0]-scale[0]/16+scale[0]/5,-0.4,position[2]]} scale={[0.15, 0.8, scale[2]]}  color={0xffffff} onChangeValue={(value) => {setOperatorFilter(value)}} dropDownValue={operatorFilter} fontSize={0.08} />
-                <CellField position={[position[0]-scale[0]/16+2*scale[0]/5,-0.4,position[2]]} scale={[scale[0]/4, 0.8, scale[2]]}  selectedCellValue={selectedCellFilter} onCellSelection={setSelectedCellFilter} />
+                <DropDown position={[position[0]-scale[0]/16+scale[0]/5,-0.4,position[2]]} scale={[0.15, 0.8, scale[2]]}  color={0xffffff} onChangeValue={onDropDownFilterChange} dropDownValue={operatorFilter} fontSize={0.08} />
+                { selectedColIdFilter ?
+                    <CellField position={[position[0]-scale[0]/16+2*scale[0]/5,-0.4,position[2]]} scale={[scale[0]/4, 0.8, scale[2]]}  selectedCellValue={selectedCellFilter} onCellSelection={setSelectedCellFilter} selectedColIdFilter={selectedColIdFilter} />
+                :
+                    null
+                }
             </>
             : 
                 null
@@ -571,16 +583,26 @@ function Reset({ position, scale, onReset }){
  * @returns {} - Reqûete
  */
 function QueryBuilder({ position, scale }) {
-    const { sendSelectRequest } = useRContext();
+    const { csv, sendSelectRequest } = useRContext();
 
     const [operatorFilter, setOperatorFilter] = useState(["=", "<>", "<", "<=", ">", ">="]);
     const [selectedColFilter, setSelectedColFilter] = useState('');
     const [selectedCellFilter, setSelectedCellFilter] = useState('');
+    const [selectedColIdFilter, setSelectedColIdFilter] = useState(null);
 
     const [selectCols, setSelectCols] = useState(['*']);
     const [groupbyCols, setGroupbyCols] = useState([]);
     const [summarizeOperator, setSummarizeOperator] = useState(["mean", "sum", "min", "max"]);
     const [summarizeCol, setSummarizeCol] = useState('');
+
+    useEffect(() => {
+        let newSelectedColId=-1;
+        if(csv && csv.length>0)
+            newSelectedColId = csv.findIndex(function(value) {return value[0]==selectedColFilter;});
+        if(newSelectedColId==-1)
+            newSelectedColId=null;
+        setSelectedColIdFilter(newSelectedColId);
+    }, [selectedColFilter])
 
     function submitRequest() {
         let query = {};
@@ -634,6 +656,7 @@ function QueryBuilder({ position, scale }) {
                 setSelectedColFilter={setSelectedColFilter}
                 selectedCellFilter={selectedCellFilter}
                 setSelectedCellFilter={setSelectedCellFilter}
+                selectedColIdFilter={selectedColIdFilter}
             />
             <GroupByBuilder position={[-scale[0]/4,-scale[1]/4-0.06,1]} scale={[scale[0]/2, 3*scale[1]/4, scale[2]]} groupbyCols={groupbyCols} onGroupByChange={setGroupbyCols} />
             {groupbyCols.length>0 ?
