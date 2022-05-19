@@ -65,13 +65,13 @@ function ColumnsField({ position, rotation, scale, maxLines, selectedColsValue, 
     const canvas = useMemo(() => {
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
-        canvas.width = scale[0]*maxLines*50;
+        canvas.width = maxLines*50;
         canvas.height = fontSize*maxLines;
         context.textBaseline = 'top';
         context.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial, sans-serif`;
     
         return canvas;
-    }, [scale]);
+    }, []);
     
     const dataMaterial = useMemo(() => {
         const context = canvas.getContext('2d');
@@ -184,7 +184,7 @@ function ColumnField({ position, rotation, scale, selectedColValue, onColSelecti
         context.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial, sans-serif`;
     
         return canvas;
-    }, [scale]);
+    }, []);
     
     const dataMaterial = useMemo(() => {
         const context = canvas.getContext('2d');
@@ -287,7 +287,7 @@ function CellField({ position, rotation, scale, selectedCellValue, onCellSelecti
         context.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial, sans-serif`;
     
         return canvas;
-    }, [scale]);
+    }, []);
     
     const dataMaterial = useMemo(() => {
         const context = canvas.getContext('2d');
@@ -347,7 +347,7 @@ function ButtonQuery({text, position, scale, textColor='#000000', backColor='#ff
         context.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial, sans-serif`;
     
         return canvas;
-    }, [scale]);
+    }, []);
     
     const dataMaterial = useMemo(() => {
         const context = canvas.getContext('2d');
@@ -373,7 +373,7 @@ function ButtonQuery({text, position, scale, textColor='#000000', backColor='#ff
         });
         return material;
 
-    }, [canvas]);
+    }, [canvas, backColor, textColor]);
 
     return(
         <mesh position={position} scale={scale} geometry={backgroundGeometry} material={dataMaterial} />

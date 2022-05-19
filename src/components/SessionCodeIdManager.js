@@ -26,8 +26,6 @@ function SessionCodeIdManager() {
         setSession(sessionCodeId);
         setPanelDiplayed(false);
       }
-
-      console.log(session, sessionCodeId);
     }, [sessionCodeId, session]);
 
     function connectToSession() {
