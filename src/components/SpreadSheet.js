@@ -19,7 +19,7 @@ const backgroundGeometry = new PlaneBufferGeometry(1, 1);
  * @returns {} - Cellule interactive
  */
 function InteractiveCell({colId, cellId, position, rotation, scale}){
-  const { rowInterval, colInterval, selectedCols, setSelectedCols, selectedCells, setSelectedCells, cellSelectionMode, colSelectionMode } = useRContext();
+  const { csv, rowInterval, colInterval, selectedCols, setSelectedCols, selectedCells, setSelectedCells, cellSelectionMode, colSelectionMode } = useRContext();
   const [selected, setSelected] = useState(false);
   const [hovered, setHovered] = useState(false);
 
@@ -42,7 +42,7 @@ function InteractiveCell({colId, cellId, position, rotation, scale}){
       let idx = selectedCols.findIndex(element => element == colIdx);
       if(idx!=-1){
         newSelectedCols.splice(idx, 1);
-      } else {
+      } else if(colIdx<csv.length){
         newSelectedCols.push(colIdx);
       }
       setSelectedCols(newSelectedCols);
@@ -52,7 +52,7 @@ function InteractiveCell({colId, cellId, position, rotation, scale}){
       let idx = selectedCells.findIndex(element => element[0] == elementToFind[0] && element[1] == elementToFind[1]);
       if(idx!=-1){
         newSelectedCells.splice(idx, 1);
-      } else {
+      } else if(colIdx<csv.length && cellIdx<csv[colIdx].length){
         newSelectedCells.push(elementToFind);
       }
       setSelectedCells(newSelectedCells);

@@ -113,7 +113,9 @@ function RContextProvider({ children }) {
         }
 
         RService.getCsvWithSelect(sessionCodeId, csvFiles[0], fetchInterval, selectQueryPool)
-            .then(response => setCsv(response))
+            .then(response => {
+                setCsv(response);
+            })
             .catch(error => { setSessionCodeId("#00001"); console.log('ERROR', error)});
     }, [fetchInterval, sessionCodeId]);
 
@@ -124,14 +126,21 @@ function RContextProvider({ children }) {
         }
 
         RService.getCsvWithSelect(sessionCodeId, csvFiles[0], fetchInterval, selectQueryPool)
-            .then(response => setCsv(response))
+            .then(response => {
+                setCsv(response);
+            })
             .catch(error => console.log('ERROR', error));
     }, [selectQueryPool]);
 
     useEffect(() => {
         if (csv && csv.length > 0 && csv[0].length > 0) {
-            setRowInterval([0, ((csv[0].length < gridSize[1] - 1) ? csv[0].length : gridSize[1] - 1)]);
-            setColInterval([0, ((csv.length < gridSize[0] - 1) ? csv.length : gridSize[0] - 1)]);
+            if(rowInterval[0]+rowInterval[1]>=csv[0].length){
+                setRowInterval([0, ((csv[0].length < gridSize[1] - 1) ? csv[0].length : gridSize[1] - 1)]);
+                setFetchInterval([0, FETCH_SIZE]); 
+            }
+            
+            if(colInterval[0]+colInterval[1]>=csv.length)
+                setColInterval([0, ((csv.length < gridSize[0] - 1) ? csv.length : gridSize[0] - 1)]);
         }
     }, [csv]);
 
@@ -312,8 +321,13 @@ class RService {
 
         return fetch(API_R + "/csv?session_code="+sessionCodeId+"&name="+csvName+"&offset="+fetchInterval[0]+"&limit="+fetchInterval[1], requestOptions)
             .then(res => {
-                const reader = res.body.getReader();
-                return reader.read();
+                if(res.status==200 || res.status==201){
+                    const reader = res.body.getReader();
+                    return reader.read();
+                }else{
+
+                    throw 'Server Error';
+                }
             })
             .then(result => {
                 const decoder = new TextDecoder('utf-8');
