@@ -9,15 +9,15 @@
   <img src="https://img.shields.io/badge/three-0.139.0-critical.svg" />
 </p>
 
-## Equipe projet
+## Contributors
 
 **Baptiste CERDAN - Janos FALKE - Mikhail GAYDAMAKHA - Thomas STEINMETZ - Victor VOGT**
 
-## Vue d'ensemble
+## General
 
-Ce projet vise à utiliser la réalité virtuelle pour visualiser des tableaux conséquents issus de fichiers CSV envoyé depuis un serveur distant. 
+This project is dedicated to CSV data visualization in virtual reality. 
 
-## Captures d'écran
+## Screenshots
 
 <img src="img/all.png" width="400" height="350"/>
 <img src="img/query_builder.png" width="500" height="250"/>
@@ -26,15 +26,17 @@ Ce projet vise à utiliser la réalité virtuelle pour visualiser des tableaux c
 <img src="img/180.JPG" width="400" height="175"/>
 <img src="img/360.JPG" width="400" height="175"/>
 
-## Fonctionnalités
+## Features
 
-- Visualiser des données extraites d'un fichier CSV à distance => [dépot git côté serveur](https://git.unistra.fr/r-vr/r-in-vr-server-r). 
-- Utiliser des commandes pour isoler vos recherches (select, filter,group by et summerize).
-- Visualiser les données en 180 ou 360 degrés.
+- Remote CSV data visualization => [remote git back-end](https://git.unistra.fr/r-vr/r-in-vr-server-r). 
+- Use commands to isolate data (select, filter,group by et summerize).
+- 180 or 360 degrees display.
 
 ## Installation
 
-Pour exécuter en local :
+To run locally :
+
+Make sure the back-end server is running and accessible.
 
 ```sh
 $ npm install
@@ -42,25 +44,19 @@ and
 $ npm start
 ```
 
-Pour exécuter en ligne :
-
-```html
-http://vr2.achencraft.fr:3000
-```
-
-## Utilisation
+## Use
 <p align="center">
   <img src="img/controller.jpg" width="600"><br>
 </p>
 
 ## Documentation 
 
-Pour générer la documentation depuis la racine du projet :
+Generate documentation :
 
 ```sh
 $ jsdoc src -r -d docs
 ```
-Puis ouvrez le fichier **index.html** dans le dossier **docs**.
+Then open **index.html** in the **docs** folder.
 
 ## Licences
 
